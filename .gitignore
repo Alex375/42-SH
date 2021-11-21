@@ -1,0 +1,24 @@
+# Temp file
+*~
+~*
+\#*
+*#
+\#*\#
+.\#*
+
+# Compilation files
+*.o
+*.out
+*.a
+*.d
+
+# Visual studio code
+.vscode
+launch.json
+
+# Mac
+.DS_Store
+
+# CLion
+.idea/
+cmake-build-debug/
