@@ -1,4 +1,4 @@
-#include "headers/xmalloc.h"
+#include "xalloc.h"
 
 #include <string.h>
 #include <err.h>
@@ -7,22 +7,22 @@ static struct xmalloc_t *get_header(void *data)
 {
     struct xmalloc_t *header = data;
     return --header;
-}
 
+}
 static void check_xmalloc(struct xmalloc_t *res)
 {
     if (res == NULL)
     {
         xfree_all();
-        errx(1, "xmalloc : memory exhausted");
+        errx(1, "xalloc : memory exhausted");
     }
 }
 
-static struct xmalloc_t *init_xmalloc(struct xmalloc_t *res)
+static struct xmalloc_t *init_xmalloc(struct xmalloc_t *res, size_t size)
 {
     res->previous = NULL;
     res->next = head;
-
+    res->allocation_size = size;
     if (head != NULL)
         head->previous = res;
 
@@ -38,7 +38,7 @@ void *xmalloc(size_t size)
     struct xmalloc_t *res = malloc(sizeof(struct xmalloc_t) + size);
     check_xmalloc(res);
 
-    res = init_xmalloc(res);
+    res = init_xmalloc(res, size);
 
     void *data = res;
     return data;
@@ -50,7 +50,7 @@ void *xcalloc(size_t n, size_t size)
     struct xmalloc_t *res = calloc(total_n, sizeof(struct xmalloc_t) + size);
     check_xmalloc(res);
 
-    res = init_xmalloc(res);
+    res = init_xmalloc(res, total_n * size);
 
     void *data = res;
     return data;
@@ -91,7 +91,21 @@ void *xrealloc(void* data, size_t new_size)
     if (xmalloc->next != NULL)
         xmalloc->next->previous = xmalloc;
 
+    xmalloc->allocation_size = new_size;
+
     data = ++xmalloc;
+    return data;
+}
+
+void *xrecalloc(void *data, size_t new_size)
+{
+    size_t old_size = get_header(data)->allocation_size;
+    data = xrealloc(data, new_size);
+
+    char* start_data_addr = data;
+    if (old_size < new_size)
+        memset(start_data_addr + old_size, 0, new_size - old_size);
+
     return data;
 }
 
