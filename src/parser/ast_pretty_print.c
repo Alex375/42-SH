@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "headers/parser.h"
 
@@ -99,8 +100,12 @@ void pp_rec(struct ast *ast, int prof)
 void ast_pretty_print(const char *script, size_t size)
 {
     struct ast *ast;
-    while ((ast = parse_input(script, size)) == NULL)
+
+    while ((errno = 0) || (ast = parse_input(script, size)) != NULL)
     {
-        pp_rec(ast, 0);
+        if (errno == ERROR_PARSING)
+            printf("!!! ERROR WHILE PARSING \n");
+        else
+            pp_rec(ast, 0);
     }
 }
