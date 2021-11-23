@@ -69,11 +69,3 @@ void echo(char *s, char *args)
         printf("\n");
     string_free(new_s);
 }
-
-int main(void)
-{
-    char *s = "bite\\nzizi";
-    char args[6] = "-n";
-    echo(s, args);
-    return 0;
-}
