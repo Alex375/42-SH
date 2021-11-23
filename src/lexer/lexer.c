@@ -2,7 +2,6 @@
 
 #include <string.h>
 
-#include "xalloc.h"
 #include "xstring.h"
 
 struct lexer_info g_lexer_info = { 15,
@@ -35,8 +34,8 @@ static int is_separator(char c)
 
 /**
 ** @brief                   Token-ify a string. Return -1 if it cannot be token-ify
- *else it return the index in the token converter array
-** @param token_str               String to be compared.
+                            *else it return the index in the token converter array
+** @param token_str         String to be compared.
 */
 static int tokenify(char *token_str)
 {
