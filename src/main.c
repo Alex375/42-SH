@@ -1,10 +1,10 @@
-#include <err.h>
 #include <stdio.h>
+#include <string.h>
 
-#include "xalloc.h"
 #include "options.h"
+#include "parser.h"
 #include "read_script.h"
-
+#include "xalloc.h"
 
 int main(int argc, char **argv)
 {
@@ -20,15 +20,19 @@ int main(int argc, char **argv)
     {
         size_t size;
         char *temp = read_script(opt->scripts[i], &size);
-        printf("%s\n", temp);
-        // TODO: call program
+        if (opt->verbose)
+            printf("Executing script %s\n", temp);
+        if (opt->print)
+            ast_pretty_print(opt->scripts[i], size);
         xfree(temp);
     }
 
     for (size_t i = 0; i < opt->nb_command; i++)
     {
-        printf("%s\n", opt->commands[i]);
-        // TODO: call program
+        if (opt->verbose)
+            printf("Executing command \'%s\'\n", opt->commands[i]);
+        if (opt->print)
+            ast_pretty_print(opt->commands[i], strlen(opt->commands[i]));
     }
     xfree_all();
     return 0;

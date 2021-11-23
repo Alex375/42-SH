@@ -24,6 +24,7 @@ struct options
     char **commands;
     int print;
     int help;
+    int verbose;
     size_t nb_script;
     char **scripts;
 };

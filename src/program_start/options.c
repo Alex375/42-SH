@@ -33,13 +33,14 @@ int get_option(struct options *options, int argc, char **argv)
 {
     struct option long_options[] = { { "commands", required_argument, 0, 'c' },
                                      { "pretty_print", no_argument, 0, 'p' },
+                                     { "verbose", no_argument, 0, 'v' },
                                      { "help", no_argument, 0, 'h' },
                                      { 0, 0, 0, 0 } };
     int c;
 
     opterr = 0;
     int long_index = 0;
-    while ((c = getopt_long(argc, argv, "c:ph", long_options, &long_index))
+    while ((c = getopt_long(argc, argv, "c:pvh", long_options, &long_index))
            != -1)
     {
         switch (c)
@@ -55,6 +56,9 @@ int get_option(struct options *options, int argc, char **argv)
             break;
         case 'h':
             options->help = 1;
+            break;
+        case 'v':
+            options->verbose = 1;
             break;
         default:
             fprintf(stderr, "Wrong argument\n");
