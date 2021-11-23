@@ -1,8 +1,9 @@
-#include "xstring.h" // manipulation de string by Lucas
-
 #include <err.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "xstring.h"
+#include "xalloc.h"
 
 struct string *echo_pars(char *s, struct string *new_s)
 {
@@ -30,11 +31,14 @@ struct string *echo_pars(char *s, struct string *new_s)
     return new_s;
 }
 
-//TODO : preparse needed
+// TODO : preparse needed
 void echo(char *s, char *args)
 {
     if (s == NULL)
-        errx(1, "echo.c: String to echo is NULL");
+    {
+        xfree_all();
+        err(1, "echo.c: String to echo is NULL");
+    }
 
     struct string *new_s = string_create();
     new_s = echo_pars(s, new_s);
