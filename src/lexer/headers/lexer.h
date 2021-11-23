@@ -57,11 +57,18 @@ struct lexer_info
 };
 
 /**
-** @brief                   Token-ify the next element of a script.
+** @brief                   Token-ify the next element of a script without popping.
 ** @param script            Script to be lex.
 ** @param size              Size in character of the script.
 */
 struct token_info get_next_token(const char *script, size_t size);
+
+/**
+** @brief                   Token-ify and pop the next element of a script.
+** @param script            Script to be lex.
+** @param size              Size in character of the script.
+*/
+struct token_info pop_token(const char *script, size_t size);
 
 
 #endif // INC_42_SH_TYPE_H

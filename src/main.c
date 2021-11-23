@@ -1,7 +1,7 @@
 #include <err.h>
 #include <stdio.h>
 
-#include "xmalloc.h"
+#include "xalloc.h"
 #include "options.h"
 #include "read_script.h"
 
@@ -21,14 +21,15 @@ int main(int argc, char **argv)
         size_t size;
         char *temp = read_script(opt->scripts[i], &size);
         printf("%s\n", temp);
-        // TODO: call programm
-        free(temp);
+        // TODO: call program
+        xfree(temp);
     }
 
     for (size_t i = 0; i < opt->nb_command; i++)
     {
         printf("%s\n", opt->commands[i]);
-        // TODO: call programm
+        // TODO: call program
     }
+    xfree_all();
     return 0;
 }

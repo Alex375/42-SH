@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include <stdio.h>
 
-#include "xmalloc.h"
+#include "xalloc.h"
 
 void print_usage(void)
 {
@@ -17,7 +17,7 @@ int get_scripts(int argc, char **argv, struct options *options)
     while (optind < argc)
     {
         options->scripts =
-            realloc(options->scripts, ++options->nb_script * sizeof(char *));
+            xrealloc(options->scripts, ++options->nb_script * sizeof(char *));
         options->scripts[options->nb_script - 1] = argv[optind++];
     }
     if (options->nb_script == 0 && options->commands == NULL)
@@ -46,7 +46,8 @@ int get_option(struct options *options, int argc, char **argv)
         {
         case 'c':
             options->commands =
-                realloc(options->commands, ++options->nb_command * sizeof(char *));
+                xrealloc(options->commands, ++options->nb_command * sizeof
+                             (char *));
             options->commands[options->nb_command - 1] = optarg;
             break;
         case 'p':
