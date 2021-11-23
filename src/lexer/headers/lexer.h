@@ -9,10 +9,13 @@ enum token
     IF,
     THEN,
     ELSE,
-    ELIF,
     FI,
+    NOT,
+    OR,
+    AND,
     COMMAND,
-    SEPARATOR,
+    NEWLINE,
+    SEMICOLON,
     QUOTE
 };
 
