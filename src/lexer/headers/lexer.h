@@ -53,7 +53,7 @@ struct lexer_info
     size_t nb_separator;
     size_t pos;
     char *token_converter[16];
-    char separator[3];
+    char *separator[10];
 };
 
 /**
