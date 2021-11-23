@@ -16,7 +16,12 @@ enum token
     T_COMMAND,
     T_NEWLINE,
     T_SEMICOLON,
-    T_QUOTE
+    T_EOF,
+    T_QUOTE,
+    T_O_BRKT,
+    T_C_BRKT,
+    T_O_PRTH,
+    T_C_PRTH
 };
 
 /**

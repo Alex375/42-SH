@@ -15,6 +15,8 @@ typedef enum AST_TYPE
     AST_PIPE,
     AST_REDIR,
     AST_FUNC,
+    AST_LIST,
+    AST_PIPELINE,
     AST_NOT,
     AST_AND,
     AST_OR,
@@ -49,14 +51,6 @@ typedef struct n_if
     ast *true;
     ast *false;
 } n_if;
-
-/**
-** @brief                   <<AST_NOT>> ast member.
-*/
-typedef struct n_not
-{
-    ast *ast;
-} n_not;
 
 /**
 ** @brief                   <<AST_AND, AST_OR>> ast member.
