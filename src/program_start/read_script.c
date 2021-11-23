@@ -15,11 +15,12 @@ char *read_script(char *filename, size_t *size)
     char *res = xmalloc(BUFFER_SIZE + 1);
     *size = 0;
     size_t r = 0;
-    while ((r = fread(res + *size, 1, BUFFER_SIZE + 1, f)))
+    while ((r = fread(res + *size, 1, BUFFER_SIZE, f)))
     {
         *size += r;
-        res = xrecalloc(res, *size);
+        res = xrealloc(res, *size + 1);
     }
+    res[(*size)++] = '\0';
     fclose(f);
     return res;
 }
