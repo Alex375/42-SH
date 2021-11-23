@@ -21,9 +21,9 @@ int main(int argc, char **argv)
         size_t size;
         char *temp = read_script(opt->scripts[i], &size);
         if (opt->verbose)
-            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_", temp);
+            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n", temp);
         if (opt->print)
-            ast_pretty_print(opt->scripts[i], size);
+            ast_pretty_print(temp, size);
         xfree(temp);
     }
 
