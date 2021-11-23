@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         char *temp = read_script(opt->scripts[i], &size);
         printf("%s\n", temp);
         // TODO: call programm
-        free(temp);
+        xfree(temp);
     }
 
     for (size_t i = 0; i < opt->nb_command; i++)
@@ -30,5 +30,6 @@ int main(int argc, char **argv)
         printf("%s\n", opt->commands[i]);
         // TODO: call programm
     }
+    xfree_all();
     return 0;
 }
