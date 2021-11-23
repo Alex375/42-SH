@@ -21,7 +21,7 @@ int main(int argc, char **argv)
         size_t size;
         char *temp = read_script(opt->scripts[i], &size);
         if (opt->verbose)
-            printf("Executing script %s\n", temp);
+            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_", temp);
         if (opt->print)
             ast_pretty_print(opt->scripts[i], size);
         xfree(temp);
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < opt->nb_command; i++)
     {
         if (opt->verbose)
-            printf("Executing command \'%s\'\n", opt->commands[i]);
+            printf("Executing command \n\'%s\'\n", opt->commands[i]);
         if (opt->print)
             ast_pretty_print(opt->commands[i], strlen(opt->commands[i]));
     }
