@@ -16,7 +16,12 @@ struct ast *parse_input(const char *script, size_t size)
 {
     struct token_info tok = get_next_token(script, size);
     if (tok.type == T_EOF || tok.type == T_NEWLINE)
+    {
+        pop_token(script, size);
+        if (tok.type == T_EOF)
+            errno = ERROR_EMPTY_EOF;
         return NULL;
+    }
     struct ast *ast = parse_list(script, size);
 
     tok = pop_token(script, size);
@@ -32,23 +37,23 @@ struct ast *parse_list(const char *script, size_t size)
 
     left = parse_and_or(script, size);
 
-    struct token_info tok = pop_token(script, size);
-    CHECK_SEG_ERROR(tok.type == T_EOF)
-    if (!left || errno == ERROR_PARSING
-        || (tok.type == T_NEWLINE || tok.type == T_EOF))
-        return left;
+    if (!left || errno != 0)
+        return NULL;
+
+    struct token_info tok = get_next_token(script, size);
 
     if (tok.type != T_SEMICOLON)
-        return NULL;
+        return left;
+
+    pop_token(script, size);
 
     right = parse_list(script, size);
 
-    if (!right || errno == ERROR_PARSING || tok.type != T_SEMICOLON)
-    {
-        if (tok.type != T_SEMICOLON)
-            errno = ERROR_PARSING;
+    if (errno != 0)
         return NULL;
-    }
+
+    if (!right)
+        return left;
 
     // BUILD AND/OR
     struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
@@ -69,18 +74,19 @@ struct ast *parse_and_or(const char *script, size_t size)
 
     left = parse_pipeline(script, size);
 
-    struct token_info tok = pop_token(script, size);
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    struct token_info tok = get_next_token(script, size);
 
-    if (!left || errno == ERROR_PARSING
+    if (!left || errno != 0
         || (tok.type != T_OR && tok.type != T_AND))
         return left;
+
+    pop_token(script, size);
 
     skip_newlines(script, size);
 
     right = parse_and_or(script, size);
 
-    if (!right || errno == ERROR_PARSING)
+    if (!right || errno != 0)
         return NULL;
 
     // BUILD AND/OR
@@ -112,17 +118,18 @@ struct ast *parse_pipeline(const char *script, size_t size)
     {
         struct ast *left = parse_command(script, size);
 
-        tok = pop_token(script, size);
-        CHECK_SEG_ERROR(tok.type == T_EOF)
+        tok = get_next_token(script, size);
 
-        if (!left || errno == ERROR_PARSING || tok.type != T_PIPE)
+        if (!left || errno != 0 || tok.type != T_PIPE)
             return left;
+
+        pop_token(script, size);
 
         skip_newlines(script, size);
 
         struct ast *right = parse_pipeline(script, size);
 
-        if (!right || errno == ERROR_PARSING)
+        if (!right || errno != 0)
             return NULL;
 
         // BUILD AND/OR
@@ -133,7 +140,7 @@ struct ast *parse_pipeline(const char *script, size_t size)
         ast = nBinary;
     }
 
-    if (!ast || errno == ERROR_PARSING)
+    if (!ast || errno != 0)
         return NULL;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
@@ -145,11 +152,14 @@ struct ast *parse_pipeline(const char *script, size_t size)
 
 struct ast *parse_command(const char *script, size_t size)
 {
-    struct token_info tok = pop_token(script, size);
+    struct token_info tok = get_next_token(script, size);
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (tok.type == T_IF) // || for || while ...
+    if (tok.type == T_IF || tok.type == T_O_PRTH
+        || tok.type == T_O_BRKT) // || for || while ...
+    {
         return parse_shell_command(script, size);
+    }
 
     return parse_simple_command(script, size);
 }
@@ -170,7 +180,7 @@ struct ast *parse_simple_command(const char *script, size_t size)
     nCmd->cmd_line = tok.command;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_NOT;
+    res->type = AST_CMD;
     res->t_ast = nCmd;
 
     return res;
@@ -191,13 +201,13 @@ struct ast *parse_shell_command(const char *script, size_t size)
         res = parse_compound(script, size);
 
         tok = pop_token(script, size);
-        CHECK_SEG_ERROR(errno == ERROR_PARSING || tok.type == T_EOF
-            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
-            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
+        CHECK_SEG_ERROR(errno != 0 || tok.type == T_EOF
+                        || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
+                        || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
 
         return res;
     case T_IF:
-        return parse_if_rule(script, size);
+        return parse_if_rule(script, size, 0);
 
     default:
         errno = ERROR_PARSING;
@@ -205,7 +215,7 @@ struct ast *parse_shell_command(const char *script, size_t size)
     }
 }
 
-struct ast *parse_if_rule(const char *script, size_t size)
+struct ast *parse_if_rule(const char *script, size_t size, int inElif)
 {
     struct ast *condition;
     struct ast *true = NULL;
@@ -216,7 +226,7 @@ struct ast *parse_if_rule(const char *script, size_t size)
     struct token_info tok = pop_token(script, size);
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (!condition || errno == ERROR_PARSING || tok.type != T_THEN)
+    if (!condition || errno != 0 || tok.type != T_THEN)
     {
         if (tok.type != T_THEN)
             errno = ERROR_PARSING;
@@ -228,18 +238,29 @@ struct ast *parse_if_rule(const char *script, size_t size)
     tok = get_next_token(script, size);
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (!true || errno == ERROR_PARSING)
+    if (!true || errno != 0)
         return NULL;
 
     if (tok.type == T_ELSE)
     {
         pop_token(script, size);
         false = parse_compound(script, size);
-        if (!false || errno == ERROR_PARSING)
+        if (!false || errno != 0)
             return NULL;
     }
 
-    tok = pop_token(script, size);
+    if (tok.type == T_ELIF)
+    {
+        pop_token(script, size);
+        false = parse_if_rule(script, size, 1);
+        if (!false || errno != 0)
+            return NULL;
+    }
+
+    tok = get_next_token(script, size);
+    if (!inElif)
+        pop_token(script, size);
+
     CHECK_SEG_ERROR(tok.type != T_FI)
 
     // BUILD IF
@@ -257,6 +278,12 @@ struct ast *parse_if_rule(const char *script, size_t size)
 
 struct ast *parse_compound(const char *script, size_t size)
 {
+    struct token_info tok = get_next_token(script, size);
+
+    if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
+        || tok.type == T_FI || tok.type == T_C_PRTH || tok.type == T_C_BRKT)
+        return NULL;
+
     struct ast *left;
     struct ast *right;
 
@@ -264,25 +291,25 @@ struct ast *parse_compound(const char *script, size_t size)
 
     left = parse_and_or(script, size);
 
-    struct token_info tok = pop_token(script, size);
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    tok = get_next_token(script, size);
 
-    if (!left || errno == ERROR_PARSING
-        || (tok.type == T_NEWLINE || tok.type == T_EOF))
+    if (!left || errno != 0)
+        return NULL;
+
+    if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
         return left;
 
-    if (tok.type != T_SEMICOLON)
-        return NULL;
+    pop_token(script, size);
+
+    skip_newlines(script, size);
 
     right = parse_compound(script, size);
 
-    if (!right || errno == ERROR_PARSING
-        || (tok.type != T_SEMICOLON && tok.type != T_NEWLINE))
-    {
-        if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
-            errno = ERROR_PARSING;
+    if (errno != 0)
         return NULL;
-    }
+
+    if (!right)
+        return left;
 
     // BUILD AND/OR
     struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));

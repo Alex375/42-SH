@@ -68,6 +68,13 @@ void pp_rec(struct ast *ast, int prof)
     case AST_FUNC:
         break;
     case AST_LIST:
+        binary_ast = ast->t_ast;
+        tab(prof);
+        printf("<< LIST : >>\n");
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("<< --- >>\n");
+        pp_rec(binary_ast->right, prof + 1);
         break;
     case AST_NOT:
         tab(prof);
@@ -100,11 +107,20 @@ void pp_rec(struct ast *ast, int prof)
 void ast_pretty_print(const char *script, size_t size)
 {
     struct ast *ast;
+    errno = 0;
 
-    while ((errno = 0) || (ast = parse_input(script, size)) != NULL)
+    //struct token_info t;
+    //while ((t = pop_token(script, size)).type != T_EOF);
+
+    while (errno != ERROR_EMPTY_EOF)
     {
+        errno = 0;
+        ast = parse_input(script, size);
         if (errno == ERROR_PARSING)
+        {
             printf("!!! ERROR WHILE PARSING \n");
+            break;
+        }
         else
             pp_rec(ast, 0);
     }

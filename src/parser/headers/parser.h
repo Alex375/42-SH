@@ -65,6 +65,7 @@ typedef struct n_binary
 #include <stddef.h>
 
 #define ERROR_PARSING 69
+#define ERROR_EMPTY_EOF 420
 
 /**
 ** @brief               printing the ast obtain from a script
@@ -127,7 +128,7 @@ struct ast *parse_shell_command(const char *script, size_t size);
 ** @param script        string containing block
 ** @param size          len of script parameter
 */
-struct ast *parse_if_rule(const char *script, size_t size);
+struct ast *parse_if_rule(const char *script, size_t size, int inElif);
 
 /**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
