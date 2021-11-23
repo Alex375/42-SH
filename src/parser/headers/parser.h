@@ -16,7 +16,6 @@ typedef enum AST_TYPE
     AST_REDIR,
     AST_FUNC,
     AST_LIST,
-    AST_PIPELINE,
     AST_NOT,
     AST_AND,
     AST_OR,
@@ -61,7 +60,7 @@ typedef struct n_binary
     ast *right;
 } n_binary;
 
-#include "../lexer/headers/lexer.h"
+#include "lexer.h"
 
 #define ERROR_PARSING 69
 
