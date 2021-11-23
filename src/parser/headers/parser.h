@@ -67,62 +67,79 @@ typedef struct n_binary
 #define ERROR_PARSING 69
 
 /**
+** @brief               printing the ast obtain from a script
+** @param script        string containing block
+** @param size          len of script parameter
+*/
+void ast_pretty_print(const char *script, size_t size);
+
+/**
 ** @brief               Parsing an input (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_input(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a list (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_list(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an and / or (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_and_or(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an pipeline (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_pipeline(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a command (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_simple_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a shell command (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_shell_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an if rule (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_if_rule(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
-** @param lex           The lexer output.
+** @param script        string containing block
+** @param size          len of script parameter
 */
 struct ast *parse_compound(const char *script, size_t size);
 
 /**
 ** @brief               calling lexer while newline (cf sh_grammar.txt)
 ** @param script        string containing block
+** @param size          len of script parameter
 */
 void skip_newlines(const char *script, size_t size);
 

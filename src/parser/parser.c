@@ -19,7 +19,7 @@ struct ast *parse_input(const char *script, size_t size)
         return NULL;
     struct ast *ast = parse_list(script, size);
 
-    tok = get_next_token(script, size);
+    tok = pop_token(script, size);
     CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
 
     return ast;
@@ -105,8 +105,7 @@ struct ast *parse_pipeline(const char *script, size_t size)
 
     if (tok.type == T_NOT)
     {
-        tok = pop_token(script, size);
-        CHECK_SEG_ERROR(tok.type == T_EOF)
+        pop_token(script, size);
         ast = parse_pipeline(script, size);
     }
     else
@@ -234,8 +233,7 @@ struct ast *parse_if_rule(const char *script, size_t size)
 
     if (tok.type == T_ELSE)
     {
-        tok = pop_token(script, size);
-        CHECK_SEG_ERROR(tok.type == T_EOF)
+        pop_token(script, size);
         false = parse_compound(script, size);
         if (!false || errno == ERROR_PARSING)
             return NULL;
