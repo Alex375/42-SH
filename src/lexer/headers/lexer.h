@@ -6,17 +6,17 @@
 */
 enum token
 {
-    IF,
-    THEN,
-    ELSE,
-    FI,
-    NOT,
-    OR,
-    AND,
-    COMMAND,
-    NEWLINE,
-    SEMICOLON,
-    QUOTE
+    T_IF,
+    T_THEN,
+    T_ELSE,
+    T_FI,
+    T_NOT,
+    T_OR,
+    T_AND,
+    T_COMMAND,
+    T_NEWLINE,
+    T_SEMICOLON,
+    T_QUOTE
 };
 
 /**
