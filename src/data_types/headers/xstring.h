@@ -39,7 +39,7 @@ void *string_get(struct string *string);
 ** @brief                   Free a string structure.
 ** @param destination       String structure that will be free.
 */
-void string_free(struct string *string)
+void string_free(struct string *string);
 
 
 #endif // INC_42_SH_STRING_H
