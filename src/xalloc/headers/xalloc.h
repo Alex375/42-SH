@@ -3,9 +3,6 @@
 
 #include <stdlib.h>
 
-struct xmalloc_t *head = NULL;
-
-
 /**
 ** @brief                   Represents a memory allocation.
 ** @param next              Next allocation.

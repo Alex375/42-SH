@@ -3,6 +3,8 @@
 #include <string.h>
 #include <err.h>
 
+struct xmalloc_t *head = NULL;
+
 static struct xmalloc_t *get_header(void *data)
 {
     struct xmalloc_t *header = data;
