@@ -1,10 +1,7 @@
-#ifndef INC_42_SH_XMALLOC_H
-#define INC_42_SH_XMALLOC_H
+#ifndef INC_42_SH_XALLOC_H
+#define INC_42_SH_XALLOC_H
 
 #include <stdlib.h>
-
-struct xmalloc_t *head = NULL;
-
 
 /**
 ** @brief                   Represents a memory allocation.
@@ -15,6 +12,7 @@ struct xmalloc_t
 {
     struct xmalloc_t *next;
     struct xmalloc_t *previous;
+    size_t allocation_size;
 };
 
 /**
@@ -37,9 +35,24 @@ void *xcalloc(size_t n, size_t size);
 void xfree(void *data);
 
 /**
-** @brief                   Free every memory allocation known by xmalloc.
+** @brief                   Modify the size of a memory allocation.
+** @param data              Allocation to modify
+** @param new_size          The new size of the allocation
+*/
+void *xrealloc(void* data, size_t new_size);
+
+/**
+** @brief                   Modify the size of a memory allocation and set every new element at 0.
+** @param data              Allocation to modify
+** @param new_size          The new size of the allocation
+*/
+void *xrecalloc(void *data, size_t new_size);
+
+
+/**
+** @brief                   Free every memory allocation known by xalloc.
 */
 void xfree_all(void);
 
 
-#endif //INC_42_SH_XMALLOC_H
+#endif //INC_42_SH_XALLOC_H
