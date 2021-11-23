@@ -38,7 +38,7 @@ static int separatorify(char *token_str)
 
 /**
 ** @brief                   Token-ify a string. Return -1 if it cannot be
-                            *token-ify else it return the index in the token converter array
+*token-ify else it return the index in the token converter array
 ** @param token_str         String to be compared.
 */
 static int tokenify(char *token_str)
@@ -114,9 +114,12 @@ static struct token_info tokenify_next(const char *script, size_t size, int pop)
     while ((token = tokenify(accumulator->data)) == -1)
     {
         /* COMMAND HANDLER AND LOOK AHEAD FOR SEPARATOR*/
-        if ((token == -1 && look_ahead(script, size) != T_COMMAND && accumulator->size != 0)
+        if ((token == -1 && look_ahead(script, size) != T_COMMAND
+             && accumulator->size != 0)
             || g_lexer_info.pos >= size)
         {
+            if (!pop)
+                g_lexer_info.pos = pos_backup;
             res.type = T_COMMAND;
             res.command = accumulator->data;
             return res;
