@@ -106,4 +106,4 @@ struct token_info get_next_token(const char *script, size_t size)
     }
 
     return 0;
-}/*
+}*/

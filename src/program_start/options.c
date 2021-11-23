@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include <stdio.h>
 
-#include "xmalloc.h"
+#include "xalloc.h"
 
 void print_usage(void)
 {

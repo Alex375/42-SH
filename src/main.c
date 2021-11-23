@@ -1,7 +1,7 @@
 #include <err.h>
 #include <stdio.h>
 
-#include "xmalloc.h"
+#include "xalloc.h"
 #include "options.h"
 #include "read_script.h"
 
