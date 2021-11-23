@@ -5,32 +5,47 @@
 
 #include "xalloc.h"
 
-struct ast *parse_input(struct lexer_list **lex)
+#define CHECK_SEG_ERROR(condition)                                             \
+    if (condition)                                                             \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+struct ast *parse_input(const char *script, size_t size)
 {
-    return parse_list(lex);
+    struct token_info tok = get_next_token(script, size);
+    if (tok.type == T_EOF || tok.type == T_NEWLINE)
+        return NULL;
+    struct ast *ast = parse_list(script, size);
+
+    tok = get_next_token(script, size);
+    CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
+
+    return ast;
 }
 
-struct ast *parse_list(struct lexer_list **lex)
+struct ast *parse_list(const char *script, size_t size)
 {
     struct ast *left;
     struct ast *right;
 
-    left = parse_and_or(lex);
+    left = parse_and_or(script, size);
 
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
     if (!left || errno == ERROR_PARSING
-        || ((*lex)->type == T_NEWLINE || (*lex)->type == T_EOF))
+        || (tok.type == T_NEWLINE || tok.type == T_EOF))
         return left;
 
-    if ((*lex)->type != T_SEMICOLON)
+    if (tok.type != T_SEMICOLON)
         return NULL;
 
-    // POP
-    *lex = (*lex)->next;
-    right = parse_list(lex);
+    right = parse_list(script, size);
 
-    if (!right || errno == ERROR_PARSING || (*lex)->type != T_SEMICOLON)
+    if (!right || errno == ERROR_PARSING || tok.type != T_SEMICOLON)
     {
-        if ((*lex)->type != T_SEMICOLON)
+        if (tok.type != T_SEMICOLON)
             errno = ERROR_PARSING;
         return NULL;
     }
@@ -47,26 +62,23 @@ struct ast *parse_list(struct lexer_list **lex)
     return res;
 }
 
-struct ast *parse_and_or(struct lexer_list **lex)
+struct ast *parse_and_or(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
     struct ast *left;
     struct ast *right;
 
-    left = parse_pipeline(lex);
+    left = parse_pipeline(script, size);
+
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (!left || errno == ERROR_PARSING
-        || ((*lex)->type != T_OR && (*lex)->type != T_AND))
+        || (tok.type != T_OR && tok.type != T_AND))
         return left;
 
-    // POP
-    *lex = (*lex)->next;
-    right = parse_and_or(lex);
+    skip_newlines(script, size);
+
+    right = parse_and_or(script, size);
 
     if (!right || errno == ERROR_PARSING)
         return NULL;
@@ -77,38 +89,39 @@ struct ast *parse_and_or(struct lexer_list **lex)
     nBinary->right = right;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_IF;
+    res->type = (tok.type == T_AND) ? AST_AND : AST_OR;
     res->t_ast = nBinary;
 
     return res;
 }
 
-struct ast *parse_pipeline(struct lexer_list **lex)
+struct ast *parse_pipeline(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
     void *ast;
-    enum token tok = (*lex)->type;
 
-    if (tok == T_NOT)
+    struct token_info tok = get_next_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
+    enum token baseType = tok.type;
+
+    if (tok.type == T_NOT)
     {
-        // POP
-        *lex = (*lex)->next;
-        ast = parse_pipeline(lex);
+        tok = pop_token(script, size);
+        CHECK_SEG_ERROR(tok.type == T_EOF)
+        ast = parse_pipeline(script, size);
     }
     else
     {
-        struct ast *left = parse_command(lex);
-        if (!left || errno == ERROR_PARSING || (*lex)->type != T_PIPE)
+        struct ast *left = parse_command(script, size);
+
+        tok = pop_token(script, size);
+        CHECK_SEG_ERROR(tok.type == T_EOF)
+
+        if (!left || errno == ERROR_PARSING || tok.type != T_PIPE)
             return left;
 
-        // POP
-        *lex = (*lex)->next;
-        struct ast *right = parse_pipeline(lex);
+        skip_newlines(script, size);
+
+        struct ast *right = parse_pipeline(script, size);
 
         if (!right || errno == ERROR_PARSING)
             return NULL;
@@ -120,49 +133,42 @@ struct ast *parse_pipeline(struct lexer_list **lex)
 
         ast = nBinary;
     }
-    
+
     if (!ast || errno == ERROR_PARSING)
         return NULL;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = (tok == T_NOT) ? AST_NOT : AST_PIPE;
+    res->type = (baseType == T_NOT) ? AST_NOT : AST_PIPE;
     res->t_ast = ast;
 
     return res;
 }
 
-struct ast *parse_command(struct lexer_list **lex)
+struct ast *parse_command(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if ((*lex)->type == T_IF) // || for || while ...
-        return parse_shell_command(lex);
+    if (tok.type == T_IF) // || for || while ...
+        return parse_shell_command(script, size);
 
-    return parse_simple_command(lex);
+    return parse_simple_command(script, size);
 }
 
-struct ast *parse_simple_command(struct lexer_list **lex)
+struct ast *parse_simple_command(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
+
+    if (tok.type != T_COMMAND)
     {
         errno = ERROR_PARSING;
         return NULL;
     }
-
-    if ((*lex)->type != T_COMMAND)
-        return NULL;
-
-    // POP
-    struct lexer_list *elt = *lex;
-    *lex = (*lex)->next;
 
     // BUILD CMD
     struct n_cmd *nCmd = xcalloc(1, sizeof(struct n_cmd));
-    nCmd->cmd_line = elt->command;
+    nCmd->cmd_line = tok.command;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
     res->type = AST_NOT;
@@ -171,85 +177,72 @@ struct ast *parse_simple_command(struct lexer_list **lex)
     return res;
 }
 
-struct ast *parse_shell_command(struct lexer_list **lex)
+struct ast *parse_shell_command(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
-    enum token tok = (*lex)->type;
-    // POP
-    *lex = (*lex)->next;
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
+    enum token baseType = tok.type;
 
     struct ast *res;
     // switch
-    switch (tok)
+    switch (baseType)
     {
     case T_O_BRKT:
     case T_O_PRTH:
-        res = parse_compound(lex);
-        if (errno == ERROR_PARSING
-            || (tok == T_O_BRKT && (*lex)->type != T_C_BRKT)
-            || (tok == T_O_PRTH && (*lex)->type != T_C_PRTH))
-        {
-            errno = ERROR_PARSING;
-            return NULL;
-        }
-        // POP
-        *lex = (*lex)->next;
+        res = parse_compound(script, size);
+
+        tok = pop_token(script, size);
+        CHECK_SEG_ERROR(errno == ERROR_PARSING || tok.type == T_EOF
+            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
+            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
+
         return res;
     case T_IF:
-        return parse_if_rule(lex);
+        return parse_if_rule(script, size);
 
     default:
+        errno = ERROR_PARSING;
         return NULL;
     }
 }
 
-struct ast *parse_if_rule(struct lexer_list **lex)
+struct ast *parse_if_rule(const char *script, size_t size)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
     struct ast *condition;
     struct ast *true = NULL;
     struct ast *false = NULL;
 
-    // POP
-    *lex = (*lex)->next;
-    condition = parse_compound(lex);
+    condition = parse_compound(script, size);
 
-    if (!condition || errno == ERROR_PARSING || (*lex)->type != T_THEN)
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
+
+    if (!condition || errno == ERROR_PARSING || tok.type != T_THEN)
+    {
+        if (tok.type != T_THEN)
+            errno = ERROR_PARSING;
         return NULL;
+    }
 
-    // POP
-    *lex = (*lex)->next;
-    true = parse_compound(lex);
+    true = parse_compound(script, size);
+
+    tok = get_next_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (!true || errno == ERROR_PARSING)
         return NULL;
 
-    if ((*lex)->type == T_ELSE)
+    if (tok.type == T_ELSE)
     {
-        // POP
-        *lex = (*lex)->next;
-        false = parse_compound(lex);
+        tok = pop_token(script, size);
+        CHECK_SEG_ERROR(tok.type == T_EOF)
+        false = parse_compound(script, size);
         if (!false || errno == ERROR_PARSING)
             return NULL;
     }
 
-    if ((*lex)->type != T_FI)
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-    // POP
-    *lex = (*lex)->next;
+    tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type != T_FI)
 
     // BUILD IF
     struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
@@ -264,28 +257,31 @@ struct ast *parse_if_rule(struct lexer_list **lex)
     return res;
 }
 
-struct ast *parse_compound(struct lexer_list **lex)
+struct ast *parse_compound(const char *script, size_t size)
 {
     struct ast *left;
     struct ast *right;
 
-    left = parse_and_or(lex);
+    skip_newlines(script, size);
+
+    left = parse_and_or(script, size);
+
+    struct token_info tok = pop_token(script, size);
+    CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (!left || errno == ERROR_PARSING
-        || ((*lex)->type == T_NEWLINE || (*lex)->type == T_EOF))
+        || (tok.type == T_NEWLINE || tok.type == T_EOF))
         return left;
 
-    if ((*lex)->type != T_SEMICOLON)
+    if (tok.type != T_SEMICOLON)
         return NULL;
 
-    // POP
-    *lex = (*lex)->next;
-    right = parse_list(lex);
+    right = parse_compound(script, size);
 
     if (!right || errno == ERROR_PARSING
-        || ((*lex)->type != T_SEMICOLON && (*lex)->type != T_NEWLINE))
+        || (tok.type != T_SEMICOLON && tok.type != T_NEWLINE))
     {
-        if ((*lex)->type != T_SEMICOLON && (*lex)->type != T_NEWLINE)
+        if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
             errno = ERROR_PARSING;
         return NULL;
     }
@@ -302,11 +298,8 @@ struct ast *parse_compound(struct lexer_list **lex)
     return res;
 }
 
-void skip_newlines(struct lexer_list **lex)
+void skip_newlines(const char *script, size_t size)
 {
-    // while (see_tok()->type == T_NEWLINE)
-    //   pop_tok();
-
-    if (lex) // trash
-        return;
+    while (get_next_token(script, size).type == T_NEWLINE)
+        pop_token(script, size);
 }

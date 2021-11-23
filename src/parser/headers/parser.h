@@ -62,62 +62,68 @@ typedef struct n_binary
 
 #include "lexer.h"
 
+#include <stddef.h>
+
 #define ERROR_PARSING 69
 
 /**
 ** @brief               Parsing an input (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_input(struct lexer_list **lex);
+struct ast *parse_input(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a list (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_list(struct lexer_list **lex);
+struct ast *parse_list(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an and / or (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_and_or(struct lexer_list **lex);
+struct ast *parse_and_or(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an pipeline (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_pipeline(struct lexer_list **lex);
+struct ast *parse_pipeline(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a command (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_command(struct lexer_list **lex);
+struct ast *parse_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_simple_command(struct lexer_list **lex);
+struct ast *parse_simple_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a shell command (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_shell_command(struct lexer_list **lex);
+struct ast *parse_shell_command(const char *script, size_t size);
 
 /**
 ** @brief               Parsing an if rule (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_if_rule(struct lexer_list **lex);
+struct ast *parse_if_rule(const char *script, size_t size);
 
 /**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
 ** @param lex           The lexer output.
 */
-struct ast *parse_compound(struct lexer_list **lex);
+struct ast *parse_compound(const char *script, size_t size);
 
-
+/**
+** @brief               calling lexer while newline (cf sh_grammar.txt)
+** @param script        string containing block
+*/
+void skip_newlines(const char *script, size_t size);
 
 #endif // INC_42_SH_PARSER_H

@@ -13,7 +13,7 @@ include_directories(src/data_types/headers)
 include_directories(src/program_start/headers)
 
 #Add every source files of the project in the SRC variable
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/program_start/*c src/data_types/*.c)
+file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/program_start/*c src/data_types/*.c src/parser/*.c)
 
 #Main executable
 add_executable(42_SH ${SRC} src/main.c)
