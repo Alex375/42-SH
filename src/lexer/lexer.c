@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "xalloc.h"
+#include "xstring.h"
 
 struct lexer_info g_lexer_info = { 15,
                                    3,
@@ -56,7 +57,7 @@ static int tokenify(char *token_str)
     return i;
 }
 
-struct token_info get_next_token(const char *script, size_t size)
+static struct token_info tokenify_next(const char *script, size_t size, int pop)
 {
     struct token_info res = { 0, NULL };
 
@@ -68,42 +69,44 @@ struct token_info get_next_token(const char *script, size_t size)
     }
 
     /* INFOS FOR LEXER */
-    char *accumulator = xcalloc(size, sizeof(char));
+    struct string *accumulator = string_create();
+    size_t pos_backup = g_lexer_info.pos;
     int token;
-    size_t i = 0;
 
     /* LEXER */
-    while ((token = tokenify(accumulator)) == -1)
+    while ((token = tokenify(accumulator->data)) == -1)
     {
         /* COMMAND HANDLER */
-        if ((is_separator(script[g_lexer_info.pos]) && token == -1 && i != 0)
+        if ((is_separator(script[g_lexer_info.pos]) && token == -1 && accumulator->size != 0)
             || g_lexer_info.pos >= size)
         {
             res.type = T_COMMAND;
-            res.command = accumulator;
+            res.command = accumulator->data;
             return res;
         }
+
         /* ACCUMULATOR */
-        if (i != 0 || script[g_lexer_info.pos] != ' ') /* Delete beginning spaces */
+        if (accumulator->size != 0 || script[g_lexer_info.pos] != ' ') /* Delete beginning spaces */
         {
-            accumulator[i] = script[g_lexer_info.pos];
-            i++;
+            accumulator = string_append(accumulator, script[g_lexer_info.pos]);
         }
         g_lexer_info.pos++;
     }
 
+    if (!pop)
+        g_lexer_info.pos = pos_backup;
+
     res.type = token;
     return res;
 }
-/*int main()
-{
-    char *test = "touch if";
-    size_t size = 57;
-    struct token_info token;
-    while ((token = get_next_token(test, size)).type != T_EOF)
-    {
-        continue;
-    }
 
-    return 0;
-}*/
+
+struct token_info get_next_token(const char *script, size_t size)
+{
+    return tokenify_next(script, size, 0);
+}
+
+struct token_info pop_token(const char *script, size_t size)
+{
+    return tokenify_next(script, size, 1);
+}
