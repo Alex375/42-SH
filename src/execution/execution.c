@@ -1,4 +1,4 @@
-#include "headers/execution.h"
+#include "execution.h"
 
 #include <unistd.h>
 #include <err.h>
@@ -12,7 +12,7 @@ void exit_program(char *msg)
     err(1, "%s", msg);
 }
 
-int execute(char *cmd, int fd)
+int execute(char *cmd, struct pipeline *pipeline)
 {
     pid_t pid = fork();
     if (pid == -1)
@@ -21,22 +21,27 @@ int execute(char *cmd, int fd)
     }
     if (pid == 0)
     {
-        dup2(fd, STDOUT_FILENO);
-        close(fd);
-        if (execlp("/bin/sh", cmd, NULL) == -1)
+        if (pipeline->out != -1)
         {
-            //TODO : handl exec error
-            exit_program("Failed to exec");
+            dup2(pipeline->fd[pipeline->out],
+                 ((pipeline->out) ? STDOUT_FILENO : STDIN_FILENO));
+            close(pipeline->fd[!(pipeline->out)]);
+        }
+        if (execlp("/bin/sh", "42sh", "-c", cmd, NULL) == -1)
+        {
+            // TODO : handle exec error
+            err(1, "Failed to exec");
         }
     }
     else
     {
         int wstatus;
-        close(fd);
+        if (!(pipeline->out))
+            close(pipeline->fd[1]);
         if (waitpid(pid, &wstatus, 0) == -1)
             exit_program("Failed to wait");
         return wstatus;
     }
     exit_program("Failed");
-    return -1;
+    return 0;
 }
