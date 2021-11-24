@@ -32,6 +32,9 @@ struct ast *parse_input(const char *script, size_t size)
 
 struct ast *parse_list(const char *script, size_t size)
 {
+    if (check_ender_token(script, size))
+        return NULL;
+
     struct ast *left;
     struct ast *right;
 
@@ -278,10 +281,7 @@ struct ast *parse_if_rule(const char *script, size_t size, int inElif)
 
 struct ast *parse_compound(const char *script, size_t size)
 {
-    struct token_info tok = get_next_token(script, size);
-
-    if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
-        || tok.type == T_FI || tok.type == T_C_PRTH || tok.type == T_C_BRKT)
+    if (check_ender_token(script, size))
         return NULL;
 
     struct ast *left;
@@ -291,7 +291,7 @@ struct ast *parse_compound(const char *script, size_t size)
 
     left = parse_and_or(script, size);
 
-    tok = get_next_token(script, size);
+    struct token_info tok = get_next_token(script, size);
 
     if (!left || errno != 0)
         return NULL;
@@ -327,4 +327,15 @@ void skip_newlines(const char *script, size_t size)
 {
     while (get_next_token(script, size).type == T_NEWLINE)
         pop_token(script, size);
+}
+
+int check_ender_token(const char *script, size_t size)
+{
+    struct token_info tok = get_next_token(script, size);
+
+    if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
+        || tok.type == T_FI || tok.type == T_C_PRTH || tok.type == T_C_BRKT)
+        return 1;
+
+    return 0;
 }

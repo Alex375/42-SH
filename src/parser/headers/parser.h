@@ -1,10 +1,12 @@
 #ifndef INC_42_SH_PARSER_H
 #define INC_42_SH_PARSER_H
 
+#include "lexer.h"
+
 /**
 ** @brief                   Describe the node type in ast.
 */
-typedef enum AST_TYPE
+enum AST_TYPE
 {
     AST_CMD,
     AST_IF,
@@ -21,46 +23,52 @@ typedef enum AST_TYPE
     AST_OR,
     AST_BRACKET,
     AST_PARENTH
-} AST_TYPE;
+};
 
 /**
 ** @brief                   A flexible ast member.
 */
-typedef struct ast
+struct ast
 {
-    AST_TYPE type;
+    enum AST_TYPE type;
     void *t_ast;
-} ast;
+};
 
 /**
 ** @brief                   <<AST_CMD>> ast member.
 */
-typedef struct n_cmd
+struct n_cmd
 {
     char *cmd_line;
-} n_cmd;
+};
 
 
 /**
 ** @brief                   <<AST_IF>> ast member.
 */
-typedef struct n_if
+struct n_if
 {
-    ast *condition;
-    ast *true;
-    ast *false;
-} n_if;
+    struct ast *condition;
+    struct ast *true;
+    struct ast *false;
+};
 
 /**
 ** @brief                   <<AST_AND, AST_OR>> ast member.
 */
-typedef struct n_binary
+struct n_binary
 {
-    ast *left;
-    ast *right;
-} n_binary;
+    struct ast *left;
+    struct ast *right;
+};
 
-#include "lexer.h"
+struct list_redir
+{
+    int ionumber;
+    enum token redir_type;
+    char *word;
+    struct list_redir *next;
+};
 
 #include <stddef.h>
 
@@ -143,5 +151,13 @@ struct ast *parse_compound(const char *script, size_t size);
 ** @param size          len of script parameter
 */
 void skip_newlines(const char *script, size_t size);
+
+/**
+** @brief               return 1 if the recursive grammar element should
+**                      stop because of an unexpected token (cf sh_grammar.txt)
+** @param script        string containing block
+** @param size          len of script parameter
+*/
+int check_ender_token(const char *script, size_t size);
 
 #endif // INC_42_SH_PARSER_H
