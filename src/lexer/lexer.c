@@ -1,95 +1,49 @@
 #include "lexer.h"
 
-#include <string.h>
+#include <ctype.h>
 
-#include "xstring.h"
 
 struct lexer_info g_lexer_info = {
-    15,
-    10,
+    GENERAL,
+    GENERAL_EXP,
     0,
-    { "if", "then", "else", "fi", "!", "||", "&&", "\n", ";", "'", "{", "}",
-      "(", ")", "|" },
-    { "||", "&&", "\n", ";", "'", "{", "}", "(", ")", "|" }
 };
 
-/**
-** @brief                   Check if a char is a separator
-** @param c                 Char to be compared.
-*/
-static int separatorify(char *token_str)
+void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 {
-    if (token_str == NULL || token_str[0] == '\0')
-        return -1;
-    size_t i = 0;
-
-    /* CHECK IF WE CAN CONVERT INTO A KNOWN SEPARATOR */
-    while (i < g_lexer_info.nb_separator
-           && strcmp(token_str, g_lexer_info.separator[i]) != 0)
-        i++;
-
-    /* UNKOWN SEPARATOR */
-    if (i >= g_lexer_info.nb_separator)
-        return -1;
-
-    /* KOWN SEPARATOR */
-    return i;
+    while (classifier(string[*cursor]))
+        (*cursor)++;
 }
 
-/**
-** @brief                   Token-ify a string. Return -1 if it cannot be
-*token-ify else it return the index in the token converter array
-** @param token_str         String to be compared.
-*/
-static int tokenify(char *token_str)
+static int look_ahead(const char *script, size_t size)
 {
-    if (token_str == NULL || token_str[0] == '\0')
-        return -1;
-    size_t i = 0;
-
-    /* CHECK IF WE CAN CONVERT INTO A KNOWN TOKEN */
-    while (i < g_lexer_info.nb_token
-           && strcmp(g_lexer_info.token_converter[i], token_str) != 0)
-        i++;
-
-    /* UNKOWN TOKEN */
-    if (i >= g_lexer_info.nb_token)
-        return -1;
-
-    /* KNOWN TOKEN */
-    return i;
+    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
+    {
+        return look_ahead_squote(script, size);
+    }
+    else
+    {
+        return look_ahead_keywords(script, size);
+    }
 }
 
-/**
-** @brief                   Look-ahead for a separator
-*/
-static enum token look_ahead(const char *script, size_t size)
+static struct token_info lex_accumulator(struct token_info res, struct string *string)
 {
-    size_t i = g_lexer_info.pos;
-
-    if (i >= size)
-        return T_COMMAND;
-
-    struct string *accumulator = string_create();
-    int token;
-
-    accumulator = string_append(accumulator, script[i]);
-    if ((token = separatorify(accumulator->data)) != -1)
+    res.type = tokenify(string->data);
+    if (res.type == T_COMMAND)
     {
-        string_free(accumulator);
-        return token;
+        res = lex_command(res, string);
+    }
+    else if (res.type == T_QUOTE)
+    {
+        res = lex_squote(res, string);
+    }
+    else
+    {
+        res = lex_keywords(res, string);
     }
 
-    i++;
-    accumulator = string_append(accumulator, script[i]);
-    if ((token = separatorify(accumulator->data)) != -1)
-    {
-        string_free(accumulator);
-        return token;
-    }
-
-    string_free(accumulator);
-    return T_COMMAND;
+    return res;
 }
 
 /* MAIN LEXER */
@@ -101,6 +55,7 @@ static struct token_info tokenify_next(const char *script, size_t size, int pop)
     if (script[g_lexer_info.pos] == '\0' || g_lexer_info.pos >= size)
     {
         g_lexer_info.pos = 0;
+        g_lexer_info.context = GENERAL;
         res.type = T_EOF;
         return res;
     }
@@ -108,38 +63,25 @@ static struct token_info tokenify_next(const char *script, size_t size, int pop)
     /* INFOS FOR LEXER */
     struct string *accumulator = string_create();
     size_t pos_backup = g_lexer_info.pos;
-    int token;
 
     /* LEXER */
-    while ((token = tokenify(accumulator->data)) == -1)
+    skip_class(isblank, script, &g_lexer_info.pos);
+    do
     {
-        /* COMMAND HANDLER AND LOOK AHEAD FOR SEPARATOR*/
-        if ((token == -1 && look_ahead(script, size) != T_COMMAND
-             && accumulator->size != 0)
-            || g_lexer_info.pos >= size)
-        {
-            if (!pop)
-                g_lexer_info.pos = pos_backup;
-            res.type = T_COMMAND;
-            res.command = accumulator->data;
-            return res;
-        }
-
-        /* ACCUMULATOR */
-        if (accumulator->size != 0
-            || script[g_lexer_info.pos] != ' ') /* Delete beginning spaces */
-        {
-            accumulator = string_append(accumulator, script[g_lexer_info.pos]);
-        }
+        accumulator = string_append(accumulator, script[g_lexer_info.pos]);
         g_lexer_info.pos++;
+
+        if (detect_first_seperator(accumulator))
+            break;
+    } while (look_ahead(script, size));
+
+    /* IF WE DO GET NEXT TOKEN WE DONT POP*/
+    if (!pop)
+    {
+        g_lexer_info.pos = pos_backup;
     }
 
-    if (!pop)
-        g_lexer_info.pos = pos_backup;
-
-    string_free(accumulator);
-    res.type = token;
-    return res;
+    return lex_accumulator(res, accumulator);
 }
 
 struct token_info get_next_token(const char *script, size_t size)

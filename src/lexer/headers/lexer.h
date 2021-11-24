@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+#include "xstring.h"
+
 /**
 ** @brief                   Describe a keyword in shell.
 */
@@ -10,6 +12,7 @@ enum token
 {
     T_IF,
     T_THEN,
+    T_ELIF,
     T_ELSE,
     T_FI,
     T_NOT,
@@ -24,7 +27,20 @@ enum token
     T_C_PRTH,
     T_PIPE,
     T_EOF,
-    T_COMMAND
+    T_COMMAND,
+    T_COMMAND_ARG
+};
+
+enum context
+{
+    GENERAL,
+    IN_COMMAND
+};
+
+enum expansion_context
+{
+    GENERAL_EXP,
+    IN_SQUOTE_EXP
 };
 
 /**
@@ -49,15 +65,45 @@ struct token_info
 */
 struct lexer_info
 {
+    enum context context;
+    enum expansion_context exp_context;
+    size_t pos;
+};
+
+struct words_converter
+{
     size_t nb_token;
     size_t nb_separator;
-    size_t pos;
     char *token_converter[16];
     char *separator[10];
 };
+/**
+** @brief                   Global variable that store the infos about the lexer.
+*/
+extern struct lexer_info g_lexer_info;
 
 /**
-** @brief                   Token-ify the next element of a script without popping.
+** @brief                   Check if a string is a separator.
+*/
+int separatorify(const char *token_str);
+
+enum token tokenify(const char *token_str);
+
+int detect_first_seperator(struct string *accumulator);
+
+int look_ahead_keywords(const char *script, size_t size);
+
+struct token_info lex_keywords(struct token_info res, struct string *string);
+
+struct token_info lex_command(struct token_info res, struct string *string);
+
+struct token_info lex_squote(struct token_info res, struct string *string);
+
+int look_ahead_squote(const char *script, size_t size);
+
+/**
+** @brief                   Token-ify the next element of a script without
+*popping.
 ** @param script            Script to be lex.
 ** @param size              Size in character of the script.
 */
@@ -69,6 +115,5 @@ struct token_info get_next_token(const char *script, size_t size);
 ** @param size              Size in character of the script.
 */
 struct token_info pop_token(const char *script, size_t size);
-
 
 #endif // INC_42_SH_TYPE_H

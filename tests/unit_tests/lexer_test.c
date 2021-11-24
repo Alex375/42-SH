@@ -26,12 +26,13 @@ void test_command1()
 {
     char *script = "(ls -la)";
     struct token_info expected[] = { { T_O_PRTH, NULL },
-                                     { T_COMMAND, "ls -la" },
+                                     { T_COMMAND, "ls" },
+                                     { T_COMMAND_ARG, "-la" },
                                      { T_C_PRTH, NULL } };
 
     printf("--  TEST SIMPLE COMMAND STARTED\n");
 
-    test_lexer(script, 3, expected);
+    test_lexer(script, 4, expected);
 
     printf("[TEST SIMPLE COMMAND GOOD]\n\n");
 }
@@ -39,12 +40,13 @@ void test_command1()
 void test_command2()
 {
     char *script = "echo test\n";
-    struct token_info expected[] = { { T_COMMAND, "echo test" },
+    struct token_info expected[] = { { T_COMMAND, "echo" },
+                                     { T_COMMAND_ARG, "test" },
                                      { T_NEWLINE, NULL } };
 
     printf("--  TEST SIMPLE COMMAND 2 STARTED\n\n");
 
-    test_lexer(script, 2, expected);
+    test_lexer(script, 3, expected);
 
     printf("[TEST SIMPLE COMMAND 2 GOOD]\n\n");
 }
@@ -52,11 +54,11 @@ void test_command2()
 void test_command3()
 {
     char *script = "ls -la";
-    struct token_info expected[] = { { T_COMMAND, "ls -la" } };
+    struct token_info expected[] = { { T_COMMAND, "ls" }, { T_COMMAND_ARG, "-la" } };
 
     printf("--  TEST SIMPLE COMMAND 3 STARTED\n\n");
 
-    test_lexer(script, 1, expected);
+    test_lexer(script, 2, expected);
 
     printf("[TEST SIMPLE COMMAND 3 GOOD]\n\n");
 }
@@ -64,13 +66,15 @@ void test_command3()
 void test_command_list()
 {
     char *script = "echo test; echo test";
-    struct token_info expected[] = { { T_COMMAND, "echo test" },
+    struct token_info expected[] = { { T_COMMAND, "echo" },
+                                     { T_COMMAND_ARG, "test" },
                                      { T_SEMICOLON, NULL },
-                                     { T_COMMAND, "echo test" } };
+                                     { T_COMMAND, "echo" },
+                                     { T_COMMAND_ARG, "test" }};
 
     printf("--  TEST SIMPLE COMMAND LIST STARTED\n");
 
-    test_lexer(script, 3, expected);
+    test_lexer(script, 5, expected);
 
     printf("[TEST SIMPLE COMMAND LIST GOOD]\n\n");
 }
@@ -78,15 +82,17 @@ void test_command_list()
 void test_command_list2()
 {
     char *script = "echo test; (echo test)";
-    struct token_info expected[] = { { T_COMMAND, "echo test" },
+    struct token_info expected[] = { { T_COMMAND, "echo" },
+                                     { T_COMMAND_ARG, "test" },
                                      { T_SEMICOLON, NULL },
                                      { T_O_PRTH, NULL },
-                                     { T_COMMAND, "echo test" },
+                                     { T_COMMAND, "echo" },
+                                     { T_COMMAND_ARG, "test" },
                                      { T_C_PRTH, NULL } };
 
     printf("--  TEST SIMPLE COMMAND LIST2 STARTED\n");
 
-    test_lexer(script, 5, expected);
+    test_lexer(script, 7, expected);
 
     printf("[TEST SIMPLE COMMAND LIST2 GOOD]\n\n");
 }
@@ -95,15 +101,16 @@ void test_command_list3()
 {
     char *script = "echo test; ((echo test))";
     struct token_info expected[] = {
-        { T_COMMAND, "echo test" }, { T_SEMICOLON, NULL },
+        { T_COMMAND, "echo" }, { T_COMMAND_ARG, "test" },
+        { T_SEMICOLON, NULL },
         { T_O_PRTH, NULL },         { T_O_PRTH, NULL },
-        { T_COMMAND, "echo test" }, { T_C_PRTH, NULL },
+        { T_COMMAND, "echo" }, { T_COMMAND_ARG, "test" }, { T_C_PRTH, NULL },
         { T_C_PRTH, NULL }
     };
 
     printf("--  TEST SIMPLE COMMAND LIST3 STARTED\n");
 
-    test_lexer(script, 7, expected);
+    test_lexer(script, 9, expected);
 
     printf("[TEST SIMPLE COMMAND LIST3 GOOD]\n\n");
 }
@@ -116,13 +123,71 @@ void test_command_if()
                                      { T_SEMICOLON, NULL },
                                      { T_THEN, NULL },
                                      { T_NEWLINE, NULL },
-                                     {T_COMMAND, "echo test"},
+                                     {T_COMMAND, "echo"},
+                                     { T_COMMAND_ARG, "test" },
                                      {T_NEWLINE, NULL},
                                      { T_FI, NULL }};
 
     printf("--  TEST IF STARTED\n");
 
-    test_lexer(script, 8, expected);
+    test_lexer(script, 9, expected);
+
+    printf("[TEST IF GOOD]\n\n");
+}
+
+void test_command_wrong_if()
+{
+    char *script = "ifecho true; then\n echo test\n fi";
+    struct token_info expected[] = { { T_COMMAND, "ifecho" },
+        { T_COMMAND_ARG, "true" },
+        { T_SEMICOLON, NULL },
+        { T_THEN, NULL },
+        { T_NEWLINE, NULL },
+        {T_COMMAND, "echo"},
+        { T_COMMAND_ARG, "test" },
+        {T_NEWLINE, NULL},
+        { T_FI, NULL }};
+
+    printf("--  TEST WRONG IF STARTED\n");
+
+    test_lexer(script, 9, expected);
+
+    printf("[TEST WRONG IF GOOD]\n\n");
+}
+
+void test_command_elif()
+{
+    char *script = "if true; then\n echo test\nelif false; then\n   echo true\nelse\n   'echo' '&&;;echo grosse merde'\nfi";
+    struct token_info expected[] = { { T_IF, NULL },
+        { T_COMMAND, "true" },
+        { T_SEMICOLON, NULL },
+        { T_THEN, NULL },
+        { T_NEWLINE, NULL },
+        {T_COMMAND, "echo"},
+        {T_COMMAND_ARG, "test"},
+        {T_NEWLINE, NULL},
+        {T_ELIF, NULL},
+        { T_COMMAND, "false" },
+        { T_SEMICOLON, NULL },
+        { T_THEN, NULL },
+        { T_NEWLINE, NULL },
+        {T_COMMAND, "echo"},
+        {T_COMMAND_ARG, "true"},
+        { T_NEWLINE, NULL },
+        { T_ELSE, NULL },
+        { T_NEWLINE, NULL },
+        { T_QUOTE, NULL },
+        {T_COMMAND, "echo"},
+        { T_QUOTE, NULL },
+        { T_QUOTE, NULL },
+        {T_COMMAND_ARG, "&&;;echo grosse merde"},
+        { T_QUOTE, NULL },
+        { T_NEWLINE, NULL },
+        { T_FI, NULL }};
+
+    printf("--  TEST IF STARTED\n");
+
+    test_lexer(script, 26, expected);
 
     printf("[TEST IF GOOD]\n\n");
 }
@@ -150,6 +215,8 @@ int main(void)
     test_command_list3();
     test_command_if();
     test_next();
+    test_command_wrong_if();
+    test_command_elif();
 
     printf("[ALL GOOD !]\n");
 }
