@@ -5,7 +5,7 @@ struct string *string_create()
 {
     struct string *res = xcalloc(1, sizeof(struct string));
     res->capacity = 16;
-    res->data = xcalloc(res->capacity, sizeof(char));
+    res->data = xcalloc(res->capacity + 1, sizeof(char));
     return res;
 }
 

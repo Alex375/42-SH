@@ -3,56 +3,14 @@
 
 #include <stddef.h>
 
+#include "tokens.h"
+#include "token_vec.h"
 #include "xstring.h"
-
-/**
-** @brief                   Describe a keyword in shell.
-*/
-enum token
-{
-    T_IF,
-    T_THEN,
-    T_ELIF,
-    T_ELSE,
-    T_FI,
-    T_NOT,
-    T_OR,
-    T_AND,
-    T_NEWLINE,
-    T_SEMICOLON,
-    T_QUOTE,
-    T_O_BRKT,
-    T_C_BRKT,
-    T_O_PRTH,
-    T_C_PRTH,
-    T_PIPE,
-    T_EOF,
-    T_COMMAND,
-    T_COMMAND_ARG
-};
-
-enum context
-{
-    GENERAL,
-    IN_COMMAND
-};
 
 enum expansion_context
 {
-    GENERAL_EXP,
-    IN_SQUOTE_EXP
-};
-
-/**
-** @brief                   Linked-list of every token in a block.
-** @param type              Type of the element.
-** @param command           Command string.
-** @param next              Next element of the list.
-*/
-struct token_info
-{
-    enum token type;
-    char *command;
+    GENERAL,
+    IN_SQUOTE
 };
 
 /**
@@ -65,17 +23,21 @@ struct token_info
 */
 struct lexer_info
 {
-    enum context context;
+    struct tkvec *token_list;
     enum expansion_context exp_context;
+    enum expansion_context last_context;
+    size_t array_pos;
     size_t pos;
+    char* script;
+    size_t script_size;
 };
 
 struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[16];
-    char *separator[10];
+    char *token_converter[17];
+    char *separator[11];
 };
 /**
 ** @brief                   Global variable that store the infos about the lexer.
@@ -97,9 +59,13 @@ struct token_info lex_keywords(struct token_info res, struct string *string);
 
 struct token_info lex_command(struct token_info res, struct string *string);
 
-struct token_info lex_squote(struct token_info res, struct string *string);
+int detect_context(char c);
 
-int look_ahead_squote(const char *script, size_t size);
+int look_ahead_squote(size_t size);
+
+void lexer_start(char* script, size_t size);
+
+void lexer_reset();
 
 /**
 ** @brief                   Token-ify the next element of a script without
@@ -107,13 +73,17 @@ int look_ahead_squote(const char *script, size_t size);
 ** @param script            Script to be lex.
 ** @param size              Size in character of the script.
 */
-struct token_info get_next_token(const char *script, size_t size);
+struct token_info get_next_token(void);
 
 /**
 ** @brief                   Token-ify and pop the next element of a script.
 ** @param script            Script to be lex.
 ** @param size              Size in character of the script.
 */
-struct token_info pop_token(const char *script, size_t size);
+struct token_info pop_token(void);
+
+struct token_info tokenify_next();
+
+struct token_info look_forward_token(int i);
 
 #endif // INC_42_SH_TYPE_H
