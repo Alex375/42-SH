@@ -8,9 +8,11 @@
 #include "read_script.h"
 #include "xalloc.h"
 
+struct options *opt = NULL;
+
 int main(int argc, char **argv)
 {
-    struct options *opt = xcalloc(1, sizeof(struct options));
+    opt = xcalloc(1, sizeof(struct options));
     get_option(opt, argc, argv);
     if (opt->help)
     {
