@@ -9,7 +9,10 @@ void print_usage(void)
 {
     printf("Usage : 42sh [OPTIONS] [SCRIPT] [ARGUMENTS .."
            ".]\n\nOptions\n\t-c, --commands <commands> Directly interpret "
-           "the argument as a shell script\n");
+           "the argument as a shell script\n\t-p, --pretty_print        Print "
+           "the ast in "
+           "a pretty way\n\t-v, --verbose             Display some additional "
+           "information\n");
 }
 
 int get_scripts(int argc, char **argv, struct options *options)
@@ -46,9 +49,8 @@ int get_option(struct options *options, int argc, char **argv)
         switch (c)
         {
         case 'c':
-            options->commands =
-                xrealloc(options->commands, ++options->nb_command * sizeof
-                             (char *));
+            options->commands = xrealloc(
+                options->commands, ++options->nb_command * sizeof(char *));
             options->commands[options->nb_command - 1] = optarg;
             break;
         case 'p':

@@ -15,6 +15,7 @@
  * otherwise)
 ** @param print             True if print is active
 ** @param help              True if help is active
+** @param verbose           True if verbose is active
 ** @param nb_script         Number of scripts files passed as arguments
 ** @param scripts           List of script file
 */
