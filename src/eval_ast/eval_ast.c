@@ -21,7 +21,7 @@ int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline wit
         return res;
     case AST_IF:
         if_ast = ast->t_ast;
-        if (eval_ast(if_ast->condition, pipeline))
+        if (eval_ast(if_ast->condition, pipeline) == 0)
             res = eval_ast(if_ast->true, pipeline);
         else
             res = eval_ast(if_ast->false, pipeline);
