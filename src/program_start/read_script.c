@@ -1,8 +1,9 @@
 #include "read_script.h"
-#include "xalloc.h"
 
 #include <err.h>
 #include <stdio.h>
+
+#include "xalloc.h"
 
 char *read_script(char *filename, size_t *size)
 {
@@ -10,7 +11,7 @@ char *read_script(char *filename, size_t *size)
     if (f == NULL)
     {
         xfree_all();
-        err(1, "No such a file  %s", filename);
+        err(1, "Failed to open %s", filename);
     }
     char *res = xmalloc(BUFFER_SIZE + 1);
     *size = 0;

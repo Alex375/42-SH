@@ -4,36 +4,86 @@
 #include <stddef.h>
 
 #include "xalloc.h"
+#include "xstrdup.h"
+#include "xstring.h"
 
-struct ast *parse_input(struct lexer_list **lex)
+#define CHECK_SEG_ERROR(condition)                                             \
+    if (condition)                                                             \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define POP_TOKEN                                                              \
+    pop_token();                                                               \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define GET_TOKEN                                                              \
+    get_next_token();                                                          \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+struct ast *start_parse(char *script, size_t size)
 {
-    return parse_list(lex);
+    lexer_start(script, size);
+
+    struct ast *res = parse_input();
+
+    lexer_reset();
+
+    return res;
 }
 
-struct ast *parse_list(struct lexer_list **lex)
+struct ast *parse_input()
 {
-    struct ast *left;
-    struct ast *right;
-
-    left = parse_and_or(lex);
-
-    if (!left || errno == ERROR_PARSING
-        || ((*lex)->type == T_NEWLINE || (*lex)->type == T_EOF))
-        return left;
-
-    if ((*lex)->type != T_SEMICOLON)
-        return NULL;
-
-    // POP
-    *lex = (*lex)->next;
-    right = parse_list(lex);
-
-    if (!right || errno == ERROR_PARSING || (*lex)->type != T_SEMICOLON)
+    struct token_info tok =
+        GET_TOKEN if (tok.type == T_EOF || tok.type == T_NEWLINE)
     {
-        if ((*lex)->type != T_SEMICOLON)
-            errno = ERROR_PARSING;
+        POP_TOKEN
+        if (tok.type == T_EOF)
+            errno = ERROR_EMPTY_EOF;
         return NULL;
     }
+    struct ast *ast = parse_list();
+
+    tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
+
+        return ast;
+}
+
+struct ast *parse_list()
+{
+    if (check_ender_token())
+        return NULL;
+
+    struct ast *left = NULL;
+    struct ast *right = NULL;
+
+    left = parse_and_or();
+
+    if (!left || errno != 0)
+        return NULL;
+
+    struct token_info tok = GET_TOKEN
+
+        if (tok.type != T_SEMICOLON) return left;
+
+    POP_TOKEN
+
+    right = parse_list();
+
+    if (errno != 0)
+        return NULL;
+
+    if (!right)
+        return left;
 
     // BUILD AND/OR
     struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
@@ -47,28 +97,25 @@ struct ast *parse_list(struct lexer_list **lex)
     return res;
 }
 
-struct ast *parse_and_or(struct lexer_list **lex)
+struct ast *parse_and_or()
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
+    struct ast *left = NULL;
+    struct ast *right = NULL;
 
-    struct ast *left;
-    struct ast *right;
+    left = parse_pipeline();
 
-    left = parse_pipeline(lex);
+    struct token_info tok = GET_TOKEN
 
-    if (!left || errno == ERROR_PARSING
-        || ((*lex)->type != T_OR && (*lex)->type != T_AND))
-        return left;
+        if (!left || errno != 0
+            || (tok.type != T_OR && tok.type != T_AND)) return left;
 
-    // POP
-    *lex = (*lex)->next;
-    right = parse_and_or(lex);
+    POP_TOKEN
 
-    if (!right || errno == ERROR_PARSING)
+    skip_newlines();
+
+    right = parse_and_or();
+
+    if (!right || errno != 0)
         return NULL;
 
     // BUILD AND/OR
@@ -77,40 +124,40 @@ struct ast *parse_and_or(struct lexer_list **lex)
     nBinary->right = right;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_IF;
+    res->type = (tok.type == T_AND) ? AST_AND : AST_OR;
     res->t_ast = nBinary;
 
     return res;
 }
 
-struct ast *parse_pipeline(struct lexer_list **lex)
+struct ast *parse_pipeline()
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
+    void *ast = NULL;
 
-    void *ast;
-    enum token tok = (*lex)->type;
+    struct token_info tok =
+        GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
+            tok.type;
 
-    if (tok == T_NOT)
+    if (tok.type == T_NOT)
     {
-        // POP
-        *lex = (*lex)->next;
-        ast = parse_pipeline(lex);
+        POP_TOKEN
+        ast = parse_pipeline();
     }
     else
     {
-        struct ast *left = parse_command(lex);
-        if (!left || errno == ERROR_PARSING || (*lex)->type != T_PIPE)
-            return left;
+        struct ast *left = parse_command();
 
-        // POP
-        *lex = (*lex)->next;
-        struct ast *right = parse_pipeline(lex);
+        tok = GET_TOKEN
 
-        if (!right || errno == ERROR_PARSING)
+            if (!left || errno != 0 || tok.type != T_PIPE) return left;
+
+        POP_TOKEN
+
+        skip_newlines();
+
+        struct ast *right = parse_pipeline();
+
+        if (!right || errno != 0)
             return NULL;
 
         // BUILD AND/OR
@@ -120,139 +167,177 @@ struct ast *parse_pipeline(struct lexer_list **lex)
 
         ast = nBinary;
     }
-    
-    if (!ast || errno == ERROR_PARSING)
+
+    if (!ast || errno != 0)
         return NULL;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = (tok == T_NOT) ? AST_NOT : AST_PIPE;
+    res->type = (baseType == T_NOT) ? AST_NOT : AST_PIPE;
     res->t_ast = ast;
 
     return res;
 }
 
-struct ast *parse_command(struct lexer_list **lex)
+struct ast *parse_command()
 {
-    if (!lex || !*lex) // maybe not
+    void *ast = NULL;
+    struct list_redir *redirs = NULL;
+
+    struct token_info tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
+
+        if (tok.type == T_IF || tok.type == T_O_PRTH
+            || tok.type == T_O_BRKT) // || for || while ...
     {
-        errno = ERROR_PARSING;
-        return NULL;
+        ast = parse_shell_command();
+        redirs = parse_redirs();
+    }
+    else
+    {
+        ast = parse_simple_command();
     }
 
-    if ((*lex)->type == T_IF) // || for || while ...
-        return parse_shell_command(lex);
+    if (!ast || errno != 0)
+        return NULL;
 
-    return parse_simple_command(lex);
+    struct n_command *cmd = xcalloc(1, sizeof(struct n_command));
+    cmd->ast = ast;
+    cmd->redirs = redirs;
+
+    return ast;
 }
 
-struct ast *parse_simple_command(struct lexer_list **lex)
+struct list_redir *parse_redirs()
 {
-    if (!lex || !*lex) // maybe not
+    struct list_redir *res = NULL;
+
+    while (1)
+    {
+        struct token_info tok = GET_TOKEN
+
+            if (!is_redir()) break;
+
+        struct list_redir *new_redir = xcalloc(1, sizeof(struct list_redir));
+
+        if (tok.type == T_WORD)
+        {
+            POP_TOKEN
+            new_redir->ionumber = tok.command;
+        }
+
+        tok = POP_TOKEN new_redir->redir_type = tok.type;
+
+        tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
+            tok.command;
+
+        add_to_redir_list(&res, new_redir);
+    }
+
+    return res;
+}
+
+struct ast *parse_simple_command()
+{
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
+
+        if (tok.type != T_WORD)
     {
         errno = ERROR_PARSING;
         return NULL;
     }
 
-    if ((*lex)->type != T_COMMAND)
-        return NULL;
-
-    // POP
-    struct lexer_list *elt = *lex;
-    *lex = (*lex)->next;
-
     // BUILD CMD
-    struct n_cmd *nCmd = xcalloc(1, sizeof(struct n_cmd));
-    nCmd->cmd_line = elt->command;
+    struct n_s_cmd *nCmd = xcalloc(1, sizeof(struct n_s_cmd));
+    nCmd->cmd = xstrdup(tok.command);
+    nCmd->cmd_arg = string_create();
+
+    while ((tok = get_next_token()).type == T_WORD)
+    {
+        POP_TOKEN
+        if (nCmd->cmd_arg->data[0])
+            string_concat(nCmd->cmd_arg, " ");
+        string_concat(nCmd->cmd_arg, tok.command);
+    }
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_NOT;
+    res->type = AST_S_CMD;
     res->t_ast = nCmd;
 
     return res;
 }
 
-struct ast *parse_shell_command(struct lexer_list **lex)
+struct ast *parse_shell_command()
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
-    enum token tok = (*lex)->type;
-    // POP
-    *lex = (*lex)->next;
+    struct token_info tok =
+        POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
+            tok.type;
 
     struct ast *res;
     // switch
-    switch (tok)
+    switch (baseType)
     {
     case T_O_BRKT:
     case T_O_PRTH:
-        res = parse_compound(lex);
-        if (errno == ERROR_PARSING
-            || (tok == T_O_BRKT && (*lex)->type != T_C_BRKT)
-            || (tok == T_O_PRTH && (*lex)->type != T_C_PRTH))
-        {
-            errno = ERROR_PARSING;
-            return NULL;
-        }
-        // POP
-        *lex = (*lex)->next;
-        return res;
+        res = parse_compound();
+
+        tok = POP_TOKEN CHECK_SEG_ERROR(
+            errno != 0 || tok.type == T_EOF
+            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
+            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
+
+            return res;
     case T_IF:
-        return parse_if_rule(lex);
+        return parse_if_rule(0);
 
     default:
+        errno = ERROR_PARSING;
         return NULL;
     }
 }
 
-struct ast *parse_if_rule(struct lexer_list **lex)
+struct ast *parse_if_rule(int inElif)
 {
-    if (!lex || !*lex) // maybe not
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
-    struct ast *condition;
+    struct ast *condition = NULL;
     struct ast *true = NULL;
     struct ast *false = NULL;
 
-    // POP
-    *lex = (*lex)->next;
-    condition = parse_compound(lex);
+    condition = parse_compound();
 
-    if (!condition || errno == ERROR_PARSING || (*lex)->type != T_THEN)
-        return NULL;
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    // POP
-    *lex = (*lex)->next;
-    true = parse_compound(lex);
-
-    if (!true || errno == ERROR_PARSING)
-        return NULL;
-
-    if ((*lex)->type == T_ELSE)
+        if (!condition || errno != 0 || tok.type != T_THEN)
     {
-        // POP
-        *lex = (*lex)->next;
-        false = parse_compound(lex);
-        if (!false || errno == ERROR_PARSING)
+        if (tok.type != T_THEN)
+            errno = ERROR_PARSING;
+        return NULL;
+    }
+
+    true = parse_compound();
+
+    tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
+
+        if (!true || errno != 0) return NULL;
+
+    if (tok.type == T_ELSE)
+    {
+        POP_TOKEN
+        false = parse_compound();
+        if (!false || errno != 0)
+            return NULL;
+    }
+    else if (tok.type == T_ELIF)
+    {
+        POP_TOKEN
+        false = parse_if_rule(1);
+        if (!false || errno != 0)
             return NULL;
     }
 
-    if ((*lex)->type != T_FI)
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-    // POP
-    *lex = (*lex)->next;
+    tok = GET_TOKEN if (!inElif){ POP_TOKEN }
 
-    // BUILD IF
-    struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
+    CHECK_SEG_ERROR(tok.type != T_FI)
+
+        // BUILD IF
+        struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
     n_if->condition = condition;
     n_if->true = true;
     n_if->false = false;
@@ -264,31 +349,36 @@ struct ast *parse_if_rule(struct lexer_list **lex)
     return res;
 }
 
-struct ast *parse_compound(struct lexer_list **lex)
+struct ast *parse_compound()
 {
-    struct ast *left;
-    struct ast *right;
+    if (check_ender_token())
+        return NULL;
 
-    left = parse_and_or(lex);
+    struct ast *left = NULL;
+    struct ast *right = NULL;
 
-    if (!left || errno == ERROR_PARSING
-        || ((*lex)->type == T_NEWLINE || (*lex)->type == T_EOF))
+    skip_newlines();
+
+    left = parse_and_or();
+
+    struct token_info tok = GET_TOKEN
+
+        if (!left || errno != 0) return NULL;
+
+    if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
         return left;
 
-    if ((*lex)->type != T_SEMICOLON)
+    POP_TOKEN
+
+    skip_newlines();
+
+    right = parse_compound();
+
+    if (errno != 0)
         return NULL;
 
-    // POP
-    *lex = (*lex)->next;
-    right = parse_list(lex);
-
-    if (!right || errno == ERROR_PARSING
-        || ((*lex)->type != T_SEMICOLON && (*lex)->type != T_NEWLINE))
-    {
-        if ((*lex)->type != T_SEMICOLON && (*lex)->type != T_NEWLINE)
-            errno = ERROR_PARSING;
-        return NULL;
-    }
+    if (!right)
+        return left;
 
     // BUILD AND/OR
     struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
@@ -302,11 +392,49 @@ struct ast *parse_compound(struct lexer_list **lex)
     return res;
 }
 
-void skip_newlines(struct lexer_list **lex)
+void skip_newlines()
 {
-    // while (see_tok()->type == T_NEWLINE)
-    //   pop_tok();
+    while (get_next_token().type == T_NEWLINE)
+        pop_token();
+}
 
-    if (lex) // trash
+int check_ender_token()
+{
+    struct token_info tok = get_next_token();
+
+    if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
+        || tok.type == T_FI || tok.type == T_C_PRTH || tok.type == T_C_BRKT)
+        return 1;
+
+    return 0;
+}
+
+static int is_chev(enum token tokT)
+{
+    if (tokT >= T_REDIR_1 && tokT <= T_REDIR_PIPE)
+        return 1;
+
+    return 0;
+}
+
+int is_redir()
+{
+    struct token_info tok = get_next_token();
+    if ((is_chev(tok.type) && look_forward_token(1).type == T_WORD)
+        || (tok.type == T_WORD && is_chev(look_forward_token(1).type)
+            && look_forward_token(2).type == T_WORD))
+        return 1;
+
+    return 0;
+}
+
+void add_to_redir_list(struct list_redir **redirs, struct list_redir *new_redir)
+{
+    if (!*redirs)
+    {
+        *redirs = new_redir;
         return;
+    }
+
+    add_to_redir_list(&(*redirs)->next, new_redir);
 }
