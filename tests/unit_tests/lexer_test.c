@@ -140,17 +140,16 @@ Test(IF, HARD_QUOTE)
 Test(QUOTE, EASY)
 {
     char *script = "echo '&&'";
-    struct token_info expected[] = { { T_WORD, "echo" },
-                                    { T_WORD, "&&" } };
+    struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "&&" } };
 
     test_lexer(script, 2, expected);
 }
 
 Test(QUOTE, MEDIUM)
 {
-    char *script = "echo      '      pute''";
+    char *script = "echo      '      pute'";
     struct token_info expected[] = { { T_WORD, "echo" },
-        { T_WORD, "      pute" } };
+                                     { T_WORD, "      pute" } };
 
     test_lexer(script, 2, expected);
 }
@@ -166,20 +165,31 @@ Test(QUOTE, HARD)
     test_lexer(script, 4, expected);
 }
 
+Test(QUOTE, ERROR)
+{
+    char *script = "echo ''cest une erreur'";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "cest" },
+                                     { T_WORD, "une" },
+                                     { T_ERROR, NULL } };
+
+    test_lexer(script, 4, expected);
+}
+
 Test(REDIR, EASY)
 {
-    char *script = "echo 'test'>test.txt";
+    char *script = "echo test>test.txt";
     struct token_info expected[] = { { T_WORD, "echo" },
-        { T_WORD, "test" },
-        { T_REDIR_1, NULL },
-        { T_WORD, "test.txt" } };
+                                     { T_WORD, "test" },
+                                     { T_REDIR_1, NULL },
+                                     { T_WORD, "test.txt" } };
 
     test_lexer(script, 4, expected);
 }
 
 /*int main(void)
 {
-    char *script = "echo ''''";
+    char *script = "echo ''cest une erreur'";
     lexer_start(script, strlen(script));
     struct token_info tk;
     while ((tk = pop_token()).type != T_EOF)
