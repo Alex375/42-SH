@@ -1,4 +1,4 @@
-#include "headers/parser.h"
+#include "parser.h"
 
 #include <errno.h>
 #include <stddef.h>
@@ -85,16 +85,7 @@ struct ast *parse_list()
     if (!right)
         return left;
 
-    // BUILD AND/OR
-    struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
-    nBinary->left = left;
-    nBinary->right = right;
-
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_LIST;
-    res->t_ast = nBinary;
-
-    return res;
+    return build_binary(AST_LIST, left, right);
 }
 
 struct ast *parse_and_or()
@@ -116,18 +107,14 @@ struct ast *parse_and_or()
     right = parse_and_or();
 
     if (!right || errno != 0)
+    {
+        // free left
+        if (!right)
+            errno = ERROR_PARSING;
         return NULL;
+    }
 
-    // BUILD AND/OR
-    struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
-    nBinary->left = left;
-    nBinary->right = right;
-
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = (tok.type == T_AND) ? AST_AND : AST_OR;
-    res->t_ast = nBinary;
-
-    return res;
+    return build_binary((tok.type == T_AND) ? AST_AND : AST_OR, left, right);
 }
 
 struct ast *parse_pipeline()
@@ -158,7 +145,12 @@ struct ast *parse_pipeline()
         struct ast *right = parse_pipeline();
 
         if (!right || errno != 0)
+        {
+            // free left
+            if (!right)
+                errno = ERROR_PARSING;
             return NULL;
+        }
 
         // BUILD AND/OR
         struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
@@ -185,8 +177,9 @@ struct ast *parse_command()
 
     struct token_info tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-        if (tok.type == T_IF || tok.type == T_O_PRTH
-            || tok.type == T_O_BRKT) // || for || while ...
+        if (tok.type == T_IF || tok.type == T_O_PRTH || tok.type == T_O_BRKT
+            || tok.type == T_FOR || tok.type == T_WHILE
+            || tok.type == T_UNTIL) // T_CASE
     {
         ast = parse_shell_command();
         redirs = parse_redirs();
@@ -199,11 +192,7 @@ struct ast *parse_command()
     if (!ast || errno != 0)
         return NULL;
 
-    struct n_command *cmd = xcalloc(1, sizeof(struct n_command));
-    cmd->ast = ast;
-    cmd->redirs = redirs;
-
-    return ast;
+    return build_cmd(ast, redirs);
 }
 
 struct list_redir *parse_redirs()
@@ -245,24 +234,21 @@ struct ast *parse_simple_command()
         return NULL;
     }
 
-    // BUILD CMD
-    struct n_s_cmd *nCmd = xcalloc(1, sizeof(struct n_s_cmd));
-    nCmd->cmd = xstrdup(tok.command);
-    nCmd->cmd_arg = string_create();
+    char *cmd = xstrdup(tok.command);
+
+    struct string *cmd_arg_s = string_create();
 
     while ((tok = get_next_token()).type == T_WORD)
     {
         POP_TOKEN
-        if (nCmd->cmd_arg->data[0])
-            string_concat(nCmd->cmd_arg, " ");
-        string_concat(nCmd->cmd_arg, tok.command);
+        if (cmd_arg_s->data[0])
+            string_concat(cmd_arg_s, " ");
+        string_concat(cmd_arg_s, tok.command);
     }
 
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_S_CMD;
-    res->t_ast = nCmd;
+    char *cmd_arg = string_get(cmd_arg_s);
 
-    return res;
+    return build_s_cmd(cmd, cmd_arg);
 }
 
 struct ast *parse_shell_command()
@@ -272,7 +258,6 @@ struct ast *parse_shell_command()
             tok.type;
 
     struct ast *res;
-    // switch
     switch (baseType)
     {
     case T_O_BRKT:
@@ -280,13 +265,19 @@ struct ast *parse_shell_command()
         res = parse_compound();
 
         tok = POP_TOKEN CHECK_SEG_ERROR(
-            errno != 0 || tok.type == T_EOF
+            errno == ERROR_PARSING || tok.type == T_EOF
             || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
             || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
 
             return res;
     case T_IF:
         return parse_if_rule(0);
+    case T_FOR:
+        return parse_if_rule(0);
+    case T_WHILE:
+    case T_UNTIL:
+        return parse_while_until_rule(tok.type);
+        // T_CASE
 
     default:
         errno = ERROR_PARSING;
@@ -297,8 +288,8 @@ struct ast *parse_shell_command()
 struct ast *parse_if_rule(int inElif)
 {
     struct ast *condition = NULL;
-    struct ast *true = NULL;
-    struct ast *false = NULL;
+    struct ast *true_c = NULL;
+    struct ast *false_c = NULL;
 
     condition = parse_compound();
 
@@ -311,24 +302,24 @@ struct ast *parse_if_rule(int inElif)
         return NULL;
     }
 
-    true = parse_compound();
+    true_c = parse_compound();
 
     tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-        if (!true || errno != 0) return NULL;
+        if (!true_c || errno != 0) return NULL;
 
     if (tok.type == T_ELSE)
     {
         POP_TOKEN
-        false = parse_compound();
-        if (!false || errno != 0)
+        false_c = parse_compound();
+        if (!false_c || errno != 0)
             return NULL;
     }
     else if (tok.type == T_ELIF)
     {
         POP_TOKEN
-        false = parse_if_rule(1);
-        if (!false || errno != 0)
+        false_c = parse_if_rule(1);
+        if (!false_c || errno != 0)
             return NULL;
     }
 
@@ -336,28 +327,44 @@ struct ast *parse_if_rule(int inElif)
 
     CHECK_SEG_ERROR(tok.type != T_FI)
 
-        // BUILD IF
-        struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
-    n_if->condition = condition;
-    n_if->true = true;
-    n_if->false = false;
+        return build_if(condition, true_c, false_c);
+}
 
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_IF;
-    res->t_ast = n_if;
+struct ast *parse_while_until_rule(enum token tokT)
+{
+    struct ast *condition = NULL;
+    struct ast *statement = NULL;
 
-    return res;
+    condition = parse_compound();
+
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
+
+        if (!condition || errno != 0 || tok.type != T_DO)
+    {
+        if (tok.type != T_DO)
+            errno = ERROR_PARSING;
+        return NULL;
+    }
+
+    statement = parse_compound();
+
+    tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_DONE)
+
+        if (!statement || errno != 0) return NULL;
+
+    return build_binary((tokT == T_WHILE) ? AST_WHILE : AST_UNTIL, condition,
+                        statement);
 }
 
 struct ast *parse_compound()
 {
+    skip_newlines();
+
     if (check_ender_token())
         return NULL;
 
     struct ast *left = NULL;
     struct ast *right = NULL;
-
-    skip_newlines();
 
     left = parse_and_or();
 
@@ -380,61 +387,5 @@ struct ast *parse_compound()
     if (!right)
         return left;
 
-    // BUILD AND/OR
-    struct n_binary *nBinary = xcalloc(1, sizeof(struct n_binary));
-    nBinary->left = left;
-    nBinary->right = right;
-
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_LIST;
-    res->t_ast = nBinary;
-
-    return res;
-}
-
-void skip_newlines()
-{
-    while (get_next_token().type == T_NEWLINE)
-        pop_token();
-}
-
-int check_ender_token()
-{
-    struct token_info tok = get_next_token();
-
-    if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
-        || tok.type == T_FI || tok.type == T_C_PRTH || tok.type == T_C_BRKT)
-        return 1;
-
-    return 0;
-}
-
-static int is_chev(enum token tokT)
-{
-    if (tokT >= T_REDIR_1 && tokT <= T_REDIR_PIPE)
-        return 1;
-
-    return 0;
-}
-
-int is_redir()
-{
-    struct token_info tok = get_next_token();
-    if ((is_chev(tok.type) && look_forward_token(1).type == T_WORD)
-        || (tok.type == T_WORD && is_chev(look_forward_token(1).type)
-            && look_forward_token(2).type == T_WORD))
-        return 1;
-
-    return 0;
-}
-
-void add_to_redir_list(struct list_redir **redirs, struct list_redir *new_redir)
-{
-    if (!*redirs)
-    {
-        *redirs = new_redir;
-        return;
-    }
-
-    add_to_redir_list(&(*redirs)->next, new_redir);
+    return build_binary(AST_LIST, left, right);
 }

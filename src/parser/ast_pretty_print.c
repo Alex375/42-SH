@@ -32,7 +32,7 @@ void pp_rec(struct ast *ast, int prof)
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
         tab(prof);
-        printf("COMMAND = %s : %s\n", s_cmd_ast->cmd, s_cmd_ast->cmd_arg->data);
+        printf("COMMAND = %s : %s\n", s_cmd_ast->cmd, s_cmd_ast->cmd_arg);
         break;
     case AST_IF:
         if_ast = ast->t_ast;
@@ -41,21 +41,34 @@ void pp_rec(struct ast *ast, int prof)
         pp_rec(if_ast->condition, prof + 1);
         tab(prof);
         printf("THEN------\n");
-        pp_rec(if_ast->true, prof + 1);
-        if (if_ast->false)
+        pp_rec(if_ast->true_c, prof + 1);
+        if (if_ast->false_c)
         {
             tab(prof);
             printf("ELSE------\n");
-            pp_rec(if_ast->false, prof + 1);
+            pp_rec(if_ast->false_c, prof + 1);
         }
+        tab(prof);
+        printf("FI------\n");
         break;
     case AST_WHILE:
+    case AST_UNTIL:
+        binary_ast = ast->t_ast;
+        tab(prof);
+        if (ast->type == AST_WHILE)
+            printf("WHILE------\n");
+        else
+            printf("UNTIL------\n");
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("DO------\n");
+        pp_rec(binary_ast->right, prof + 1);
+        tab(prof);
+        printf("DONE------\n");
         break;
     case AST_FOR:
         break;
     case AST_CASE:
-        break;
-    case AST_UNTIL:
         break;
     case AST_PIPE:
         binary_ast = ast->t_ast;
