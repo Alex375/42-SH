@@ -31,6 +31,21 @@ struct string *echo_pars(char *s, struct string *new_s)
     return new_s;
 }
 
+void get_option(char *args, int *flag_n, int *flag_e)
+{
+    char *token = strtok(args, " ");
+    while (token != NULL)
+    {
+        if (strcmp("-n", token) == 0)
+            *flag_n = 1;
+
+        else if (strcmp("-e", token) == 0)
+            *flag_e = 1;
+
+        token = strtok(NULL, " ");
+    }
+}
+
 // TODO : preparse needed
 void echo(char *s, char *args)
 {
@@ -46,17 +61,7 @@ void echo(char *s, char *args)
     int flag_n = 0; // si flag = 0 on add un \n a la fin de notre string (-n)
     int flag_e = 0; // si flag = 1 on execute notre input
 
-    char *token = strtok(args, " ");
-    while (token != NULL)
-    {
-        if (strcmp("-n", token) == 0)
-            flag_n = 1;
 
-        else if (strcmp("-e", token) == 0)
-            flag_e = 1;
-
-        token = strtok(NULL, " ");
-    }
 
     if (flag_n == 0)
         new_s = string_append(new_s, '\n');
