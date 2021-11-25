@@ -3,11 +3,11 @@
 #include "lexer.h"
 
 struct words_converter converter = {
-    17,
-    11,
-    { "if", "then", "elif", "else", "fi", "!", "||", "&&", "\n", ";", "{", "}",
-      "(", ")", "|", ">", "<" },
-    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<" }
+    27 ,
+    16,
+    { "if", "then", "elif", "else", "fi", "while", "until", "for", "do", "done", "!", "||", "&&", "\n", ";", "{", "}",
+      "(", ")", "|", ">", "<", ">&", "<&", ">>", "<>", ">|" },
+    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&", ">>", "<>", ">|"  }
 };
 
 int separatorify(const char *token_str)
@@ -48,14 +48,28 @@ enum token tokenify(const char *token_str)
     return i;
 }
 
-int detect_first_seperator(struct string *accumulator)
+int look_ahead_token(struct string *accumulator, char next_char)
 {
     if (g_lexer_info.exp_context == IN_SQUOTE)
     {
         return 0;
     }
 
-    int token = separatorify(accumulator->data);
+    int token;
+
+    if (g_lexer_info.pos + 1 < g_lexer_info.script_size)
+    {
+        accumulator = string_append(accumulator, next_char);
+        token = separatorify(accumulator->data);
+        if (token != -1)
+        {
+            g_lexer_info.pos++;
+            return 1;
+        }
+        accumulator = string_pop(accumulator, NULL);
+    }
+
+    token = separatorify(accumulator->data);
     if (token == -1)
         return 0;
 

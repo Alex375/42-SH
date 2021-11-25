@@ -24,4 +24,4 @@ add_executable(42_SH ${SRC} src/main.c)
 
 #Test executable
 add_executable(lexer_test ${SRC} tests/unit_tests/lexer_test.c)
-target_link_libraries(lexer_test PUBLIC -lcunit)
+target_link_libraries(lexer_test PUBLIC -lcriterion)

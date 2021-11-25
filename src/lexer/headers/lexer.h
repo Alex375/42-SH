@@ -36,8 +36,8 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[17];
-    char *separator[11];
+    char *token_converter[27];
+    char *separator[16];
 };
 /**
 ** @brief                   Global variable that store the infos about the
@@ -52,7 +52,7 @@ int separatorify(const char *token_str);
 
 enum token tokenify(const char *token_str);
 
-int detect_first_seperator(struct string *accumulator);
+int look_ahead_token(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 

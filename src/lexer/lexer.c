@@ -62,7 +62,7 @@ struct token_info tokenify_next(const char *script, size_t size)
             accumulator = string_append(accumulator, script[g_lexer_info.pos]);
         g_lexer_info.pos++;
 
-        if (detect_first_seperator(accumulator))
+        if (look_ahead_token(accumulator, script[g_lexer_info.pos]))
             break;
     } while (look_ahead(script, size));
 
@@ -72,8 +72,8 @@ struct token_info tokenify_next(const char *script, size_t size)
 struct token_info look_forward_token(int i)
 {
     struct token_info EOF = { T_EOF, NULL };
-
-    if (g_lexer_info.token_list == NULL || g_lexer_info.array_pos + i < 0
+    int new_pos = g_lexer_info.array_pos + i;
+    if (g_lexer_info.token_list == NULL || new_pos < 0
         || g_lexer_info.array_pos + i >= g_lexer_info.token_list->size)
     {
         return EOF;
