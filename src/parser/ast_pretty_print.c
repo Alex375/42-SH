@@ -132,9 +132,10 @@ void ast_pretty_print(char *script, size_t size)
     {
         errno = 0;
         ast = parse_input();
-        if (errno == ERROR_PARSING)
+        if (errno != 0)
         {
-            printf("!!! ERROR WHILE PARSING \n");
+            if (errno == ERROR_PARSING)
+                printf("!!! ERROR WHILE PARSING \n");
             break;
         }
         else
