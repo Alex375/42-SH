@@ -24,6 +24,7 @@ int main(int argc, char **argv)
             printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n", temp);
         if (opt->print)
             ast_pretty_print(temp, size);
+
         xfree(temp);
     }
 

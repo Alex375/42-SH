@@ -17,7 +17,7 @@ int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline wit
     {
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
-        res = execute(cmd_ast->cmd_line, pipeline);
+        res = execute(s_cmd_ast->cmd, s_cmd_ast->cmd_arg->data, pipeline);
         return res;
     case AST_IF:
         if_ast = ast->t_ast;
@@ -62,6 +62,6 @@ int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline wit
     case AST_CMD:
         cmd = ast->t_ast;
         //TODO exec redirs
-        return eval_ast(cmd->ast);
+        return eval_ast(cmd->ast, pipeline);
     }
 }
