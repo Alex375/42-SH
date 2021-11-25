@@ -14,7 +14,7 @@ struct pipeline
     int fd[2];
 };
 
-int execute(char *cmd, struct pipeline *pipeline);
+int execute(char *cmd, char *args, struct pipeline *pipeline);
 int exec_pipe(struct ast *left, struct ast *right, struct pipeline *pipeline);
 
 #endif // INC_42_SH_EXECUTION_H

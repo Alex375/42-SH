@@ -33,8 +33,6 @@ int look_ahead_keywords(const char *script, size_t size)
 
 struct token_info lex_keywords(struct token_info res, struct string *string)
 {
-    g_lexer_info.context = GENERAL;
     string_free(string);
-
     return res;
 }

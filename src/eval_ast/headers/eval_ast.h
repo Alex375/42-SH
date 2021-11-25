@@ -1,8 +1,8 @@
 #ifndef INC_42_SH_EVAL_AST_H
 #define INC_42_SH_EVAL_AST_H
 
-#include "parser.h"
 #include "execution.h"
+#include "parser.h"
 
 /**
 ** @brief               Evaluate builded ast executing commands along the way

@@ -30,7 +30,8 @@ struct string *string_append(struct string *string, char c);
 struct string *string_concat(struct string *destination, char *source);
 
 /**
-** @brief                   Free the data structure around string and return the string date (you will need to free it).
+** @brief                   Free the data structure around string and return the
+*string date (you will need to free it).
 ** @param destination       String data that will be free.
 */
 void *string_get(struct string *string);
@@ -40,6 +41,5 @@ void *string_get(struct string *string);
 ** @param destination       String structure that will be free.
 */
 void string_free(struct string *string);
-
 
 #endif // INC_42_SH_STRING_H

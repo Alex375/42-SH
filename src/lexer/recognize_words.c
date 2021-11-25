@@ -3,11 +3,11 @@
 #include "lexer.h"
 
 struct words_converter converter = {
-    16,
-    10,
-    { "if", "then", "elif", "else", "fi", "!", "||", "&&", "\n", ";", "'", "{",
-      "}", "(", ")", "|" },
-    { "||", "&&", "\n", ";", "'", "(", ")", "|", " ", "\0" }
+    17,
+    11,
+    { "if", "then", "elif", "else", "fi", "!", "||", "&&", "\n", ";", "{", "}",
+      "(", ")", "|", ">", "<" },
+    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<" }
 };
 
 int separatorify(const char *token_str)
@@ -42,7 +42,7 @@ enum token tokenify(const char *token_str)
 
     /* UNKOWN TOKEN */
     if (i >= converter.nb_token)
-        return T_COMMAND;
+        return T_WORD;
 
     /* KNOWN TOKEN */
     return i;
@@ -50,19 +50,14 @@ enum token tokenify(const char *token_str)
 
 int detect_first_seperator(struct string *accumulator)
 {
+    if (g_lexer_info.exp_context == IN_SQUOTE)
+    {
+        return 0;
+    }
+
     int token = separatorify(accumulator->data);
     if (token == -1)
         return 0;
-
-    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
-    {
-        if (token == 4)
-        {
-            return 1;
-        }
-
-        return 0;
-    }
 
     return 1;
 }

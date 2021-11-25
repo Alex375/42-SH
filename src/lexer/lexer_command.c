@@ -2,13 +2,16 @@
 
 struct token_info lex_command(struct token_info res, struct string *string)
 {
-    if (g_lexer_info.context == IN_COMMAND)
+    if (g_lexer_info.exp_context == IN_SQUOTE)
     {
-        res.type = T_COMMAND_ARG;
+        res.type = T_ERROR;
+        res.command = NULL;
+        string_free(string);
     }
-
-    g_lexer_info.context = IN_COMMAND;
-    res.command = string_get(string);
-
+    else
+    {
+        res.type = T_WORD;
+        res.command = string_get(string);
+    }
     return res;
 }
