@@ -1,8 +1,9 @@
+#include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <errno.h>
 
-#include "headers/parser.h"
+#include "parser.h"
+#include "string.h"
 
 void tab(int prof)
 {
@@ -21,16 +22,17 @@ void pp_rec(struct ast *ast, int prof)
         return;
     }
 
-    struct n_cmd *cmd_ast;
+    struct n_s_cmd *s_cmd_ast;
     struct n_binary *binary_ast;
     struct n_if *if_ast;
+    struct n_command *cmd_ast;
 
     switch (ast->type)
     {
-    case AST_CMD:
-        cmd_ast = ast->t_ast;
+    case AST_S_CMD:
+        s_cmd_ast = ast->t_ast;
         tab(prof);
-        printf("COMMAND : %s\n", cmd_ast->cmd_line);
+        printf("COMMAND = %s : %s\n", s_cmd_ast->cmd, s_cmd_ast->cmd_arg->data);
         break;
     case AST_IF:
         if_ast = ast->t_ast;
@@ -101,21 +103,35 @@ void pp_rec(struct ast *ast, int prof)
         break;
     case AST_PARENTH:
         break;
+    case AST_CMD:
+        cmd_ast = ast->t_ast;
+        pp_rec(cmd_ast->ast, prof + 1);
+        tab(prof);
+        printf("REDIRS : ");
+        struct list_redir *tmp = cmd_ast->redirs;
+        while (tmp)
+        {
+            printf("%s into %s |", tmp->ionumber, tmp->word);
+            tmp = tmp->next;
+        }
+        printf("\n");
+        break;
     }
 }
 
-void ast_pretty_print(const char *script, size_t size)
+void ast_pretty_print(char *script, size_t size)
 {
     struct ast *ast;
     errno = 0;
 
-    //struct token_info t;
-    //while ((t = pop_token(script, size)).type != T_EOF);
+    // struct token_info t;
+    // while ((t = pop_token(script, size)).type != T_EOF);
 
+    lexer_start(script, size);
     while (errno != ERROR_EMPTY_EOF)
     {
         errno = 0;
-        ast = parse_input(script, size);
+        ast = parse_input();
         if (errno == ERROR_PARSING)
         {
             printf("!!! ERROR WHILE PARSING \n");
@@ -124,4 +140,5 @@ void ast_pretty_print(const char *script, size_t size)
         else
             pp_rec(ast, 0);
     }
+    lexer_reset();
 }

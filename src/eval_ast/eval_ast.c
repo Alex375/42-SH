@@ -5,18 +5,19 @@ int eval_ast(struct ast *ast)
     if (!ast)
         return 0;
 
-    struct n_cmd *cmd_ast;
+    struct n_s_cmd *s_cmd_ast;
     struct n_binary *binary_ast;
     struct n_if *if_ast;
+    struct n_command *cmd;
 
     int res;
 
     switch (ast->type)
     {
-    case AST_CMD:
-        cmd_ast = ast->t_ast;
+    case AST_S_CMD:
+        s_cmd_ast = ast->t_ast;
         //TODO exec cmd
-        if (cmd_ast->cmd_line)
+        if (s_cmd_ast->cmd)
             return 1;
         return 0; // exit code of cmd
     case AST_IF:
@@ -58,5 +59,9 @@ int eval_ast(struct ast *ast)
         return 0;
     case AST_PARENTH:
         return 0;
+    case AST_CMD:
+        cmd = ast->t_ast;
+        //TODO exec redirs
+        return eval_ast(cmd->ast);
     }
 }
