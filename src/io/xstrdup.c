@@ -1,7 +1,8 @@
+#include "xstrdup.h"
+
 #include <string.h>
 
 #include "xalloc.h"
-#include "xstrdup.h"
 
 char *xstrdup(const char *s)
 {

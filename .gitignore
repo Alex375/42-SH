@@ -22,3 +22,5 @@ launch.json
 # CLion
 .idea/
 cmake-build-debug/
+
+debug.sh
