@@ -32,7 +32,11 @@ void pp_rec(struct ast *ast, int prof)
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
         tab(prof);
-        printf("COMMAND = %s : %s\n", s_cmd_ast->cmd, s_cmd_ast->cmd_arg);
+        printf("COMMAND = %s ", s_cmd_ast->cmd);
+        int i = 0;
+        while (s_cmd_ast->cmd_arg[i])
+            printf("%s ", s_cmd_ast->cmd_arg[i++]);
+        printf("\n");
         break;
     case AST_IF:
         if_ast = ast->t_ast;
@@ -132,27 +136,9 @@ void pp_rec(struct ast *ast, int prof)
     }
 }
 
-void ast_pretty_print(char *script, size_t size)
+void ast_pretty_print(struct ast *ast)
 {
-    struct ast *ast;
-    errno = 0;
-
-    // struct token_info t;
-    // while ((t = pop_token(script, size)).type != T_EOF);
-
-    lexer_start(script, size);
-    while (errno != ERROR_EMPTY_EOF)
-    {
-        errno = 0;
-        ast = parse_input();
-        if (errno != 0)
-        {
-            if (errno == ERROR_PARSING)
-                printf("!!! ERROR WHILE PARSING \n");
-            break;
-        }
-        else
-            pp_rec(ast, 0);
-    }
-    lexer_reset();
+    if (errno == ERROR_PARSING)
+        printf("!!! ERROR WHILE PARSING \n");
+    pp_rec(ast, 0);
 }

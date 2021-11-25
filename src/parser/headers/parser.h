@@ -2,7 +2,6 @@
 #define INC_42_SH_PARSER_H
 
 #include "lexer.h"
-#include "xstring.h"
 
 /**
 ** @brief                   Describe the node type in ast.
@@ -42,7 +41,7 @@ struct ast
 struct n_s_cmd
 {
     char *cmd;
-    char *cmd_arg;
+    char **cmd_arg;
     struct list_redir *redirs;
 };
 
@@ -106,10 +105,10 @@ struct ast *build_if(struct ast *condition, struct ast * true_c,
 /**
 ** @brief               builds a n_s_cmd node
 ** @param cmd           name of the command
-** @param cmd_arg       string containing all the command arguments
+** @param cmd_arg       string list containing all the command arguments
  *                      separated by spaces.
 */
-struct ast *build_s_cmd(char *cmd, char *cmd_arg);
+struct ast *build_s_cmd(char *cmd, char **cmd_arg);
 
 /**
 ** @brief               builds a n_command node
@@ -133,10 +132,9 @@ void exec_script(char *script, size_t size);
 
 /**
 ** @brief               printing the ast obtain from a script
-** @param script        string containing block
-** @param size          len of script parameter
+** @param ast           Ast to be printed
 */
-void ast_pretty_print(char *script, size_t size);
+void ast_pretty_print(struct ast *ast);
 
 /**
 ** @brief               start the parsing of a script

@@ -8,6 +8,8 @@
 #include "options.h"
 #include "read_script.h"
 
+extern struct options *opt;
+
 void exec_script(char *script, size_t size)
 {
     struct ast *ast;
@@ -21,6 +23,8 @@ void exec_script(char *script, size_t size)
         errno = 0;
         pipeline->out = -1;
         ast = parse_input();
+        if (opt->print)
+            ast_pretty_print(ast);
         if (errno != 0)
         {
             if (errno == ERROR_PARSING)
@@ -34,5 +38,6 @@ void exec_script(char *script, size_t size)
             eval_ast(ast, pipeline);
     }
     lexer_reset();
+    xfree(pipeline);
 }
 

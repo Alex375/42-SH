@@ -31,7 +31,7 @@ struct ast *build_if(struct ast *condition, struct ast *true_c,
     return res;
 }
 
-struct ast *build_s_cmd(char *cmd, char *cmd_arg)
+struct ast *build_s_cmd(char *cmd, char **cmd_arg)
 {
     struct n_s_cmd *nCmd = xcalloc(1, sizeof(struct n_s_cmd));
     nCmd->cmd = cmd;

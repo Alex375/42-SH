@@ -31,9 +31,9 @@ int eval_ast(struct ast *ast,
     case AST_WHILE:
     case AST_UNTIL:
         b_ast = ast->t_ast;
-        while (
-            (ast->type == T_UNTIL && eval_ast(b_ast->left, pipeline) != 0)
-            || (ast->type == T_WHILE && eval_ast(b_ast->left, pipeline) == 0))
+        while ((ast->type == AST_UNTIL && eval_ast(b_ast->left, pipeline))
+                || (ast->type == AST_WHILE
+                    && eval_ast(b_ast->left, pipeline) == 0))
             res = eval_ast(b_ast->right, pipeline);
 
         return res;
@@ -57,11 +57,11 @@ int eval_ast(struct ast *ast,
     case AST_AND:
         b_ast = ast->t_ast;
         return eval_ast(b_ast->left, pipeline)
-            && eval_ast(b_ast->right, pipeline);
+            || eval_ast(b_ast->right, pipeline);
     case AST_OR:
         b_ast = ast->t_ast;
         return eval_ast(b_ast->left, pipeline)
-            || eval_ast(b_ast->right, pipeline);
+            && eval_ast(b_ast->right, pipeline);
     case AST_BRACKET:
         return 0;
     case AST_PARENTH:

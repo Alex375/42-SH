@@ -30,7 +30,7 @@ struct pipeline
  * pipeline)
  * @return          Return the exit command of the executed command
  */
-int execute(char *cmd, char *args, struct pipeline *pipeline);
+int execute(char *cmd, char **args, struct pipeline *pipeline);
 
 /*!
  *

@@ -5,7 +5,6 @@
 
 #include "xalloc.h"
 #include "xstrdup.h"
-#include "xstring.h"
 
 #define CHECK_SEG_ERROR(condition)                                             \
     if (condition)                                                             \
@@ -236,17 +235,21 @@ struct ast *parse_simple_command()
 
     char *cmd = xstrdup(tok.command);
 
-    struct string *cmd_arg_s = string_create();
-
+    int cap = 8;
+    int i = 1;
+    char **cmd_arg = xcalloc(cap, sizeof(char*));
+    cmd_arg[0] = cmd;
     while ((tok = get_next_token()).type == T_WORD)
     {
+        if (i >= cap - 1)
+        {
+            cap *= 2;
+            xrecalloc(cmd_arg, cap);
+        }
         POP_TOKEN
-        if (cmd_arg_s->data[0])
-            string_concat(cmd_arg_s, " ");
-        string_concat(cmd_arg_s, tok.command);
+        cmd_arg[i] = xstrdup(tok.command);
+        i++;
     }
-
-    char *cmd_arg = string_get(cmd_arg_s);
 
     return build_s_cmd(cmd, cmd_arg);
 }

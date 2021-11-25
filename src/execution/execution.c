@@ -1,7 +1,7 @@
 #include "execution.h"
 
 #include <err.h>
-#include <printf.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -16,13 +16,13 @@ void exit_program(char *msg)
     err(1, "%s", msg);
 }
 
-int execute(char *cmd, char *args, struct pipeline *pipeline)
+int execute(char *cmd, char **args, struct pipeline *pipeline)
 {
     if (opt->verbose)
     {
-        printf("Executing command -> %s\nWith args -> %s\nOn "
+        printf("Executing command -> %s\nWith args -> \nOn "
                "%s\n",
-               cmd, args,
+               cmd,
                (pipeline->out == -1)      ? "no pipeline"
                    : (pipeline->out == 1) ? "out "
                                             "pipeline"
@@ -41,7 +41,7 @@ int execute(char *cmd, char *args, struct pipeline *pipeline)
                  ((pipeline->out) ? STDOUT_FILENO : STDIN_FILENO));
             close(pipeline->fd[!(pipeline->out)]);
         }
-        if (execlp(cmd, cmd, args, NULL) == -1)
+        if (execvp(cmd, args) == -1)
         {
             // TODO : handle exec error
             err(1, "Failed to exec");
