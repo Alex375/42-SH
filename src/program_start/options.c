@@ -65,7 +65,8 @@ int get_option(struct options *options, int argc, char **argv)
         default:
             fprintf(stderr, "Wrong argument\n");
             print_usage();
-            return 1;
+            xfree_all();
+            exit(1);
         }
     }
 

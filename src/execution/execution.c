@@ -1,10 +1,14 @@
 #include "execution.h"
 
 #include <err.h>
-#include <unistd.h>
+#include <printf.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
+#include "options.h"
 #include "xalloc.h"
+
+extern struct options *opt;
 
 void exit_program(char *msg)
 {
@@ -14,6 +18,16 @@ void exit_program(char *msg)
 
 int execute(char *cmd, char *args, struct pipeline *pipeline)
 {
+    if (opt->verbose)
+    {
+        printf("Executing command -> %s\nWith args -> %s\nOn "
+               "%s\n",
+               cmd, args,
+               (pipeline->out == -1)      ? "no pipeline"
+                   : (pipeline->out == 1) ? "out "
+                                            "pipeline"
+                                          : "in pipline");
+    }
     pid_t pid = fork();
     if (pid == -1)
     {
