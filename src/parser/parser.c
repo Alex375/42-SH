@@ -15,6 +15,22 @@
         return NULL;                                                           \
     }
 
+#define POP_TOKEN \
+    pop_token();\
+    if (tok.type == T_ERROR)\
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define GET_TOKEN \
+    get_next_token();              \
+    if (tok.type == T_ERROR)\
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
 struct ast *start_parse(char *script, size_t size)
 {
     lexer_start(script, size);
@@ -28,17 +44,17 @@ struct ast *start_parse(char *script, size_t size)
 
 struct ast *parse_input()
 {
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
     if (tok.type == T_EOF || tok.type == T_NEWLINE)
     {
-        pop_token();
+        POP_TOKEN
         if (tok.type == T_EOF)
             errno = ERROR_EMPTY_EOF;
         return NULL;
     }
     struct ast *ast = parse_list();
 
-    tok = pop_token();
+    tok = POP_TOKEN
     CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
 
     return ast;
@@ -57,12 +73,12 @@ struct ast *parse_list()
     if (!left || errno != 0)
         return NULL;
 
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
 
     if (tok.type != T_SEMICOLON)
         return left;
 
-    pop_token();
+    POP_TOKEN
 
     right = parse_list();
 
@@ -91,12 +107,12 @@ struct ast *parse_and_or()
 
     left = parse_pipeline();
 
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
 
     if (!left || errno != 0 || (tok.type != T_OR && tok.type != T_AND))
         return left;
 
-    pop_token();
+    POP_TOKEN
 
     skip_newlines();
 
@@ -121,25 +137,25 @@ struct ast *parse_pipeline()
 {
     void *ast = NULL;
 
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
     enum token baseType = tok.type;
 
     if (tok.type == T_NOT)
     {
-        pop_token();
+        POP_TOKEN
         ast = parse_pipeline();
     }
     else
     {
         struct ast *left = parse_command();
 
-        tok = get_next_token();
+        tok = GET_TOKEN
 
         if (!left || errno != 0 || tok.type != T_PIPE)
             return left;
 
-        pop_token();
+        POP_TOKEN
 
         skip_newlines();
 
@@ -171,7 +187,7 @@ struct ast *parse_command()
     void *ast = NULL;
     struct list_redir *redirs = NULL;
 
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (tok.type == T_IF || tok.type == T_O_PRTH
@@ -201,7 +217,7 @@ struct list_redir *parse_redirs()
 
     while (1)
     {
-        struct token_info tok = get_next_token();
+        struct token_info tok = GET_TOKEN
 
         if (!is_redir())
             break;
@@ -210,14 +226,14 @@ struct list_redir *parse_redirs()
 
         if (tok.type == T_WORD)
         {
-            pop_token();
+            POP_TOKEN
             new_redir->ionumber = tok.command;
         }
 
-        tok = pop_token();
+        tok = POP_TOKEN
         new_redir->redir_type = tok.type;
 
-        tok = pop_token();
+        tok = POP_TOKEN
         CHECK_SEG_ERROR(tok.type != T_WORD)
         new_redir->word = tok.command;
 
@@ -229,7 +245,7 @@ struct list_redir *parse_redirs()
 
 struct ast *parse_simple_command()
 {
-    struct token_info tok = pop_token();
+    struct token_info tok = POP_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (tok.type != T_WORD)
@@ -245,7 +261,7 @@ struct ast *parse_simple_command()
 
     while((tok = get_next_token()).type == T_WORD)
     {
-        pop_token();
+        POP_TOKEN
         if (nCmd->cmd_arg->data[0])
             string_concat(nCmd->cmd_arg, " ");
         string_concat(nCmd->cmd_arg, tok.command);
@@ -260,7 +276,7 @@ struct ast *parse_simple_command()
 
 struct ast *parse_shell_command()
 {
-    struct token_info tok = pop_token();
+    struct token_info tok = POP_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
     enum token baseType = tok.type;
 
@@ -272,7 +288,7 @@ struct ast *parse_shell_command()
     case T_O_PRTH:
         res = parse_compound();
 
-        tok = pop_token();
+        tok = POP_TOKEN
         CHECK_SEG_ERROR(errno != 0 || tok.type == T_EOF
                         || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
                         || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
@@ -295,7 +311,7 @@ struct ast *parse_if_rule(int inElif)
 
     condition = parse_compound();
 
-    struct token_info tok = pop_token();
+    struct token_info tok = POP_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (!condition || errno != 0 || tok.type != T_THEN)
@@ -307,7 +323,7 @@ struct ast *parse_if_rule(int inElif)
 
     true = parse_compound();
 
-    tok = get_next_token();
+    tok = GET_TOKEN
     CHECK_SEG_ERROR(tok.type == T_EOF)
 
     if (!true || errno != 0)
@@ -315,22 +331,24 @@ struct ast *parse_if_rule(int inElif)
 
     if (tok.type == T_ELSE)
     {
-        pop_token();
+        POP_TOKEN
         false = parse_compound();
         if (!false || errno != 0)
             return NULL;
     }
     else if (tok.type == T_ELIF)
     {
-        pop_token();
+        POP_TOKEN
         false = parse_if_rule(1);
         if (!false || errno != 0)
             return NULL;
     }
 
-    tok = get_next_token();
+    tok = GET_TOKEN
     if (!inElif)
-        pop_token();
+    {
+        POP_TOKEN
+    }
 
     CHECK_SEG_ERROR(tok.type != T_FI)
 
@@ -359,7 +377,7 @@ struct ast *parse_compound()
 
     left = parse_and_or();
 
-    struct token_info tok = get_next_token();
+    struct token_info tok = GET_TOKEN
 
     if (!left || errno != 0)
         return NULL;
@@ -367,7 +385,7 @@ struct ast *parse_compound()
     if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
         return left;
 
-    pop_token();
+    POP_TOKEN
 
     skip_newlines();
 
