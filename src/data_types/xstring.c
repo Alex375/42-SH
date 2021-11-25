@@ -1,4 +1,5 @@
 #include "xstring.h"
+
 #include "xalloc.h"
 
 struct string *string_create()

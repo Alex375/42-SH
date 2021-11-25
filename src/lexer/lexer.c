@@ -2,15 +2,7 @@
 
 #include <ctype.h>
 
-struct lexer_info g_lexer_info = {
-    NULL,
-    GENERAL,
-    GENERAL,
-    0,
-    0,
-    NULL,
-    0
-};
+struct lexer_info g_lexer_info = { NULL, GENERAL, GENERAL, 0, 0, NULL, 0 };
 
 void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 {
@@ -30,7 +22,8 @@ static int look_ahead(const char *script, size_t size)
     }
 }
 
-static struct token_info lex_accumulator(struct token_info res, struct string *string)
+static struct token_info lex_accumulator(struct token_info res,
+                                         struct string *string)
 {
     res.type = tokenify(string->data);
     if (res.type == T_WORD || g_lexer_info.last_context != GENERAL)
@@ -80,8 +73,8 @@ struct token_info look_forward_token(int i)
 {
     struct token_info EOF = { T_EOF, NULL };
 
-    if (g_lexer_info.token_list == NULL || g_lexer_info.array_pos + i < 0 ||
-        g_lexer_info.array_pos + i >= g_lexer_info.token_list->size)
+    if (g_lexer_info.token_list == NULL || g_lexer_info.array_pos + i < 0
+        || g_lexer_info.array_pos + i >= g_lexer_info.token_list->size)
     {
         return EOF;
     }
@@ -93,8 +86,8 @@ struct token_info get_next_token(void)
 {
     struct token_info EOF = { T_EOF, NULL };
 
-    if (g_lexer_info.token_list == NULL ||
-        g_lexer_info.array_pos >= g_lexer_info.token_list->size)
+    if (g_lexer_info.token_list == NULL
+        || g_lexer_info.array_pos >= g_lexer_info.token_list->size)
     {
         return EOF;
     }
@@ -106,8 +99,8 @@ struct token_info pop_token(void)
 {
     struct token_info EOF = { T_EOF, NULL };
 
-    if (g_lexer_info.token_list == NULL ||
-        g_lexer_info.array_pos >= g_lexer_info.token_list->size)
+    if (g_lexer_info.token_list == NULL
+        || g_lexer_info.array_pos >= g_lexer_info.token_list->size)
     {
         return EOF;
     }

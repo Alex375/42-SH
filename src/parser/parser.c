@@ -7,7 +7,6 @@
 #include "xstrdup.h"
 #include "xstring.h"
 
-
 #define CHECK_SEG_ERROR(condition)                                             \
     if (condition)                                                             \
     {                                                                          \
@@ -15,17 +14,17 @@
         return NULL;                                                           \
     }
 
-#define POP_TOKEN \
-    pop_token();\
-    if (tok.type == T_ERROR)\
+#define POP_TOKEN                                                              \
+    pop_token();                                                               \
+    if (tok.type == T_ERROR)                                                   \
     {                                                                          \
         errno = ERROR_PARSING;                                                 \
         return NULL;                                                           \
     }
 
-#define GET_TOKEN \
-    get_next_token();              \
-    if (tok.type == T_ERROR)\
+#define GET_TOKEN                                                              \
+    get_next_token();                                                          \
+    if (tok.type == T_ERROR)                                                   \
     {                                                                          \
         errno = ERROR_PARSING;                                                 \
         return NULL;                                                           \
@@ -44,8 +43,8 @@ struct ast *start_parse(char *script, size_t size)
 
 struct ast *parse_input()
 {
-    struct token_info tok = GET_TOKEN
-    if (tok.type == T_EOF || tok.type == T_NEWLINE)
+    struct token_info tok =
+        GET_TOKEN if (tok.type == T_EOF || tok.type == T_NEWLINE)
     {
         POP_TOKEN
         if (tok.type == T_EOF)
@@ -54,10 +53,9 @@ struct ast *parse_input()
     }
     struct ast *ast = parse_list();
 
-    tok = POP_TOKEN
-    CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
+    tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_EOF && tok.type != T_NEWLINE)
 
-    return ast;
+        return ast;
 }
 
 struct ast *parse_list()
@@ -75,8 +73,7 @@ struct ast *parse_list()
 
     struct token_info tok = GET_TOKEN
 
-    if (tok.type != T_SEMICOLON)
-        return left;
+        if (tok.type != T_SEMICOLON) return left;
 
     POP_TOKEN
 
@@ -109,8 +106,8 @@ struct ast *parse_and_or()
 
     struct token_info tok = GET_TOKEN
 
-    if (!left || errno != 0 || (tok.type != T_OR && tok.type != T_AND))
-        return left;
+        if (!left || errno != 0
+            || (tok.type != T_OR && tok.type != T_AND)) return left;
 
     POP_TOKEN
 
@@ -137,9 +134,9 @@ struct ast *parse_pipeline()
 {
     void *ast = NULL;
 
-    struct token_info tok = GET_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
-    enum token baseType = tok.type;
+    struct token_info tok =
+        GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
+            tok.type;
 
     if (tok.type == T_NOT)
     {
@@ -152,8 +149,7 @@ struct ast *parse_pipeline()
 
         tok = GET_TOKEN
 
-        if (!left || errno != 0 || tok.type != T_PIPE)
-            return left;
+            if (!left || errno != 0 || tok.type != T_PIPE) return left;
 
         POP_TOKEN
 
@@ -187,11 +183,10 @@ struct ast *parse_command()
     void *ast = NULL;
     struct list_redir *redirs = NULL;
 
-    struct token_info tok = GET_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    struct token_info tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (tok.type == T_IF || tok.type == T_O_PRTH
-        || tok.type == T_O_BRKT) // || for || while ...
+        if (tok.type == T_IF || tok.type == T_O_PRTH
+            || tok.type == T_O_BRKT) // || for || while ...
     {
         ast = parse_shell_command();
         redirs = parse_redirs();
@@ -219,8 +214,7 @@ struct list_redir *parse_redirs()
     {
         struct token_info tok = GET_TOKEN
 
-        if (!is_redir())
-            break;
+            if (!is_redir()) break;
 
         struct list_redir *new_redir = xcalloc(1, sizeof(struct list_redir));
 
@@ -230,12 +224,10 @@ struct list_redir *parse_redirs()
             new_redir->ionumber = tok.command;
         }
 
-        tok = POP_TOKEN
-        new_redir->redir_type = tok.type;
+        tok = POP_TOKEN new_redir->redir_type = tok.type;
 
-        tok = POP_TOKEN
-        CHECK_SEG_ERROR(tok.type != T_WORD)
-        new_redir->word = tok.command;
+        tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
+            tok.command;
 
         add_to_redir_list(&res, new_redir);
     }
@@ -245,10 +237,9 @@ struct list_redir *parse_redirs()
 
 struct ast *parse_simple_command()
 {
-    struct token_info tok = POP_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (tok.type != T_WORD)
+        if (tok.type != T_WORD)
     {
         errno = ERROR_PARSING;
         return NULL;
@@ -259,7 +250,7 @@ struct ast *parse_simple_command()
     nCmd->cmd = xstrdup(tok.command);
     nCmd->cmd_arg = string_create();
 
-    while((tok = get_next_token()).type == T_WORD)
+    while ((tok = get_next_token()).type == T_WORD)
     {
         POP_TOKEN
         if (nCmd->cmd_arg->data[0])
@@ -276,9 +267,9 @@ struct ast *parse_simple_command()
 
 struct ast *parse_shell_command()
 {
-    struct token_info tok = POP_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
-    enum token baseType = tok.type;
+    struct token_info tok =
+        POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
+            tok.type;
 
     struct ast *res;
     // switch
@@ -288,12 +279,12 @@ struct ast *parse_shell_command()
     case T_O_PRTH:
         res = parse_compound();
 
-        tok = POP_TOKEN
-        CHECK_SEG_ERROR(errno != 0 || tok.type == T_EOF
-                        || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
-                        || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
+        tok = POP_TOKEN CHECK_SEG_ERROR(
+            errno != 0 || tok.type == T_EOF
+            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
+            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
 
-        return res;
+            return res;
     case T_IF:
         return parse_if_rule(0);
 
@@ -311,10 +302,9 @@ struct ast *parse_if_rule(int inElif)
 
     condition = parse_compound();
 
-    struct token_info tok = POP_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (!condition || errno != 0 || tok.type != T_THEN)
+        if (!condition || errno != 0 || tok.type != T_THEN)
     {
         if (tok.type != T_THEN)
             errno = ERROR_PARSING;
@@ -323,11 +313,9 @@ struct ast *parse_if_rule(int inElif)
 
     true = parse_compound();
 
-    tok = GET_TOKEN
-    CHECK_SEG_ERROR(tok.type == T_EOF)
+    tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
-    if (!true || errno != 0)
-        return NULL;
+        if (!true || errno != 0) return NULL;
 
     if (tok.type == T_ELSE)
     {
@@ -344,16 +332,12 @@ struct ast *parse_if_rule(int inElif)
             return NULL;
     }
 
-    tok = GET_TOKEN
-    if (!inElif)
-    {
-        POP_TOKEN
-    }
+    tok = GET_TOKEN if (!inElif){ POP_TOKEN }
 
     CHECK_SEG_ERROR(tok.type != T_FI)
 
-    // BUILD IF
-    struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
+        // BUILD IF
+        struct n_if *n_if = xcalloc(1, sizeof(struct n_if));
     n_if->condition = condition;
     n_if->true = true;
     n_if->false = false;
@@ -379,8 +363,7 @@ struct ast *parse_compound()
 
     struct token_info tok = GET_TOKEN
 
-    if (!left || errno != 0)
-        return NULL;
+        if (!left || errno != 0) return NULL;
 
     if (tok.type != T_SEMICOLON && tok.type != T_NEWLINE)
         return left;

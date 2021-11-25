@@ -1,4 +1,5 @@
 #include "token_vec.h"
+
 #include "xalloc.h"
 
 struct tkvec *tkvec_create()
@@ -14,7 +15,8 @@ struct tkvec *tkvec_append(struct tkvec *tkvec, struct token_info tk)
     if (tkvec->size == tkvec->capacity)
     {
         tkvec->capacity = tkvec->capacity * 2;
-        tkvec->data = xrealloc(tkvec->data, tkvec->capacity * sizeof(struct tkvec));
+        tkvec->data =
+            xrealloc(tkvec->data, tkvec->capacity * sizeof(struct tkvec));
     }
     tkvec->data[tkvec->size] = tk;
     tkvec->size++;

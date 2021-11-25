@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#include "tokens.h"
 #include "token_vec.h"
+#include "tokens.h"
 #include "xstring.h"
 
 enum expansion_context
@@ -28,7 +28,7 @@ struct lexer_info
     enum expansion_context last_context;
     size_t array_pos;
     size_t pos;
-    char* script;
+    char *script;
     size_t script_size;
 };
 
@@ -40,7 +40,8 @@ struct words_converter
     char *separator[11];
 };
 /**
-** @brief                   Global variable that store the infos about the lexer.
+** @brief                   Global variable that store the infos about the
+*lexer.
 */
 extern struct lexer_info g_lexer_info;
 
@@ -63,7 +64,7 @@ int detect_context(char c);
 
 int look_ahead_squote(size_t size);
 
-void lexer_start(char* script, size_t size);
+void lexer_start(char *script, size_t size);
 
 void lexer_reset();
 

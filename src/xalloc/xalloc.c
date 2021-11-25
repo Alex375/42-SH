@@ -1,7 +1,7 @@
 #include "xalloc.h"
 
-#include <string.h>
 #include <err.h>
+#include <string.h>
 
 struct xmalloc_t *head = NULL;
 
@@ -9,7 +9,6 @@ static struct xmalloc_t *get_header(void *data)
 {
     struct xmalloc_t *header = data;
     return header - 1;
-
 }
 static void check_xmalloc(struct xmalloc_t *res)
 {
@@ -81,14 +80,13 @@ void xfree(void *data)
     free(xmalloc);
 }
 
-void *xrealloc(void* data, size_t new_size)
+void *xrealloc(void *data, size_t new_size)
 {
     if (data == NULL)
         return xmalloc(new_size);
     struct xmalloc_t *xmalloc = get_header(data);
     xmalloc = realloc(xmalloc, sizeof(struct xmalloc_t) + new_size);
     check_xmalloc(xmalloc);
-
 
     if (xmalloc->previous != NULL)
         xmalloc->previous->next = xmalloc;
@@ -109,7 +107,7 @@ void *xrecalloc(void *data, size_t new_size)
     size_t old_size = get_header(data)->allocation_size;
     data = xrealloc(data, new_size);
 
-    char* start_data_addr = data;
+    char *start_data_addr = data;
     if (old_size < new_size)
         memset(start_data_addr + old_size, 0, new_size - old_size);
 

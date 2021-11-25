@@ -1,7 +1,9 @@
 #include "eval_ast.h"
+
 #include "execution.h"
 
-int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline with null
+int eval_ast(struct ast *ast,
+             struct pipeline *pipeline) // TODO alloc pipline with null
 {
     if (!ast)
         return 0;
@@ -49,19 +51,19 @@ int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline wit
         return !eval_ast(ast->t_ast, pipeline);
     case AST_AND:
         binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left, pipeline) && eval_ast
-            (binary_ast->right, pipeline);
+        return eval_ast(binary_ast->left, pipeline)
+            && eval_ast(binary_ast->right, pipeline);
     case AST_OR:
         binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left, pipeline) || eval_ast
-            (binary_ast->right, pipeline);
+        return eval_ast(binary_ast->left, pipeline)
+            || eval_ast(binary_ast->right, pipeline);
     case AST_BRACKET:
         return 0;
     case AST_PARENTH:
         return 0;
     case AST_CMD:
         cmd = ast->t_ast;
-        //TODO exec redirs
+        // TODO exec redirs
         return eval_ast(cmd->ast, pipeline);
     }
 }

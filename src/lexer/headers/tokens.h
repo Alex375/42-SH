@@ -33,7 +33,6 @@ enum token
     T_ERROR
 };
 
-
 /**
 ** @brief                   Linked-list of every token in a block.
 ** @param type              Type of the element.
@@ -45,6 +44,5 @@ struct token_info
     enum token type;
     char *command;
 };
-
 
 #endif // INC_42_SH_TOKENS_H

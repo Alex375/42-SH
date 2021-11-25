@@ -1,6 +1,6 @@
 #include "lexer.h"
 
-void lexer_start(char* script, size_t size)
+void lexer_start(char *script, size_t size)
 {
     if (g_lexer_info.token_list != NULL)
         return;

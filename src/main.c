@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "eval_ast.h"
+#include "execution.h"
 #include "options.h"
 #include "parser.h"
 #include "read_script.h"
 #include "xalloc.h"
-#include "execution.h"
-#include "eval_ast.h"
 
 int main(int argc, char **argv)
 {
@@ -25,7 +25,8 @@ int main(int argc, char **argv)
         size_t size;
         char *temp = read_script(opt->scripts[i], &size);
         if (opt->verbose)
-            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n", temp);
+            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n",
+                   temp);
         if (opt->print)
             ast_pretty_print(temp, size);
 
@@ -43,8 +44,8 @@ int main(int argc, char **argv)
         if (opt->print)
             ast_pretty_print(opt->commands[i], strlen(opt->commands[i]));
         pipeline->out = -1;
-        struct ast *ast = start_parse(opt->commands[i], strlen
-                                      (opt->commands[i]));
+        struct ast *ast =
+            start_parse(opt->commands[i], strlen(opt->commands[i]));
         eval_ast(ast, pipeline);
     }
     xfree_all();

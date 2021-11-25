@@ -2,6 +2,7 @@
 #define INC_42_SH_TOKEN_VEC_H
 
 #include <stddef.h>
+
 #include "tokens.h"
 
 struct tkvec
@@ -16,6 +17,5 @@ struct tkvec *tkvec_create();
 struct tkvec *tkvec_append(struct tkvec *string, struct token_info tk);
 
 void tkvec_free(struct tkvec *string);
-
 
 #endif // INC_42_SH_TOKEN_VEC_H

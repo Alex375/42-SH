@@ -1,10 +1,10 @@
 #include "execution.h"
 
-#include <unistd.h>
 #include <err.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #include "xalloc.h"
-
 
 void exit_program(char *msg)
 {
@@ -27,7 +27,7 @@ int execute(char *cmd, char *args, struct pipeline *pipeline)
                  ((pipeline->out) ? STDOUT_FILENO : STDIN_FILENO));
             close(pipeline->fd[!(pipeline->out)]);
         }
-        if (execlp(cmd, "42sh", args, NULL) == -1)
+        if (execlp(cmd, cmd, args, NULL) == -1)
         {
             // TODO : handle exec error
             err(1, "Failed to exec");

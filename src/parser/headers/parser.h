@@ -52,8 +52,8 @@ struct n_s_cmd
 struct n_if
 {
     struct ast *condition;
-    struct ast *true;
-    struct ast *false;
+    struct ast * true;
+    struct ast * false;
 };
 
 /**

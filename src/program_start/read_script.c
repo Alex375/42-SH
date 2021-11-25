@@ -1,8 +1,9 @@
 #include "read_script.h"
-#include "xalloc.h"
 
 #include <err.h>
 #include <stdio.h>
+
+#include "xalloc.h"
 
 char *read_script(char *filename, size_t *size)
 {

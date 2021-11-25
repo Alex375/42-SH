@@ -1,11 +1,8 @@
-#include "execution.h"
-
-
 #include <unistd.h>
 
 #include "eval_ast.h"
-#include "parser.h"
 #include "execution.h"
+#include "parser.h"
 
 int exec_pipe(struct ast *left, struct ast *right, struct pipeline *pipeline)
 {
