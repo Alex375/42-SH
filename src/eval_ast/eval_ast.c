@@ -1,6 +1,7 @@
 #include "eval_ast.h"
+#include "execution.h"
 
-int eval_ast(struct ast *ast)
+int eval_ast(struct ast *ast, struct pipeline *pipeline)//TODO alloc pipline with null
 {
     if (!ast)
         return 0;
@@ -16,16 +17,14 @@ int eval_ast(struct ast *ast)
     {
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
-        //TODO exec cmd
-        if (s_cmd_ast->cmd)
-            return 1;
-        return 0; // exit code of cmd
+        res = execute(cmd_ast->cmd_line, pipeline);
+        return res;
     case AST_IF:
         if_ast = ast->t_ast;
-        if (eval_ast(if_ast->condition))
-            res = eval_ast(if_ast->true);
+        if (eval_ast(if_ast->condition, pipeline))
+            res = eval_ast(if_ast->true, pipeline);
         else
-            res = eval_ast(if_ast->false);
+            res = eval_ast(if_ast->false, pipeline);
         return res;
     case AST_WHILE:
         return 0;
@@ -36,25 +35,26 @@ int eval_ast(struct ast *ast)
     case AST_UNTIL:
         return 0;
     case AST_PIPE:
-        binary_ast = ast->t_ast; // TODO REDIR PIPE
-        eval_ast(binary_ast->left);
-        return eval_ast(binary_ast->right);
+        binary_ast = ast->t_ast;
+        return exec_pipe(binary_ast->left, binary_ast->right, pipeline);
     case AST_REDIR:
         return 0;
     case AST_FUNC:
         return 0;
     case AST_LIST:
         binary_ast = ast->t_ast;
-        eval_ast(binary_ast->left);
-        return eval_ast(binary_ast->right);
+        eval_ast(binary_ast->left, pipeline);
+        return eval_ast(binary_ast->right, pipeline);
     case AST_NOT:
-        return !eval_ast(ast->t_ast);
+        return !eval_ast(ast->t_ast, pipeline);
     case AST_AND:
         binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left) && eval_ast(binary_ast->right);
+        return eval_ast(binary_ast->left, pipeline) && eval_ast
+            (binary_ast->right, pipeline);
     case AST_OR:
         binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left) || eval_ast(binary_ast->right);
+        return eval_ast(binary_ast->left, pipeline) || eval_ast
+            (binary_ast->right, pipeline);
     case AST_BRACKET:
         return 0;
     case AST_PARENTH:
