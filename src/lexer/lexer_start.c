@@ -20,8 +20,9 @@ void lexer_reset()
 {
     g_lexer_info.array_pos = 0;
     g_lexer_info.pos = 0;
-    g_lexer_info.exp_context = GENERAL;
-    g_lexer_info.last_context = GENERAL;
+    g_lexer_info.exp_context = GENERAL_EXP;
+    g_lexer_info.last_exp_context = GENERAL_EXP;
+    g_lexer_info.word_context = GENERAL;
     g_lexer_info.script = NULL;
     g_lexer_info.script_size = 0;
     tkvec_free(g_lexer_info.token_list);

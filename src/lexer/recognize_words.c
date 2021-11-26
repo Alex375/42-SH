@@ -29,6 +29,19 @@ int separatorify(const char *token_str)
     return i;
 }
 
+int is_token_seperator(enum token token)
+{
+    enum token sep[] = { T_AND, T_OR, T_NEWLINE, T_SEMICOLON, T_C_PRTH, T_O_PRTH, T_PIPE, T_EOF, T_REDIR_1, T_REDIR_2, T_REDIR_O_2, T_REDIR_O_2, T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE};
+    size_t nb_sep = sizeof(sep) / sizeof (enum token);
+
+    for (size_t i = 0; i < nb_sep; ++i)
+    {
+        if (sep[i] == token)
+            return 1;
+    }
+    return 0;
+}
+
 enum token tokenify(const char *token_str)
 {
     if (token_str == NULL || token_str[0] == '\0')
@@ -50,7 +63,7 @@ enum token tokenify(const char *token_str)
 
 int look_ahead_token(struct string *accumulator, char next_char)
 {
-    if (g_lexer_info.exp_context == IN_SQUOTE)
+    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
     {
         return 0;
     }

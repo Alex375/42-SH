@@ -7,10 +7,16 @@
 #include "tokens.h"
 #include "xstring.h"
 
-enum expansion_context
+enum word_context
 {
     GENERAL,
-    IN_SQUOTE
+    IN_COMMAND
+};
+
+enum expansion_context
+{
+    GENERAL_EXP,
+    IN_SQUOTE_EXP
 };
 
 /**
@@ -24,8 +30,9 @@ enum expansion_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum word_context word_context;
     enum expansion_context exp_context;
-    enum expansion_context last_context;
+    enum expansion_context last_exp_context;
     size_t array_pos;
     size_t pos;
     char *script;
@@ -50,7 +57,13 @@ extern struct lexer_info g_lexer_info;
 */
 int separatorify(const char *token_str);
 
+int is_token_seperator(enum token token);
+
 enum token tokenify(const char *token_str);
+
+int is_ionumber(struct token_info res, struct string *string);
+
+struct token_info lex_ionumber(struct token_info res, struct string *string);
 
 int look_ahead_token(struct string *accumulator, char next_char);
 

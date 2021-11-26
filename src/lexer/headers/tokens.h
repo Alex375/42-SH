@@ -35,6 +35,7 @@ enum token
     T_REDIR_O_2,
     T_REDIR_PIPE,
     T_EOF,
+    T_IONUMBER,
     T_WORD,
     T_ERROR
 };

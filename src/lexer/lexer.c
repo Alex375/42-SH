@@ -2,7 +2,7 @@
 
 #include <ctype.h>
 
-struct lexer_info g_lexer_info = { NULL, GENERAL, GENERAL, 0, 0, NULL, 0 };
+struct lexer_info g_lexer_info = { NULL, GENERAL,GENERAL_EXP, GENERAL_EXP, 0, 0, NULL, 0 };
 
 void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 {
@@ -12,7 +12,7 @@ void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 
 static int look_ahead(const char *script, size_t size)
 {
-    if (g_lexer_info.exp_context == IN_SQUOTE)
+    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
     {
         return look_ahead_squote(size);
     }
@@ -26,7 +26,16 @@ static struct token_info lex_accumulator(struct token_info res,
                                          struct string *string)
 {
     res.type = tokenify(string->data);
-    if (res.type == T_WORD || g_lexer_info.last_context != GENERAL)
+    if (is_token_seperator(res.type))
+    {
+        g_lexer_info.word_context = GENERAL;
+    }
+
+    if (is_ionumber(res, string))
+    {
+        return lex_ionumber(res, string);
+    }
+    else if (res.type == T_WORD || g_lexer_info.last_exp_context != GENERAL || g_lexer_info.word_context == IN_COMMAND)
     {
         res = lex_command(res, string);
     }
@@ -34,8 +43,8 @@ static struct token_info lex_accumulator(struct token_info res,
     {
         res = lex_keywords(res, string);
     }
-    g_lexer_info.exp_context = GENERAL;
-    g_lexer_info.last_context = GENERAL;
+    g_lexer_info.exp_context = GENERAL_EXP;
+    g_lexer_info.last_exp_context = GENERAL_EXP;
     return res;
 }
 
