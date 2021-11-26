@@ -2,31 +2,38 @@
 
 #include "eval_ast.h"
 #include "execution.h"
+#include "options.h"
 #include "parser.h"
+#include "xalloc.h"
 
-int exec_pipe(struct ast *left, struct ast *right, struct pipeline *pipeline)
+extern struct options *opt;
+
+int exec_pipe(struct ast *left, struct ast *right)
 {
-    pipe(pipeline->fd);
+    struct pipeline *new_pipe = xcalloc(1, sizeof(struct pipeline));
+    pipe(new_pipe->fd);
 
     int temp_stdout = dup(STDOUT_FILENO);
+    dup2(new_pipe->fd[1], STDOUT_FILENO);
 
-    pipeline->out = 1;
-    int res1 = eval_ast(left, pipeline);
+    int res1 = eval_ast(left);
 
     dup2(temp_stdout, STDOUT_FILENO);
     close(temp_stdout);
 
     int temp_stdin = dup(STDIN_FILENO);
+    dup2(new_pipe->fd[0], STDIN_FILENO);
 
-    pipeline->out = 0;
-    eval_ast(right, pipeline);
+    close(new_pipe->fd[1]);
+    eval_ast(right);
 
     dup2(temp_stdin, STDIN_FILENO);
     close(temp_stdin);
 
-    pipeline->out = -1;
-    close(pipeline->fd[0]);
-    close(pipeline->fd[1]);
+    close(new_pipe->fd[0]);
+    close(new_pipe->fd[1]);
+
+    xfree(new_pipe);
 
     return res1;
 }

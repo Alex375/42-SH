@@ -1,11 +1,9 @@
-#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "xalloc.h"
-#include "xstring.h"
 #include "builtins.h"
 #include "xstrdup.h"
+#include "xstring.h"
 
 struct string *echo_pars(char *s, struct string *new_s, int flag_e)
 {

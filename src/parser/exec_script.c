@@ -15,13 +15,13 @@ void exec_script(char *script, size_t size)
     struct ast *ast;
     errno = 0;
 
-    struct pipeline *pipeline = xcalloc(1, sizeof(struct pipeline));
+    //struct pipeline *pipeline = xcalloc(1, sizeof(struct pipeline));
 
     lexer_start(script, size);
     while (errno != ERROR_EMPTY_EOF)
     {
         errno = 0;
-        pipeline->out = -1;
+        //pipeline->out = -1;
         ast = parse_input();
         if (opt->print)
             ast_pretty_print(ast);
@@ -35,10 +35,10 @@ void exec_script(char *script, size_t size)
             break;
         }
         else if (ast)
-            eval_ast(ast, pipeline);
+            eval_ast(ast);
     }
     lexer_reset();
-    xfree(pipeline);
+   // xfree(pipeline);
 }
 
 struct ast *start_parse(char *script, size_t size)
