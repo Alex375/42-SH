@@ -35,6 +35,24 @@ struct string *string_concat(struct string *destination, char *source)
     return destination;
 }
 
+struct string *string_pop(struct string *string, char *pop)
+{
+    if (string->size == 0)
+    {
+        if (pop != NULL)
+            *pop = '\0';
+        return string;
+    }
+
+    if (pop != NULL)
+        *pop = string->data[string->size - 1];
+
+    string->data[string->size - 1] = '\0';
+    string->size--;
+
+    return string;
+}
+
 void *string_get(struct string *string)
 {
     char *res = string->data;
