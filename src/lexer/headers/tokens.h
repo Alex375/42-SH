@@ -14,6 +14,7 @@ enum token
     T_WHILE,
     T_UNTIL,
     T_FOR,
+    T_IN,
     T_DO,
     T_DONE,
     T_NOT,

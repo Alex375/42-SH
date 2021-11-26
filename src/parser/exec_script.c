@@ -41,3 +41,13 @@ void exec_script(char *script, size_t size)
     xfree(pipeline);
 }
 
+struct ast *start_parse(char *script, size_t size)
+{
+    lexer_start(script, size);
+
+    struct ast *res = parse_input();
+
+    lexer_reset();
+
+    return res;
+}

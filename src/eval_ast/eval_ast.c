@@ -12,8 +12,9 @@ int eval_ast(struct ast *ast,
     struct n_binary *b_ast;
     struct n_if *if_ast;
     struct n_command *cmd;
+    struct n_for *for_ast;
 
-    int res;
+    int res = 0;
 
     switch (ast->type)
     {
@@ -38,7 +39,14 @@ int eval_ast(struct ast *ast,
 
         return res;
     case AST_FOR:
-        return 0;
+        for_ast = ast->t_ast;
+        //TODO set var name to for_ast->seq[i] inside for line
+        for (int i = 0; for_ast->seq[i]; ++i)
+        {
+            res = eval_ast(for_ast->statement, pipeline);
+        }
+
+        return res;
     case AST_CASE:
         return 0;
     case AST_PIPE:

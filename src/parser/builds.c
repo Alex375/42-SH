@@ -50,5 +50,23 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs)
     cmd->ast = ast;
     cmd->redirs = redirs;
 
-    return ast;
+    struct ast *res = xcalloc(1, sizeof(struct ast));
+    res->type = AST_CMD;
+    res->t_ast = cmd;
+
+    return res;
+}
+
+struct ast *build_for(char *name, char **seq, struct ast *statement)
+{
+    struct n_for *nFor = xcalloc(1, sizeof(struct n_for));
+    nFor->name = name;
+    nFor->seq = seq;
+    nFor->statement = statement;
+
+    struct ast *res = xcalloc(1, sizeof(struct ast));
+    res->type = AST_FOR;
+    res->t_ast = nFor;
+
+    return res;
 }

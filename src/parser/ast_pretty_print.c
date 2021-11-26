@@ -26,6 +26,7 @@ void pp_rec(struct ast *ast, int prof)
     struct n_binary *binary_ast;
     struct n_if *if_ast;
     struct n_command *cmd_ast;
+    struct n_for *for_ast;
 
     switch (ast->type)
     {
@@ -33,7 +34,7 @@ void pp_rec(struct ast *ast, int prof)
         s_cmd_ast = ast->t_ast;
         tab(prof);
         printf("COMMAND = %s ", s_cmd_ast->cmd);
-        int i = 0;
+        int i = 1;
         while (s_cmd_ast->cmd_arg[i])
             printf("%s ", s_cmd_ast->cmd_arg[i++]);
         printf("\n");
@@ -71,6 +72,17 @@ void pp_rec(struct ast *ast, int prof)
         printf("DONE------\n");
         break;
     case AST_FOR:
+        for_ast = ast->t_ast;
+        tab(prof);
+        printf("FOR------\n");
+        tab(prof + 1);
+        printf("%s ", for_ast->name);
+        int j = 0;
+        if (for_ast->seq[0])
+            printf("--IN-- ");
+        while (for_ast->seq[j])
+            printf("%s ", for_ast->seq[j++]);
+        printf("\n");
         break;
     case AST_CASE:
         break;
@@ -89,10 +101,10 @@ void pp_rec(struct ast *ast, int prof)
     case AST_LIST:
         binary_ast = ast->t_ast;
         tab(prof);
-        printf("<< LIST : >>\n");
+        printf("LIST : \n");
         pp_rec(binary_ast->left, prof + 1);
         tab(prof);
-        printf("<< --- >>\n");
+        printf("----   \n");
         pp_rec(binary_ast->right, prof + 1);
         break;
     case AST_NOT:
@@ -122,16 +134,20 @@ void pp_rec(struct ast *ast, int prof)
         break;
     case AST_CMD:
         cmd_ast = ast->t_ast;
-        pp_rec(cmd_ast->ast, prof + 1);
-        tab(prof);
-        printf("REDIRS : ");
+        pp_rec(cmd_ast->ast, prof);
         struct list_redir *tmp = cmd_ast->redirs;
-        while (tmp)
+        if (tmp)
         {
-            printf("%s into %s |", tmp->ionumber, tmp->word);
-            tmp = tmp->next;
+            tab(prof);
+            printf("REDIRS : ");
+            while (tmp)
+            {
+                printf("%s into %s |", tmp->ionumber, tmp->word);
+                tmp = tmp->next;
+            }
+            printf("\n");
         }
-        printf("\n");
+
         break;
     }
 }

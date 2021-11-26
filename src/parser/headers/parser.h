@@ -46,7 +46,7 @@ struct n_s_cmd
 };
 
 /**
-** @brief                   <<AST_IF>> ast member.
+** @brief                   AST_IF ast member.
 */
 struct n_if
 {
@@ -56,7 +56,7 @@ struct n_if
 };
 
 /**
-** @brief                   <<AST_CMD>> ast member.
+** @brief                   AST_CMD ast member.
 */
 struct n_binary
 {
@@ -76,12 +76,22 @@ struct list_redir
 };
 
 /**
-** @brief                   <<AST_CMD>> ast member.
+** @brief                   AST_CMD ast member.
 */
 struct n_command
 {
     struct ast *ast;
     struct list_redir *redirs;
+};
+
+/**
+** @brief                   AST_FOR ast member.
+*/
+struct n_for
+{
+    char *name;
+    char **seq;
+    struct ast *statement;
 };
 
 /**
@@ -116,6 +126,15 @@ struct ast *build_s_cmd(char *cmd, char **cmd_arg);
 ** @param redirs        list of redirections
 */
 struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
+
+/*!
+** @brief               builds a n_for node
+** @param name          name of the variable of for
+** @param seq           list on what the name variable is going to
+ *                      take it's values
+** @param statement     ast inside the for
+ */
+struct ast *build_for(char *name, char **seq, struct ast *statement);
 
 #include <stddef.h>
 
@@ -195,6 +214,12 @@ struct ast *parse_if_rule(int inElif);
 **                      (cf sh_grammar.txt)
 */
 struct ast *parse_while_until_rule(enum token tokT);
+
+/**
+** @brief               Parsing a for rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_for_rule();
 
 /**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)

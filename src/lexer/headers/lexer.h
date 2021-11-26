@@ -36,7 +36,7 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[27];
+    char *token_converter[28];
     char *separator[16];
 };
 /**
