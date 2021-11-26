@@ -1,0 +1,11 @@
+subdir('builtins')
+subdir('data_types')
+subdir('eval_ast')
+subdir('execution')
+subdir('io')
+subdir('lexer')
+subdir('parser')
+subdir('program_start')
+subdir('xalloc')
+
+sources += files('main.c')

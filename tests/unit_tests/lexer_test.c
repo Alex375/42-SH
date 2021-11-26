@@ -51,6 +51,16 @@ Test(COMMAND, SIMPLE)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(COMMAND, MEDIUM)
+{
+    char *script = "echo if \n";
+    struct token_info expected[] = { { T_WORD, "echo" },
+        { T_WORD, "if" },
+        { T_NEWLINE, NULL } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
 Test(COMMAND, SIMPLE_LS)
 {
     char *script = "ls -la";
@@ -156,6 +166,15 @@ Test(QUOTE, MEDIUM)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(QUOTE, EMPTY)
+{
+    char *script = "echo  ''''";
+    struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "" }};
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
 Test(QUOTE, HARD)
 {
     char *script = " i'f''&&'&&'ec'ho '%% pute'";
@@ -255,6 +274,43 @@ Test(REDIR, MEDIUM5)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(REDIR, MEDIUM_io)
+{
+    char *script = "echo test 2>|test.txt";
+    struct token_info expected[] = { { T_WORD, "echo" },
+        { T_WORD, "test" },
+        { T_IONUMBER, "2" },
+        { T_REDIR_PIPE, NULL },
+        { T_WORD, "test.txt" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(REDIR, MEDIUM2_io)
+{
+    char *script = "echo test 2<test.txt";
+    struct token_info expected[] = { { T_WORD, "echo" },
+        { T_WORD, "test" },
+        { T_IONUMBER, "2" },
+        { T_REDIR_I_1, NULL },
+        { T_WORD, "test.txt" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(REDIR, MEDIUM2_WRONG_IO)
+{
+    char *script = "echo test caca<test.txt";
+    struct token_info expected[] = { { T_WORD, "echo" },
+        { T_WORD, "test" },
+        { T_WORD, "caca" },
+        { T_REDIR_I_1, NULL },
+        { T_WORD, "test.txt" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
 Test(OR, EASY)
 {
     char *script = "echo test || echo test";
@@ -312,14 +368,44 @@ Test(UNTIL, EASY)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
-// int main(void)
+Test(COMMAND, SPACES_AFTER)
+{
+    char *script = "echo coucou ";
+    struct token_info expected[] = { {T_WORD, "echo"}, {T_WORD, "coucou"} };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(EMPTY, SIMPLE)
+{
+    char *script = "";
+    struct token_info *expected = NULL;
+
+    test_lexer(script, 0, expected);
+}
+
+Test(EMPTY, MEIDUM)
+{
+    char *script = "    ";
+    struct token_info *expected = NULL;
+
+    test_lexer(script, 0, expected);
+}
+
+Test(EMPTY, QUOTE)
+{
+    char *script = "''";
+    struct token_info expected[] = {{T_WORD, ""}};
+
+    test_lexer(script, 1, expected);
+}
+
+
+
+//int main(void)
 //{
-//    struct token_info expected[] = {
-//        { T_WORD, "echo" }, { T_WORD, "test" }, { T_OR, NULL },
-//        { T_WORD, "echo" }, { T_WORD, "test" },
-//    };
-//     char *script = "echo test || echo test";
-//     lexer_start(script, strlen(script));
+//    char *script = "       echo '''      ";
+//    lexer_start(script, strlen(script));
 //     struct token_info tk;
 //     while ((tk = pop_token()).type != T_EOF)
 //         continue;
