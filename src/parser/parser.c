@@ -237,7 +237,7 @@ struct ast *parse_simple_command()
 
     int cap = 8;
     int i = 1;
-    char **cmd_arg = xcalloc(cap, sizeof(char*));
+    char **cmd_arg = xcalloc(cap, sizeof(char *));
     cmd_arg[0] = cmd;
     while ((tok = get_next_token()).type == T_WORD)
     {

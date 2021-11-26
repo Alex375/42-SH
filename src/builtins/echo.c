@@ -59,29 +59,28 @@ int parse_option(struct string *res, char *token, int *flag_e, int *flag_n)
     return 0;
 }
 
-void echo(char *args)
+int echo(char **args)
 {
     struct string *new_s = string_create();
-    char *temp_args = xstrdup(args);
-    char *token = strtok(temp_args, " ");
     int arguments = 1;
     int flag_e = 0;
     int flag_n = 0;
-    while (token != NULL)
+    int i = 1;
+    while (args[i] != NULL)
     {
         if (arguments)
-            arguments = parse_option(new_s, token, &flag_e, &flag_n);
+            arguments = parse_option(new_s, args[i], &flag_e, &flag_n);
         else
         {
-            echo_pars(token, new_s, flag_e);
+            echo_pars(args[i], new_s, flag_e);
             string_append(new_s, ' ');
         }
-        token = strtok(NULL, " ");
+        i++;
     }
     if (new_s->size > 0 && new_s->data[new_s->size - 1] == ' ')
         new_s->data[new_s->size - 1] = (flag_n) ? '\0' : '\n';
     printf("%s", new_s->data);
     fflush(stdout);
     string_free(new_s);
-    xfree(temp_args);
+    return 0;
 }

@@ -7,6 +7,7 @@
 
 #include "options.h"
 #include "xalloc.h"
+#include "builtins.h"
 
 extern struct options *opt;
 
@@ -27,6 +28,12 @@ int execute(char *cmd, char **args, struct pipeline *pipeline)
                    : (pipeline->out == 1) ? "out "
                                             "pipeline"
                                           : "in pipline");
+    }
+    int index;
+    if ((index = is_builins(cmd)) != -1)
+    {
+        int res = exec_builtin(index, args, pipeline);
+        return res;
     }
     pid_t pid = fork();
     if (pid == -1)
