@@ -44,6 +44,8 @@ struct token_info tokenify_next(const char *script, size_t size)
 {
     struct token_info res = { 0, NULL };
 
+    skip_class(isblank, script, &g_lexer_info.pos);
+
     /* CHECK IF FINISHED TO READ THE SCRIPT */
     if (script[g_lexer_info.pos] == '\0' || g_lexer_info.pos >= size)
     {
@@ -55,7 +57,6 @@ struct token_info tokenify_next(const char *script, size_t size)
     struct string *accumulator = string_create();
 
     /* LEXER */
-    skip_class(isblank, script, &g_lexer_info.pos);
     do
     {
         if (!detect_context(script[g_lexer_info.pos]))
