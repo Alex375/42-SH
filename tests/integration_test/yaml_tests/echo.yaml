@@ -1,7 +1,19 @@
-- name: Echo with args
-  input: "echo -ne cou\ncou"
-  testtype: success
+- name: Simple echo
+  input: echo coucou
+  type: success
 
-- name: Hard echo with args
-  input: "echo -e -neq cou\ncou"
-  testtype: success
+- name: Echo with n
+  input: echo -n coucou
+  type: success
+
+- name: Echo with mutiple
+  input: echo coucou re rere
+  type: success
+
+- name: Echo with multpiple and n
+  input: echo -n coucou re rere
+  type: success
+
+- name: Echo withe mutltiple and option in
+  input: echo -na coucou -n coucoure
+  type: success

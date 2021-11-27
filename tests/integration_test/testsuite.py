@@ -23,7 +23,7 @@ KO_TAG = f"[ {termcolor.colored('KO', 'red')} ]"
 class TestCase:
     name: str
     input: str
-    testtype: str = field(
+    type: str = field(
         default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
@@ -167,10 +167,10 @@ if __name__ == "__main__":
             stdin = testcase.input
             name = testcase.name
             try:
-                if testcase.testtype == "":
+                if testcase.type == "":
                     check = testcase.checks
                 else:
-                    check = test_types[testcase.testtype]
+                    check = test_types[testcase.type]
                 with timeout(1):
                     dash_proc = run_shell(ref, stdin)
                     sh_proc = run_shell(binary_path, stdin)

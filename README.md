@@ -9,7 +9,7 @@ When we need to merge branches we merge into the `dev-merge` branch which is sub
 Integration test file is `tests/integration_test/testsuite.py`.
 
 ### Environment setup
-- Generate en virtual environment named `env` (on Nuc outside of AFS)
+- Generate en virtual environment named `env` (outside of AFS on Nuc)
 ```sh
 $ python3 -m venv env
 ```
@@ -28,7 +28,7 @@ Your virtual environment is now setup to run the testsuite.
 
 ### Run the test suite
 Test suite argument :
-- `--binary` (required): binary file to test if the binary is not found it will copy the binary from `cmake-build-debug`
+- `--binary` (required): binary file to test, if the binary is not found it will copy the binary from `cmake-build-debug`
 - `--reference` (optional) : reference program (`dash` by default)
 - `--category` (optional) : categories of test to be run categories are files stored in`yaml_tests` (by default all categories are run)
 Exemple :
@@ -53,7 +53,7 @@ There are 2 optional fields:
   - `stderr` : check that the stderr of the reference is equal to the binary's stderr
   - `err_msg` : check that the binary wrote an error msg in stderr (doesn't check the content of stderr)
   - `exitcode` : check that the exit code of the reference is equal to the binary's exit code
-- `testtype` : test type is a preset for the `checks` fields (`testtype` over wright `checks`) :
+- `type` : test type is a preset for the `checks` fields (`testtype` over wright `checks`) :
   - `success`: `stdout stderr exitcode`,
   - `failed`: `stdout err_msg exitcode`,
   - `noerrcheck`: `exitcode stdout`
@@ -64,7 +64,7 @@ Simple test
 ```yaml
 - name: Echo basic
   input: echo coucou
-  testtype: success
+  type: success
 ```
 Is equivalent to
 ```yaml
@@ -82,7 +82,7 @@ Is equivalent to
 ````yaml
 - name: Pipe no end
   input: echo coucou |
-  testtyoe: failed
+  type: failed
 ````
 Multiline input
 ````yaml
@@ -93,5 +93,5 @@ Multiline input
       echo coucou
     else
       exit 1; fi
-  testtype: success
+  type: success
 ````
