@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "eval_ast.h"
-#include "execution.h"
+#include "launch_program.h"
 #include "options.h"
 #include "parser.h"
-#include "read_script.h"
 #include "xalloc.h"
 
 struct options *opt = NULL;
@@ -20,24 +18,18 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    for (size_t i = 0; i < opt->nb_script; i++)
-    {
-        size_t size;
-        char *temp = read_script(opt->scripts[i], &size);
-        if (opt->verbose)
-            printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n",
-                   temp);
+    int res = launch_script();
+    if (res == -1)
+        res = launch_command();
 
-        exec_script(temp, size);
-        xfree(temp);
-    }
-
-    for (size_t i = 0; i < opt->nb_command; i++)
+    if (res == -1)
     {
+        char *read = read_stdin();
         if (opt->verbose)
-            printf("Executing command \n\'%s\'\n", opt->commands[i]);
-        exec_script(opt->commands[i], strlen(opt->commands[i]));
+            printf("Executing command \n\'%s\'\n", opt->commands[0]);
+        res = exec_script(read,
+                          strlen(read));
     }
     xfree_all();
-    return 0;
+    return res;
 }

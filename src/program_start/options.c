@@ -23,12 +23,6 @@ int get_scripts(int argc, char **argv, struct options *options)
             xrealloc(options->scripts, ++options->nb_script * sizeof(char *));
         options->scripts[options->nb_script - 1] = argv[optind++];
     }
-    if (options->nb_script == 0 && options->commands == NULL)
-    {
-        fprintf(stderr, "No arguments\n");
-        print_usage();
-        return 1;
-    }
     return 0;
 }
 

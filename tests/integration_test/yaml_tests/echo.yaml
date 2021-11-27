@@ -1,0 +1,7 @@
+- name: Echo with args
+  input: "echo -ne cou\ncou"
+  testtype: success
+
+- name: Hard echo with args
+  input: "echo -e -neq cou\ncou"
+  testtype: success
