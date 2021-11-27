@@ -1,11 +1,15 @@
+import os.path
 from argparse import ArgumentParser
 from pathlib import Path
 import subprocess as sp
 from difflib import unified_diff
 from dataclasses import dataclass, field
 from contextlib import contextmanager
+from os import listdir
+from os.path import isfile, join
 import signal
 import time
+import shutil
 
 import termcolor
 import yaml
@@ -19,6 +23,8 @@ KO_TAG = f"[ {termcolor.colored('KO', 'red')} ]"
 class TestCase:
     name: str
     input: str
+    testtype: str = field(
+        default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
 
@@ -69,49 +75,13 @@ def run_shell(shell: str, stdin: str) -> sp.CompletedProcess:
     return sp.run([shell], input=stdin, capture_output=True, text=True)
 
 
-if __name__ == "__main__":
-    parser = ArgumentParser("Testsuite")
-    parser.add_argument("--binary", required=True, type=Path)
-    args = parser.parse_args()
-
-    binary_path = args.binary.absolute()
-    print(f"Testing {binary_path}")
-
-    with open("yaml_tests/test.yaml", "r") as file:
-        testsuite = [TestCase(**testcase) for testcase in
-                     list(yaml.safe_load(file))]
-
-    passed = 0
-    failed = 0
-
-    start_time = time.perf_counter()
-    for testcase in testsuite:
-        stdin = testcase.input
-        name = testcase.name
-
-        try:
-            with timeout(1):
-                dash_proc = run_shell("dash", stdin)
-                sh_proc = run_shell(binary_path, stdin)
-                test_repport = perform_checks(dash_proc, sh_proc,
-                                              testcase.checks)
-        except Exception as err:
-            failed += 1
-            if type(err) == TimeoutError and str(err) == "!!timeout!!":
-                print(f"{KO_TAG} {name}\nTest timedout")
-            else:
-                print(f"{KO_TAG} {name} with arguments : {stdin}\n{err}")
-        else:
-            if len(test_repport) == 0:
-                passed += 1
-                print(f"{OK_TAG} {name}")
-            else:
-                failed += 1
-                print(
-                    f"{KO_TAG} {name} with arguments : {stdin}\n{test_repport}")
-    end_time = time.perf_counter()
-    print(
-        f"[========SUMMARY ran {passed + failed} tests ", end='')
+def print_summary(passed: int, failed: int, start_time: float, end_time: float):
+    if passed == 0:
+        print(f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'magenta')} | ", end='')
+    elif failed == 0:
+        print(f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'green')} | ", end='')
+    else:
+        print(f"[========SUMMARY ran {passed + failed} tests ", end='')
     if passed == 0:
         print(f"{termcolor.colored(f'passed {passed}', 'magenta')} | ", end='')
     else:
@@ -132,5 +102,95 @@ if __name__ == "__main__":
         print(f"{termcolor.colored(f' {round((passed / (failed + passed)) * 100, 2)}%', 'red')} ", end='')
     else:
         print(f"{termcolor.colored(f' {round((passed / (failed + passed)) * 100, 2)}%', 'yellow')} ", end='')
-    print(f"in {round(end_time - start_time, 2)} secs", end='')
-    print("========]")
+
+    if passed == 0:
+        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'magenta')}", end='')
+    elif failed == 0:
+        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'green')}", end='')
+    else:
+        print(f"in {round(end_time - start_time, 2)} secs ========]", end='')
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser("Testsuite")
+    parser.add_argument("--binary", required=True, type=Path)
+    parser.add_argument("--category", required=False, type=str)
+    parser.add_argument("--reference", required=False, type=str)
+    args = parser.parse_args()
+
+    binary_path = args.binary.absolute()
+    categories = args.category
+    ref = args.reference
+
+    if not os.path.exists(binary_path):
+        shutil.copy(f"../../cmake-build-debug/{args.binary}", "./")
+        if not os.path.exists(binary_path):
+            raise FileNotFoundError(f"Tried to copy file but {binary_path} not found")
+
+
+    if ref is None:
+        ref = "dash"
+
+    if categories is not None:
+        categories = categories.split(' ')
+
+    all_categories = [f[:-5] for f in listdir("./yaml_tests") if isfile(join("./yaml_tests", f)) and join("./yaml_tests", f).endswith(".yaml")]
+
+    if categories is None:
+        categories = all_categories
+
+    for categ in categories:
+        if categ not in all_categories:
+            print(f"Unknown category : {categ}\nChoose in all categories : {all_categories}")
+            raise SyntaxError("Bad category name")
+
+    print(f"Categori(es) : {categories}")
+    print(f"Testing {binary_path}")
+
+    passed = 0
+    failed = 0
+    start_time = time.perf_counter()
+
+    test_types = {
+        "success": "stdout stderr exitcode",
+        "failed": "stdout err_msg exitcode",
+        "noerrcheck": "exitcode stdout"
+    }
+
+    for categ in categories:
+
+        with open(f"yaml_tests/{categ}.yaml", "r") as file:
+            testsuite = [TestCase(**testcase) for testcase in
+                         list(yaml.safe_load(file))]
+
+        for testcase in testsuite:
+            stdin = testcase.input
+            name = testcase.name
+            try:
+                if testcase.testtype == "":
+                    check = testcase.checks
+                else:
+                    check = test_types[testcase.testtype]
+                with timeout(1):
+                    dash_proc = run_shell(ref, stdin)
+                    sh_proc = run_shell(binary_path, stdin)
+                    test_repport = perform_checks(dash_proc, sh_proc,
+                                                  check)
+            except Exception as err:
+                failed += 1
+                if type(err) == TimeoutError and str(err) == "!!timeout!!":
+                    print(f"{KO_TAG} {categ} - {name}\nTest timedout")
+                elif type(err) == KeyError:
+                    print(f"{KO_TAG} {categ} - {name}\nWrong test type")
+                else:
+                    print(f"{KO_TAG} {categ} - {name}\nWith arguments : '{stdin}'\n{err}\n")
+            else:
+                if len(test_repport) == 0:
+                    passed += 1
+                    print(f"{OK_TAG} {categ} - {name}")
+                else:
+                    failed += 1
+                    print(
+                        f"{KO_TAG} {categ} - {name}\nWith arguments : '{stdin}'\n{test_repport}\n")
+    end_time = time.perf_counter()
+    print_summary(passed, failed, start_time, end_time)

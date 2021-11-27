@@ -27,9 +27,8 @@ int main(int argc, char **argv)
         char *read = read_stdin();
         if (opt->verbose)
             printf("Executing command \n\'%s\'\n", opt->commands[0]);
-        exec_script(read,
-                    strlen(read)); // TODO get exec exit code
-        res = 0;
+        res = exec_script(read,
+                          strlen(read));
     }
     xfree_all();
     return res;

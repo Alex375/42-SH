@@ -146,8 +146,9 @@ struct ast *build_for(char *name, char **seq, struct ast *statement);
 *                      (crash if a parsing error is found)
 ** @param script        string containing block
 ** @param size          len of script parameter
+** @return              Return le exit code of the last executed command
 */
-void exec_script(char *script, size_t size);
+int exec_script(char *script, size_t size);
 
 /**
 ** @brief               printing the ast obtain from a script

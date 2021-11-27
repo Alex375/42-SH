@@ -38,8 +38,8 @@ int execute(char *cmd, char **args)
     {
         if (execvp(cmd, args) == -1)
         {
-            // TODO : handle exec error
-            err(1, "Failed to exec");
+            fprintf(stderr, "42SH: %s: not found\n", cmd);
+            exit(127);
         }
     }
     else
@@ -47,7 +47,7 @@ int execute(char *cmd, char **args)
         int wstatus;
         if (waitpid(pid, &wstatus, 0) == -1)
             exit_program("Failed to wait");
-        return wstatus;
+        return WEXITSTATUS(wstatus);
     }
     exit_program("Failed");
     return 0;
