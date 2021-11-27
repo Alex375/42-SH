@@ -48,7 +48,7 @@ struct ast *parse_input()
 
 struct ast *parse_list()
 {
-    if (check_ender_token())
+    if (check_ender_token(0))
         return NULL;
 
     struct ast *left = NULL;
@@ -162,7 +162,7 @@ struct ast *parse_compound()
 {
     skip_newlines();
 
-    if (check_ender_token())
+    if (check_ender_token(1))
         return NULL;
 
     struct ast *left = NULL;

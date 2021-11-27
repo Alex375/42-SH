@@ -142,7 +142,7 @@ void pp_rec(struct ast *ast, int prof)
             printf("REDIRS : ");
             while (tmp)
             {
-                printf("%s into %s |", tmp->ionumber, tmp->word);
+                printf("%s into %s | ", tmp->ionumber, tmp->word);
                 tmp = tmp->next;
             }
             printf("\n");

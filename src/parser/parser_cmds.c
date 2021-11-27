@@ -59,22 +59,32 @@ struct list_redir *parse_redirs()
 
     while (1)
     {
+        if (err_redir() || !is_redir())
+            break;
+
         struct token_info tok = GET_TOKEN
 
-            if (!is_redir()) break;
+            struct list_redir *new_redir =
+                xcalloc(1, sizeof(struct list_redir));
 
-        struct list_redir *new_redir = xcalloc(1, sizeof(struct list_redir));
-
-        if (tok.type == T_WORD)
+        if (tok.type == T_IONUMBER)
         {
             POP_TOKEN
-            new_redir->ionumber = tok.command;
+            new_redir->ionumber = xstrdup(tok.command);
+        }
+        else
+        {
+            if (tok.type == T_REDIR_I_1 || tok.type == T_REDIR_I_A
+                || tok.type == T_REDIR_O_2)
+                new_redir->ionumber = xstrdup("0");
+            else
+                new_redir->ionumber = xstrdup("1");
         }
 
         tok = POP_TOKEN new_redir->redir_type = tok.type;
 
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
-            tok.command;
+            xstrdup(tok.command);
 
         add_to_redir_list(&res, new_redir);
     }

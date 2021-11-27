@@ -213,6 +213,7 @@ struct ast *parse_if_rule(int inElif);
 /**
 ** @brief               Parsing a while rule and an until rule
 **                      (cf sh_grammar.txt)
+ * @param tokT          either WHILE or UNTIL
 */
 struct ast *parse_while_until_rule(enum token tokT);
 
@@ -235,8 +236,16 @@ void skip_newlines();
 /**
 ** @brief               return 1 if the recursive grammar element should
 **                      stop because of an unexpected token (cf sh_grammar.txt)
+** @param list_type     0 if in a list and 1 if in compound
 */
-int check_ender_token();
+int check_ender_token(int in_compound);
+
+/**
+** @brief               return 1 if there is a redir token not following
+ *                      the grammar (sets errno)
+**                      (cf sh_grammar.txt)
+*/
+int err_redir();
 
 /**
 ** @brief               return 1 if the next tokens are a redirection
