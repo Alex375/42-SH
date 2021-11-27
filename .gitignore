@@ -23,4 +23,7 @@ launch.json
 .idea/
 cmake-build-debug/
 
+# Meson
+builddir/
+
 debug.sh
