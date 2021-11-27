@@ -33,6 +33,10 @@ int look_ahead_keywords(const char *script, size_t size)
 
 struct token_info lex_keywords(struct token_info res, struct string *string)
 {
+    if (res.type == T_FOR)
+    {
+        g_lexer_info.for_context = IN_FOR;
+    }
     string_free(string);
     return res;
 }

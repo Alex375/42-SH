@@ -2,7 +2,7 @@
 
 #include <ctype.h>
 
-struct lexer_info g_lexer_info = { NULL, GENERAL,GENERAL_EXP, GENERAL_EXP, 0, 0, NULL, 0 };
+struct lexer_info g_lexer_info = { NULL, GENERAL_FOR,GENERAL,GENERAL_EXP, GENERAL_EXP, 0, 0, NULL, 0 };
 
 void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 {
@@ -29,13 +29,22 @@ static struct token_info lex_accumulator(struct token_info res,
     if (is_token_seperator(res.type))
     {
         g_lexer_info.word_context = GENERAL;
+        g_lexer_info.for_context = GENERAL_FOR;
     }
+
+    if (g_lexer_info.for_context == IN_FOR && g_lexer_info.word_context == IN_COMMAND && res.type == T_IN)
+    {
+        g_lexer_info.for_context = GENERAL_FOR;
+        g_lexer_info.word_context = GENERAL;
+        return res;
+    }
+
 
     if (is_ionumber(res, string))
     {
         return lex_ionumber(res, string);
     }
-    else if (res.type == T_WORD || g_lexer_info.last_exp_context != GENERAL || g_lexer_info.word_context == IN_COMMAND)
+    else if (res.type == T_WORD || g_lexer_info.last_exp_context != GENERAL_EXP || g_lexer_info.word_context == IN_COMMAND)
     {
         res = lex_command(res, string);
     }

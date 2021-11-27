@@ -19,6 +19,12 @@ enum expansion_context
     IN_SQUOTE_EXP
 };
 
+enum for_context
+{
+    GENERAL_FOR,
+    IN_FOR
+};
+
 /**
 ** @brief                   Global info for the lexer
 ** @param nb_token          The number of token in the token converter.
@@ -30,6 +36,7 @@ enum expansion_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum for_context for_context;
     enum word_context word_context;
     enum expansion_context exp_context;
     enum expansion_context last_exp_context;
@@ -46,6 +53,7 @@ struct words_converter
     char *token_converter[28];
     char *separator[16];
 };
+
 /**
 ** @brief                   Global variable that store the infos about the
 *lexer.

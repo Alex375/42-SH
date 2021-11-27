@@ -335,9 +335,9 @@ Test(OR, MEDIUM)
 
 Test(AND, MEDIUM)
 {
-    char *script = "echo test||echo test";
+    char *script = "echo test&&echo test";
     struct token_info expected[] = {
-        { T_WORD, "echo" }, { T_WORD, "test" }, { T_OR, NULL },
+        { T_WORD, "echo" }, { T_WORD, "test" }, { T_AND, NULL },
         { T_WORD, "echo" }, { T_WORD, "test" },
     };
 
@@ -401,12 +401,18 @@ Test(EMPTY, QUOTE)
 }
 
 
+Test(FOR, EASY)
+{
+    char *script = "for test in 1 2 3\ndo\n echo 'jadore h'\ndone";
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_WORD, "test" },
+                                     { T_IN, NULL }, { T_WORD, "1" },
+                                     { T_WORD, "2" }, { T_WORD, "3" },
+                                     { T_NEWLINE, NULL },  { T_DO, NULL },
+                                     { T_NEWLINE, NULL }, { T_WORD, "echo" }, { T_WORD, "jadore h" },
+                                     { T_NEWLINE, NULL }, { T_DONE, NULL} };
 
-//int main(void)
-//{
-//    char *script = "       echo '''      ";
-//    lexer_start(script, strlen(script));
-//     struct token_info tk;
-//     while ((tk = pop_token()).type != T_EOF)
-//         continue;
-// }
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
