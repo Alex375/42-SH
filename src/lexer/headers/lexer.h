@@ -22,7 +22,8 @@ enum expansion_context
 enum for_context
 {
     GENERAL_FOR,
-    IN_FOR
+    VAR_FOR,
+    IN_FOR,
 };
 
 /**
@@ -77,9 +78,13 @@ int look_ahead_token(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 
+struct token_info lex_for(struct token_info res, struct string *string);
+
 struct token_info lex_keywords(struct token_info res, struct string *string);
 
 struct token_info lex_command(struct token_info res, struct string *string);
+
+void context_update(struct token_info res);
 
 int detect_context(char c);
 

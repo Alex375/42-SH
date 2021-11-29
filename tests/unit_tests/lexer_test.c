@@ -404,7 +404,7 @@ Test(EMPTY, QUOTE)
 Test(FOR, EASY)
 {
     char *script = "for test in 1 2 3\ndo\n echo 'jadore h'\ndone";
-    struct token_info expected[] = {{ T_FOR, NULL },   { T_WORD, "test" },
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_VAR, "test" },
                                      { T_IN, NULL }, { T_WORD, "1" },
                                      { T_WORD, "2" }, { T_WORD, "3" },
                                      { T_NEWLINE, NULL },  { T_DO, NULL },
@@ -415,12 +415,63 @@ Test(FOR, EASY)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
-int main()
+Test(FOR, MEDIUM)
 {
-    char *script = "for test in in 1 2 3\ndo\necho test";
-    lexer_start(script, strlen(script));
-    struct token_info tk;
-    while ((tk = pop_token()).type != T_EOF)
-        continue;
+    char *script = "for in in in; do\n  test\ndone";
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_VAR, "in" },
+                                     { T_IN, NULL }, { T_WORD, "in" },
+                                     { T_SEMICOLON, NULL },  { T_DO, NULL },
+                                     { T_NEWLINE, NULL }, { T_WORD, "test" },
+                                     { T_NEWLINE, NULL }, { T_DONE, NULL} };
+
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
+
+Test(FOR, WEIRD)
+{
+    char *script = "for ; in in; do\n  test\ndone";
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_VAR, ";" },
+                                     { T_IN, NULL }, { T_WORD, "in" },
+                                     { T_SEMICOLON, NULL },  { T_DO, NULL },
+                                     { T_NEWLINE, NULL }, { T_WORD, "test" },
+                                     { T_NEWLINE, NULL }, { T_DONE, NULL} };
+
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FOR, WEIRD2)
+{
+    char *script = "for test; do\n  test\ndone";
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_VAR, "test" },
+                                     { T_SEMICOLON, NULL },  { T_DO, NULL },
+                                     { T_NEWLINE, NULL }, { T_WORD, "test" },
+                                     { T_NEWLINE, NULL }, { T_DONE, NULL} };
+
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FOR, WEIRD3)
+{
+    char *script = "for test; in do\n  test\ndone";
+    struct token_info expected[] = {{ T_FOR, NULL },   { T_VAR, "test" },
+                                     { T_SEMICOLON, NULL }, { T_IN, NULL }, { T_DO, NULL },
+                                     { T_NEWLINE, NULL }, { T_WORD, "test" },
+                                     { T_NEWLINE, NULL }, { T_DONE, NULL} };
+
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
+//int main()
+//{
+//    char *script = "for test; do\n  test\ndone";
+//    lexer_start(script, strlen(script));
+//    struct token_info tk;
+//    while ((tk = pop_token()).type != T_EOF)
+//        continue;
+//}
 

@@ -1,0 +1,28 @@
+#include "lexer.h"
+
+struct token_info lex_for(struct token_info res, struct string *string)
+{
+    if (g_lexer_info.for_context == VAR_FOR)
+    {
+        res.type = T_VAR;
+        res.command = string_get(string);
+        g_lexer_info.for_context = IN_FOR;
+    }
+    else if (res.type == T_IN && g_lexer_info.for_context == IN_FOR)
+    {
+        g_lexer_info.for_context = GENERAL_FOR;
+        g_lexer_info.word_context = IN_COMMAND;
+    }
+    else if (res.type == T_NEWLINE || res.type == T_SEMICOLON)
+    {
+        g_lexer_info.for_context = GENERAL_FOR;
+        g_lexer_info.word_context = GENERAL;
+    }
+    else
+    {
+        res.type = T_WORD;
+        res.command = string_get(string);
+    }
+
+    return res;
+}

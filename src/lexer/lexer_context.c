@@ -18,3 +18,11 @@ int detect_context(char c)
 
     return 0;
 }
+
+void context_update(struct token_info res)
+{
+    if (is_token_seperator(res.type))
+    {
+        g_lexer_info.word_context = GENERAL;
+    }
+}
