@@ -1,5 +1,5 @@
 #include "eval_ast.h"
-
+#include <err.h>
 #include "execution.h"
 
 int eval_ast(struct ast *ast) // TODO alloc pipline with null
@@ -77,5 +77,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         cmd = ast->t_ast;
         // TODO exec redirs
         return eval_ast(cmd->ast);
+    default:
+        errx(1, "Mettez un default svp ça fait crash cmake ok | j'ai mis un default");
     }
 }

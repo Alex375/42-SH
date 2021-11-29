@@ -42,7 +42,7 @@ element:      WORD
 
 compound_list - DONE:  ('\n')* and_or ((';'|'\n') ('\n')* and_or)* [(';'|'\n') ('\n')*]
 
-rule_for:      For WORD ([';']|[('\n')* 'in' (WORD)* (';'|'\n')]) ('\n')* do_group
+rule_for - DONE:      For WORD ([';']|[('\n')* 'in' (WORD)* (';'|'\n')]) ('\n')* do_group
 
 rule_while - DONE:    'while' compound_list do_group
 

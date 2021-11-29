@@ -7,10 +7,36 @@
 #include "tokens.h"
 #include "xstring.h"
 
-enum expansion_context
+enum word_context
 {
     GENERAL,
-    IN_SQUOTE
+    IN_COMMAND
+};
+
+enum hard_expansion
+{
+    GENERAL_EXP_HARD,
+    IN_SQUOTE_EXP,
+    IN_ESCAPE_EXP
+};
+
+enum soft_expansion
+{
+    GENERAL_EXP_SOFT,
+    IN_DQUOTE
+};
+
+enum for_context
+{
+    GENERAL_FOR,
+    VAR_FOR,
+    IN_FOR,
+};
+
+enum var_context
+{
+    GENERAL_VAR,
+    IN_VAR
 };
 
 /**
@@ -24,8 +50,13 @@ enum expansion_context
 struct lexer_info
 {
     struct tkvec *token_list;
-    enum expansion_context exp_context;
-    enum expansion_context last_context;
+    enum soft_expansion last_soft;
+    enum soft_expansion soft_expansion;
+    enum var_context var_context;
+    enum for_context for_context;
+    enum word_context word_context;
+    enum hard_expansion exp_context;
+    enum hard_expansion last_exp_context;
     size_t array_pos;
     size_t pos;
     char *script;
@@ -39,6 +70,7 @@ struct words_converter
     char *token_converter[28];
     char *separator[16];
 };
+
 /**
 ** @brief                   Global variable that store the infos about the
 *lexer.
@@ -50,17 +82,33 @@ extern struct lexer_info g_lexer_info;
 */
 int separatorify(const char *token_str);
 
+int is_token_seperator(enum token token);
+
 enum token tokenify(const char *token_str);
+
+int is_ionumber(struct token_info res, struct string *string);
+
+struct token_info lex_var(struct token_info res, struct string *string);
+
+struct token_info lex_ionumber(struct token_info res, struct string *string);
 
 int look_ahead_token(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 
+struct token_info lex_for(struct token_info res, struct string *string);
+
 struct token_info lex_keywords(struct token_info res, struct string *string);
 
 struct token_info lex_command(struct token_info res, struct string *string);
 
+int skip_character(char c);
+
+void context_update(struct token_info res);
+
 int detect_context(char c);
+
+int look_ahead_dquote(const char* script, size_t size);
 
 int look_ahead_squote(size_t size);
 

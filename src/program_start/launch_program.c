@@ -8,7 +8,7 @@
 #include "options.h"
 #include "read_script.h"
 
-extern struct options *opt;
+struct options *opt = NULL;
 
 int launch_script(void)
 {
@@ -19,9 +19,9 @@ int launch_script(void)
     if (opt->verbose)
         printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n", temp);
 
-    exec_script(temp, size); // TODO get script exit code
+    int res = exec_script(temp, size);
     xfree(temp);
-    return 0;
+    return res;
 }
 
 int launch_command(void)
@@ -30,15 +30,14 @@ int launch_command(void)
         return -1;
     if (opt->verbose)
         printf("Executing command \n\'%s\'\n", opt->commands[0]);
-    exec_script(opt->commands[0], strlen(opt->commands[0]));//TODO get exec exit code
-    return 0;
+    return exec_script(opt->commands[0], strlen(opt->commands[0]));
 }
 
 char *read_stdin(void)
 {
     char *buffer = xcalloc(1, 2049);
     int total = 0;
-    ssize_t r = 0;
+    ssize_t r;
     while ((r = read(STDIN_FILENO, buffer + total, 2048)) > 0)
     {
         total += r;
@@ -50,4 +49,30 @@ char *read_stdin(void)
         err(1, "Failed to read stdin");
     }
     return buffer;
+}
+
+int launch_program(int argc, char **argv)
+{
+    opt = xcalloc(1, sizeof(struct options));
+    get_option(opt, argc, argv);
+    if (opt->help)
+    {
+        print_usage();
+        return 0;
+    }
+
+    int res = launch_script();
+    if (res == -1)
+        res = launch_command();
+
+    if (res == -1)
+    {
+        char *read = read_stdin();
+        if (opt->verbose)
+            printf("Executing command \n\'%s\'\n", opt->commands[0]);
+        res = exec_script(read,
+                          strlen(read));
+    }
+    xfree_all();
+    return res;
 }

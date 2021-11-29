@@ -19,7 +19,7 @@ int get_builins_index(char *function)
 
 int exec_builtin(int index, char **args)
 {
-    if (opt->verbose)
+    if (opt && opt->verbose)
         fprintf(stderr, "Executing buitdins\n");
     int (*builints[])(char **) = { echo };
     return builints[index](args);

@@ -40,11 +40,11 @@ struct ast *parse_command()
             || tok.type == T_UNTIL) // T_CASE
     {
         ast = parse_shell_command();
-        redirs = parse_redirs();
+        parse_redirs(&redirs);
     }
     else
     {
-        ast = parse_simple_command();
+        ast = parse_simple_command(&redirs);
     }
 
     if (!ast || errno != 0)
@@ -53,51 +53,51 @@ struct ast *parse_command()
     return build_cmd(ast, redirs);
 }
 
-struct list_redir *parse_redirs()
+void *parse_redirs(struct list_redir **redirs)
 {
-    struct list_redir *res = NULL;
-
     while (1)
     {
+        if (err_redir() || !is_redir())
+            break;
+
         struct token_info tok = GET_TOKEN
 
-            if (!is_redir()) break;
+            struct list_redir *new_redir =
+                xcalloc(1, sizeof(struct list_redir));
 
-        struct list_redir *new_redir = xcalloc(1, sizeof(struct list_redir));
-
-        if (tok.type == T_WORD)
+        if (tok.type == T_IONUMBER)
         {
             POP_TOKEN
-            new_redir->ionumber = tok.command;
+            new_redir->ionumber = xstrdup(tok.command);
+        }
+        else
+        {
+            if (tok.type == T_REDIR_I_1 || tok.type == T_REDIR_I_A
+                || tok.type == T_REDIR_O_2)
+                new_redir->ionumber = xstrdup("0");
+            else
+                new_redir->ionumber = xstrdup("1");
         }
 
         tok = POP_TOKEN new_redir->redir_type = tok.type;
 
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
-            tok.command;
+            xstrdup(tok.command);
 
-        add_to_redir_list(&res, new_redir);
+        add_to_redir_list(redirs, new_redir);
     }
 
-    return res;
+    return NULL;
 }
 
-struct ast *parse_simple_command()
+struct ast *parse_simple_command(struct list_redir **redirs)
 {
-    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
+    parse_redirs(redirs);
 
-        if (tok.type != T_WORD)
-    {
-        errno = ERROR_PARSING;
-        return NULL;
-    }
-
-    char *cmd = xstrdup(tok.command);
-
+    struct token_info tok;
     int cap = 8;
-    int i = 1;
+    int i = 0;
     char **cmd_arg = xcalloc(cap, sizeof(char *));
-    cmd_arg[0] = cmd;
     while ((tok = get_next_token()).type == T_WORD)
     {
         if (i >= cap - 1)
@@ -107,8 +107,15 @@ struct ast *parse_simple_command()
         }
         POP_TOKEN
         cmd_arg[i] = xstrdup(tok.command);
+
+        parse_redirs(redirs);
+
         i++;
     }
+
+    char *cmd = NULL;
+    if (i > 0)
+        cmd = xstrdup(cmd_arg[0]);
 
     return build_s_cmd(cmd, cmd_arg);
 }

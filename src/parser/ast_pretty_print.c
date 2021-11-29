@@ -13,6 +13,21 @@ void tab(int prof)
     }
 }
 
+void print_redir(struct list_redir *redirs,  int prof)
+{
+    if (redirs)
+    {
+        tab(prof);
+        printf("REDIRS : ");
+        while (redirs)
+        {
+            printf("%s into %s | ", redirs->ionumber, redirs->word);
+            redirs = redirs->next;
+        }
+        printf("\n");
+    }
+}
+
 void pp_rec(struct ast *ast, int prof)
 {
     if (!ast)
@@ -83,6 +98,11 @@ void pp_rec(struct ast *ast, int prof)
         while (for_ast->seq[j])
             printf("%s ", for_ast->seq[j++]);
         printf("\n");
+        tab(prof);
+        printf("DO------\n");
+        pp_rec(for_ast->statement, prof + 1);
+        tab(prof);
+        printf("DONE------\n");
         break;
     case AST_CASE:
         break;
@@ -135,26 +155,18 @@ void pp_rec(struct ast *ast, int prof)
     case AST_CMD:
         cmd_ast = ast->t_ast;
         pp_rec(cmd_ast->ast, prof);
-        struct list_redir *tmp = cmd_ast->redirs;
-        if (tmp)
-        {
-            tab(prof);
-            printf("REDIRS : ");
-            while (tmp)
-            {
-                printf("%s into %s |", tmp->ionumber, tmp->word);
-                tmp = tmp->next;
-            }
-            printf("\n");
-        }
-
+        print_redir(cmd_ast->redirs, prof);
         break;
     }
 }
 
 void ast_pretty_print(struct ast *ast)
 {
+    if (!ast)
+        return;
     if (errno == ERROR_PARSING)
         printf("!!! ERROR WHILE PARSING \n");
+    printf("\n========================================\n\n");
     pp_rec(ast, 0);
+    printf("\n-_-_-_-_-_-_-_-_-_-_\n\n");
 }
