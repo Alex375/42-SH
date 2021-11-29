@@ -22,7 +22,14 @@ enum expansion_context
 enum for_context
 {
     GENERAL_FOR,
-    IN_FOR
+    VAR_FOR,
+    IN_FOR,
+};
+
+enum var_context
+{
+    GENERAL_VAR,
+    IN_VAR
 };
 
 /**
@@ -36,6 +43,7 @@ enum for_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum var_context var_context;
     enum for_context for_context;
     enum word_context word_context;
     enum expansion_context exp_context;
@@ -71,15 +79,21 @@ enum token tokenify(const char *token_str);
 
 int is_ionumber(struct token_info res, struct string *string);
 
+struct token_info lex_var(struct token_info res, struct string *string);
+
 struct token_info lex_ionumber(struct token_info res, struct string *string);
 
 int look_ahead_token(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 
+struct token_info lex_for(struct token_info res, struct string *string);
+
 struct token_info lex_keywords(struct token_info res, struct string *string);
 
 struct token_info lex_command(struct token_info res, struct string *string);
+
+void context_update(struct token_info res);
 
 int detect_context(char c);
 
