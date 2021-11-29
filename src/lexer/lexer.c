@@ -2,7 +2,7 @@
 
 #include <ctype.h>
 
-struct lexer_info g_lexer_info = { NULL,        GENERAL_FOR, GENERAL,
+struct lexer_info g_lexer_info = { NULL,      GENERAL_VAR,  GENERAL_FOR, GENERAL,
                                    GENERAL_EXP, GENERAL_EXP, 0,
                                    0,           NULL,        0 };
 
@@ -30,9 +30,14 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
+
     if (g_lexer_info.for_context != GENERAL_FOR)
     {
         res = lex_for(res, string);
+    }
+    else if (g_lexer_info.var_context != GENERAL_VAR)
+    {
+        res = lex_var(res, string);
     }
     else if (is_ionumber(res, string))
     {

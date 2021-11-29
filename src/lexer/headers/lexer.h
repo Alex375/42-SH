@@ -26,6 +26,12 @@ enum for_context
     IN_FOR,
 };
 
+enum var_context
+{
+    GENERAL_VAR,
+    IN_VAR
+};
+
 /**
 ** @brief                   Global info for the lexer
 ** @param nb_token          The number of token in the token converter.
@@ -37,6 +43,7 @@ enum for_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum var_context var_context;
     enum for_context for_context;
     enum word_context word_context;
     enum expansion_context exp_context;
@@ -71,6 +78,8 @@ int is_token_seperator(enum token token);
 enum token tokenify(const char *token_str);
 
 int is_ionumber(struct token_info res, struct string *string);
+
+struct token_info lex_var(struct token_info res, struct string *string);
 
 struct token_info lex_ionumber(struct token_info res, struct string *string);
 
