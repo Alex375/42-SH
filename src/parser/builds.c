@@ -31,11 +31,12 @@ struct ast *build_if(struct ast *condition, struct ast *true_c,
     return res;
 }
 
-struct ast *build_s_cmd(char *cmd, char **cmd_arg)
+struct ast *build_s_cmd(char *cmd, char **cmd_arg, struct list_redir *redirs)
 {
     struct n_s_cmd *nCmd = xcalloc(1, sizeof(struct n_s_cmd));
     nCmd->cmd = cmd;
     nCmd->cmd_arg = cmd_arg;
+    nCmd->redirs = redirs;
 
     struct ast *res = xcalloc(1, sizeof(struct ast));
     res->type = AST_S_CMD;

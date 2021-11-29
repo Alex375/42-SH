@@ -117,8 +117,9 @@ struct ast *build_if(struct ast *condition, struct ast * true_c,
 ** @param cmd           name of the command
 ** @param cmd_arg       string list containing all the command arguments
  *                      separated by spaces.
+** @param redirs        list of redirection in the command
 */
-struct ast *build_s_cmd(char *cmd, char **cmd_arg);
+struct ast *build_s_cmd(char *cmd, char **cmd_arg, struct list_redir *redirs);
 
 /**
 ** @brief               builds a n_command node
@@ -190,8 +191,9 @@ struct ast *parse_command();
 
 /**
 ** @brief               Parsing a list of redirections (cf sh_grammar.txt)
+ * @param redirs        list of redir to append to
 */
-struct list_redir *parse_redirs();
+void *parse_redirs(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)

@@ -16,6 +16,8 @@ int check_ender_token(int in_compound)
     if (tok.type == T_EOF || tok.type == T_THEN || tok.type == T_ELSE
         || tok.type == T_ELIF || tok.type == T_FI || tok.type == T_C_PRTH
         || tok.type == T_C_BRKT || tok.type == T_DO || tok.type == T_DONE
+        || tok.type == T_IN || tok.type == T_OR || tok.type == T_AND
+        || tok.type == T_SEMICOLON || tok.type == T_PIPE || tok.type == T_ERROR
         || (!in_compound && tok.type == T_NEWLINE))
         return 1;
 
