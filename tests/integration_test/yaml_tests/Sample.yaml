@@ -58,7 +58,3 @@
     else;
       exit 1; fi
   type: failed
-
-- name: Simple exit code
-  input: exit 42
-  type: success

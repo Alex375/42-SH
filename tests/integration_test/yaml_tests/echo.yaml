@@ -14,6 +14,26 @@
   input: echo -n coucou re rere
   type: success
 
-- name: Echo withe mutltiple and option in
+- name: Echo with mutltiple and option in
   input: echo -na coucou -n coucoure
+  type: success
+
+- name: Echo expansion
+  input: "echo 'cou\\ncou'"
+  type: success
+
+- name: Echo expansion with e
+  input: "echo -e 'cou\\nco\\tu\\'"
+  type: success
+
+- name: Echo expansion with e and n
+  input: "echo -en 'cou\\nco\\tu\\'"
+  type: success
+
+- name: Echo hard expansion with e and n
+  input: "echo -e -nde 'cou\\nco\\tu\\'"
+  type: success
+
+- name: Echo hard expansion with e and n
+  input: "echo -e -n 'cou\nco\tu'"
   type: success

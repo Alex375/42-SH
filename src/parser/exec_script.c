@@ -22,7 +22,7 @@ int exec_script(char *script, size_t size)
     {
         errno = 0;
         ast = parse_input();
-        if (opt->print)
+        if (opt && opt->print)
             ast_pretty_print(ast);
         if (errno != 0)
         {
