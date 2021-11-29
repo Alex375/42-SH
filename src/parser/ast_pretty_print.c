@@ -53,7 +53,6 @@ void pp_rec(struct ast *ast, int prof)
         while (s_cmd_ast->cmd_arg[i])
             printf("%s ", s_cmd_ast->cmd_arg[i++]);
         printf("\n");
-        print_redir(s_cmd_ast->redirs, prof);
         break;
     case AST_IF:
         if_ast = ast->t_ast;

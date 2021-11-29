@@ -42,7 +42,6 @@ struct n_s_cmd
 {
     char *cmd;
     char **cmd_arg;
-    struct list_redir *redirs;
 };
 
 /**
@@ -117,9 +116,8 @@ struct ast *build_if(struct ast *condition, struct ast * true_c,
 ** @param cmd           name of the command
 ** @param cmd_arg       string list containing all the command arguments
  *                      separated by spaces.
-** @param redirs        list of redirection in the command
 */
-struct ast *build_s_cmd(char *cmd, char **cmd_arg, struct list_redir *redirs);
+struct ast *build_s_cmd(char *cmd, char **cmd_arg);
 
 /**
 ** @brief               builds a n_command node
@@ -197,8 +195,9 @@ void *parse_redirs(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)
+ * @param redirs        list of redir to append to
 */
-struct ast *parse_simple_command();
+struct ast *parse_simple_command(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a shell command (cf sh_grammar.txt)

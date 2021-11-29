@@ -44,7 +44,7 @@ struct ast *parse_command()
     }
     else
     {
-        ast = parse_simple_command();
+        ast = parse_simple_command(&redirs);
     }
 
     if (!ast || errno != 0)
@@ -90,11 +90,9 @@ void *parse_redirs(struct list_redir **redirs)
     return NULL;
 }
 
-struct ast *parse_simple_command()
+struct ast *parse_simple_command(struct list_redir **redirs)
 {
-    struct list_redir *redirs = NULL;
-
-    parse_redirs(&redirs);
+    parse_redirs(redirs);
 
     struct token_info tok;
     int cap = 8;
@@ -110,7 +108,7 @@ struct ast *parse_simple_command()
         POP_TOKEN
         cmd_arg[i] = xstrdup(tok.command);
 
-        parse_redirs(&redirs);
+        parse_redirs(redirs);
 
         i++;
     }
@@ -119,5 +117,5 @@ struct ast *parse_simple_command()
     if (i > 0)
         cmd = xstrdup(cmd_arg[0]);
 
-    return build_s_cmd(cmd, cmd_arg, redirs);
+    return build_s_cmd(cmd, cmd_arg);
 }
