@@ -2,9 +2,18 @@
 
 #include <ctype.h>
 
-struct lexer_info g_lexer_info = { NULL,      GENERAL_VAR,  GENERAL_FOR, GENERAL,
-                                   GENERAL_EXP, GENERAL_EXP, 0,
-                                   0,           NULL,        0 };
+struct lexer_info g_lexer_info = { NULL,
+                                   GENERAL_EXP_SOFT,
+                                   GENERAL_EXP_SOFT,
+                                   GENERAL_VAR,
+                                   GENERAL_FOR,
+                                   GENERAL,
+                                   GENERAL_EXP_HARD,
+                                   GENERAL_EXP_HARD,
+                                   0,
+                                   0,
+                                   NULL,
+                                   0 };
 
 void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 {
@@ -12,11 +21,15 @@ void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
         (*cursor)++;
 }
 
-static int look_ahead(const char *script, size_t size)
+static int look_ahead(const char* script, size_t size)
 {
-    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
+    if (g_lexer_info.exp_context != GENERAL_EXP_HARD)
     {
         return look_ahead_squote(size);
+    }
+    else if (g_lexer_info.soft_expansion == IN_DQUOTE)
+    {
+        return look_ahead_dquote(script, size);
     }
     else
     {
@@ -30,7 +43,6 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
-
     if (g_lexer_info.for_context != GENERAL_FOR)
     {
         res = lex_for(res, string);
@@ -43,7 +55,8 @@ static struct token_info lex_accumulator(struct token_info res,
     {
         res = lex_ionumber(res, string);
     }
-    else if (res.type == T_WORD || g_lexer_info.last_exp_context != GENERAL_EXP
+    else if (res.type == T_WORD
+             || g_lexer_info.last_exp_context != GENERAL_EXP_HARD || g_lexer_info.last_soft == IN_DQUOTE
              || g_lexer_info.word_context == IN_COMMAND)
     {
         res = lex_command(res, string);
@@ -53,8 +66,10 @@ static struct token_info lex_accumulator(struct token_info res,
         res = lex_keywords(res, string);
     }
 
-    g_lexer_info.exp_context = GENERAL_EXP;
-    g_lexer_info.last_exp_context = GENERAL_EXP;
+    g_lexer_info.exp_context = GENERAL_EXP_HARD;
+    g_lexer_info.last_exp_context = GENERAL_EXP_HARD;
+    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
+        g_lexer_info.last_soft = GENERAL_EXP_SOFT;
     return res;
 }
 
@@ -63,7 +78,8 @@ struct token_info tokenify_next(const char *script, size_t size)
 {
     struct token_info res = { 0, NULL };
 
-    skip_class(isblank, script, &g_lexer_info.pos);
+    if (g_lexer_info.soft_expansion != IN_DQUOTE)
+        skip_class(isblank, script, &g_lexer_info.pos);
 
     /* CHECK IF FINISHED TO READ THE SCRIPT */
     if (script[g_lexer_info.pos] == '\0' || g_lexer_info.pos >= size)
@@ -76,8 +92,10 @@ struct token_info tokenify_next(const char *script, size_t size)
     struct string *accumulator = string_create();
     do
     {
-        if (!detect_context(script[g_lexer_info.pos]))
+        if (!skip_character(script[g_lexer_info.pos]))
             accumulator = string_append(accumulator, script[g_lexer_info.pos]);
+
+        detect_context(script[g_lexer_info.pos]);
         g_lexer_info.pos++;
 
         if (look_ahead_token(accumulator, script[g_lexer_info.pos]))
@@ -86,5 +104,3 @@ struct token_info tokenify_next(const char *script, size_t size)
 
     return lex_accumulator(res, accumulator);
 }
-
-
