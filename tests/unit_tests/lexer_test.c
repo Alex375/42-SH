@@ -415,4 +415,12 @@ Test(FOR, EASY)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+int main()
+{
+    char *script = "for test in in 1 2 3\ndo\necho test";
+    lexer_start(script, strlen(script));
+    struct token_info tk;
+    while ((tk = pop_token()).type != T_EOF)
+        continue;
+}
 

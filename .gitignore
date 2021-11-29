@@ -26,5 +26,8 @@ cmake-build-debug/
 # Meson
 builddir/
 
+#Python
+venv/
+
 debug.sh
 /tests/integration_test/42SH
