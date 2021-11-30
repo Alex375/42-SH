@@ -1,4 +1,6 @@
 #include "lexer.h"
+#include <ctype.h>
+
 
 struct token_info lex_var(struct token_info res, struct string *string)
 {

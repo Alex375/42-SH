@@ -555,7 +555,7 @@ Test(VAR, MEDIUM2)
 Test(VAR, MEDIUM3)
 {
     char *script = "echo $a$b";
-    struct token_info expected[] = { { T_WORD, "echo" }, { T_VAR, "$a" }, { T_VAR, "$b" }};
+    struct token_info expected[] = { { T_WORD, "echo" }, { T_VAR, "a" }, { T_VAR, "b" }};
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -564,6 +564,14 @@ Test(VAR, MEDIUM_QUOTE)
 {
     char *script = "echo '(\"'";
     struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "(\"" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, HARDQUOTE)
+{
+    char *script = "echo $'a'";
+    struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "$a" }};
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -677,17 +685,28 @@ Test(DOUBLE_QUOTE, MEDIUM2)
     char *script = "echo \"$i $test $test< && > $test";
     struct token_info expected[] = { { T_WORD, "echo" },   { T_VAR, "i" },
                                      { T_WORD, " " },      { T_VAR, "test" },
-                                     { T_WORD, " " },      { T_VAR, "test<" },
-                                     { T_WORD, " && > " }, { T_VAR, "test" } };
+                                     { T_WORD, " " },      { T_VAR, "test" },
+                                     { T_WORD, "< && > " }, { T_VAR, "test" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
-// int main()
-//{
-//     char *script = "echo \"$i $test $test< && > $test";
-//     lexer_start(script, strlen(script));
-//     struct token_info tk;
-//     while ((tk = pop_token()).type != T_EOF)
-//         continue;
-// }
+Test(DOUBLE_QUOTE, MEDIUM3)
+{
+    char *script = "echo \"Hello $world, if this is $working then is good ! \"";
+    struct token_info expected[] = { { T_WORD, "echo" },   { T_WORD, "Hello " },
+                                     { T_VAR, "world" },      { T_WORD, ", if this is " },
+                                     { T_VAR, "working" },      { T_WORD, " then is good ! " }};
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
+/*int main()
+{
+    char *script = "echo $test";
+     lexer_start(script, strlen(script));
+     struct token_info tk;
+     while ((tk = pop_token()).type != T_EOF)
+         continue;
+ }*/

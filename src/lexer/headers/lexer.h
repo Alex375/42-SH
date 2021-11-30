@@ -88,6 +88,8 @@ enum token tokenify(const char *token_str);
 
 int is_ionumber(struct token_info res, struct string *string);
 
+int look_ahead_var(const char *script, size_t size);
+
 struct token_info lex_var(struct token_info res, struct string *string);
 
 struct token_info lex_ionumber(struct token_info res, struct string *string);

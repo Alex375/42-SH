@@ -1,5 +1,7 @@
-#include <string.h>
+#define _GNU_SOURCE
 
+#include <string.h>
+#include <fnmatch.h>
 #include "lexer.h"
 
 struct words_converter converter = {
@@ -66,12 +68,23 @@ enum token tokenify(const char *token_str)
     return i;
 }
 
+static int is_valid_var(const char *string)
+{
+    return fnmatch("$?(*[a-zA-Z0-9_]|[@*?$#])", string, FNM_EXTMATCH) == 0;
+}
+
 int look_ahead_token(struct string *accumulator, char next_char)
 {
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD
         || g_lexer_info.last_exp_context == IN_ESCAPE_EXP
         || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
     {
+        return 0;
+    }
+
+    if (g_lexer_info.var_context == IN_VAR && !is_valid_var(accumulator->data))
+    {
+        accumulator->size--;
         return 0;
     }
 

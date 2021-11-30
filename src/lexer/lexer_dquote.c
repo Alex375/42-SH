@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <ctype.h>
 
 int look_ahead_dquote(const char* script, size_t size)
 {
@@ -8,11 +9,6 @@ int look_ahead_dquote(const char* script, size_t size)
     {
         return 0;
     }
-    if (script[i] == '$' && i > 0 && script[i - 1] != '"')
-    {
-        return 0;
-    }
-
 
     if (i > size)
         return 0;
