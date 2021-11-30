@@ -67,8 +67,8 @@ static int err_redir()
     enum token t1 = look_forward_token(1).type;
     enum token t2 = look_forward_token(2).type;
     if ((is_chev(t0) && t1 != T_WORD)
-        || (is_chev(t1)
-            && ((t0 != T_WORD && t0 != T_IONUMBER) || t2 != T_WORD)))
+        || (t0 == T_IONUMBER
+            && ((!is_chev(t1)) || t2 != T_WORD)))
     {
         errno = ERROR_PARSING;
         return 1;
