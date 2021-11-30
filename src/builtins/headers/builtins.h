@@ -10,10 +10,15 @@
 int echo(char **args);
 /*!
  * @brief Replicate the exit function
- * @param args Array of string containing arguments of echo
- * @note  Implemented arguments are -n and -e
+ * @param args Array of string containing arguments of exit
  */
 int xexit(char **args);
+
+/*!
+ * @brief Replicate the cd function
+ * @param args Array of string containing arguments of cd
+ */
+int cd(char **args);
 
 /*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
