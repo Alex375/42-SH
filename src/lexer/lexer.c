@@ -44,7 +44,7 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
-    if  (g_lexer_info.var_context == IN_VAR_NAME)
+    if (g_lexer_info.var_context == IN_VAR_NAME)
     {
         res = lex_varname(res, string);
     }

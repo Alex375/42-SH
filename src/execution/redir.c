@@ -1,7 +1,7 @@
 #include <err.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "eval_ast.h"
 #include "execution.h"
@@ -10,7 +10,7 @@
 
 int open_file(char *filename)
 {
-    FILE* temp = fopen(filename, "w");
+    FILE *temp = fopen(filename, "w");
     fclose(temp);
     int f = open(filename, O_WRONLY | O_CREAT, 644);
     if (f < 0)

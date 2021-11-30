@@ -13,7 +13,7 @@ void tab(int prof)
     }
 }
 
-void print_redir(struct list_redir *redirs,  int prof)
+void print_redir(struct list_redir *redirs, int prof)
 {
     if (redirs)
     {
@@ -28,7 +28,7 @@ void print_redir(struct list_redir *redirs,  int prof)
     }
 }
 
-void print_assign(struct list_var_assign *vars,  int prof)
+void print_assign(struct list_var_assign *vars, int prof)
 {
     if (vars)
     {

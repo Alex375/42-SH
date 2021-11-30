@@ -18,7 +18,6 @@ int look_ahead_keywords(const char *script, size_t size)
         return 0;
     }
 
-
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {

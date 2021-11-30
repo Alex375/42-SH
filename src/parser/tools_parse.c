@@ -1,7 +1,7 @@
+#include <errno.h>
+
 #include "headers/parser.h"
 #include "xstrdup.h"
-
-#include <errno.h>
 
 void skip_newlines()
 {
@@ -35,7 +35,8 @@ void add_to_redir_list(struct list_redir **redirs, struct list_redir *new_redir)
     add_to_redir_list(&(*redirs)->next, new_redir);
 }
 
-void add_to_var_assign_list(struct list_var_assign **vars, struct list_var_assign *new_var)
+void add_to_var_assign_list(struct list_var_assign **vars,
+                            struct list_var_assign *new_var)
 {
     if (!*vars)
     {
