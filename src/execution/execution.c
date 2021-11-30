@@ -19,6 +19,8 @@ void exit_program(const char *msg)
 
 int execute(char *cmd, char **args)
 {
+    if (!cmd)
+        return 0;
     if (opt && opt->verbose)
     {
         fprintf(stderr, "Executing command -> %s\nWith args -> \n", cmd);
