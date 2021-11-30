@@ -8,6 +8,12 @@
  * @note  Implemented arguments are -n and -e
  */
 int echo(char **args);
+/*!
+ * @brief Replicate the exit function
+ * @param args Array of string containing arguments of echo
+ * @note  Implemented arguments are -n and -e
+ */
+int xexit(char **args);
 
 /*!
  * @brief Execute the builtins at the given index (call get_builtins_index to

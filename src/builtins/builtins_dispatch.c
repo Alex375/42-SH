@@ -10,8 +10,8 @@ int get_builins_index(char *function)
 {
     if (function == NULL)
         return -1;
-    char *builints[1] = { "echo" };
-    for (int i = 0; i < 1; i++)
+    char *builints[2] = { "echo", "exit" };
+    for (int i = 0; i < 2; i++)
     {
         if (strcmp(builints[i], function) == 0)
             return i;
@@ -23,6 +23,6 @@ int exec_builtin(int index, char **args)
 {
     if (opt && opt->verbose)
         fprintf(stderr, "Executing buitdins\n");
-    int (*builints[])(char **) = { echo };
+    int (*builints[])(char **) = { echo, xexit };
     return builints[index](args);
 }

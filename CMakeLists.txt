@@ -33,3 +33,4 @@ add_executable(echo_main ${SRC} tests/unit_tests/echo_tests/echo_main.c)
 
 target_link_libraries(lexer_test PUBLIC -lcriterion)
 target_link_libraries(echo_test PUBLIC -lcriterion)
+target_link_libraries(42SH PUBLIC -fsanitize=address)

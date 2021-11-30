@@ -122,11 +122,10 @@ if __name__ == "__main__":
     categories = args.category
     ref = args.reference
 
-    if not os.path.exists(binary_path):
+    if os.path.exists(f"../../cmake-build-debug/{args.binary}"):
         shutil.copy(f"../../cmake-build-debug/{args.binary}", "./")
         if not os.path.exists(binary_path):
             raise FileNotFoundError(f"Tried to copy file but {binary_path} not found")
-
 
     if ref is None:
         ref = "dash"
@@ -162,7 +161,12 @@ if __name__ == "__main__":
         with open(f"yaml_tests/{categ}.yaml", "r") as file:
             testsuite = [TestCase(**testcase) for testcase in
                          list(yaml.safe_load(file))]
-
+        if categ == "echo":
+            ref = "bash"
+        else:
+            ref = args.reference
+            if ref is None:
+                ref = "dash"
         for testcase in testsuite:
             stdin = testcase.input
             name = testcase.name
