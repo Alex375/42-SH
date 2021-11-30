@@ -2,7 +2,6 @@
 #define INC_42_SH_PARSER_H
 
 #include "lexer.h"
-#include "xstring.h"
 
 /**
 ** @brief                   Describe the node type in ast.
@@ -42,27 +41,58 @@ struct ast
 struct n_s_cmd
 {
     char *cmd;
-    struct string *cmd_arg;
-    struct list_redir *redirs;
+    char **cmd_arg;
+    struct list_var_assign *vars;
 };
 
 /**
-** @brief                   <<AST_IF>> ast member.
+** @brief                   AST_IF ast member.
 */
 struct n_if
 {
     struct ast *condition;
-    struct ast * true;
-    struct ast * false;
+    struct ast *true_c;
+    struct ast *false_c;
 };
 
 /**
-** @brief                   <<AST_CMD>> ast member.
+** @brief                   AST_CMD ast member.
 */
 struct n_binary
 {
     struct ast *left;
     struct ast *right;
+};
+
+/**
+** @brief                   AST_CMD ast member.
+*/
+struct n_command
+{
+    struct ast *ast;
+    struct list_redir *redirs;
+};
+
+/**
+** @brief                   AST_FOR ast member.
+*/
+struct n_for
+{
+    char *name;
+    char **seq;
+    struct ast *statement;
+};
+
+////////////////
+
+/**
+** @brief                   chained list of variable assignation.
+*/
+struct list_var_assign
+{
+    char *name;
+    char *value;
+    struct list_var_assign *next;
 };
 
 /**
@@ -76,26 +106,70 @@ struct list_redir
     struct list_redir *next;
 };
 
+///////////////
+
 /**
-** @brief                   <<AST_CMD>> ast member.
+** @brief               builds a n_binary node
+** @param type          type to build
+** @param left          left child ast
+** @param right         right child ast
 */
-struct n_command
-{
-    struct ast *ast;
-    struct list_redir *redirs;
-};
+struct ast *build_binary(enum AST_TYPE type, struct ast *left,
+                         struct ast *right);
+
+/**
+** @brief               builds a n_if node
+** @param condition     condition child ast
+** @param left          left child ast
+** @param right         right child ast
+*/
+struct ast *build_if(struct ast *condition, struct ast *true_c,
+                     struct ast *false_c);
+
+/**
+** @brief               builds a n_s_cmd node
+** @param cmd           name of the command
+** @param cmd_arg       string list containing all the command arguments
+*                      separated by spaces.
+*/
+struct ast *build_s_cmd(char *cmd, char **cmd_arg,
+                        struct list_var_assign *vars);
+
+/**
+** @brief               builds a n_command node
+** @param ast           child ast
+** @param redirs        list of redirections
+*/
+struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
+
+/*!
+** @brief               builds a n_for node
+** @param name          name of the variable of for
+** @param seq           list on what the name variable is going to
+*                      take it's values
+** @param statement     ast inside the for
+*/
+struct ast *build_for(char *name, char **seq, struct ast *statement);
 
 #include <stddef.h>
 
-#define ERROR_PARSING 69
-#define ERROR_EMPTY_EOF 420
+#define ERROR_PARSING 127
+#define ERROR_EMPTY_EOF 69
+
+/**
+** @brief               executes all the lines of a script
+*                      (crash if a parsing error is found)
+** @param script        string containing block
+** @param size          len of script parameter
+** @return              Return le exit code of the last executed command
+*/
+int exec_script(char *script, size_t size);
 
 /**
 ** @brief               printing the ast obtain from a script
-** @param script        string containing block
-** @param size          len of script parameter
+** @param ast           Ast to be printed
 */
-void ast_pretty_print(char *script, size_t size);
+void ast_pretty_print(struct ast *ast);
 
 /**
 ** @brief               start the parsing of a script
@@ -131,13 +205,21 @@ struct ast *parse_command();
 
 /**
 ** @brief               Parsing a list of redirections (cf sh_grammar.txt)
+* @param redirs         list of redir to append to
 */
-struct list_redir *parse_redirs();
+void *parse_redirs(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)
+* @param redirs        list of redir to append to
 */
-struct ast *parse_simple_command();
+struct ast *parse_simple_command(struct list_redir **redirs);
+
+/**
+** @brief               Parsing a prefix (cf sh_grammar.txt)
+* @param redirs        list of redir to append to
+*/
+struct list_var_assign *parse_var_assignement(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a shell command (cf sh_grammar.txt)
@@ -152,6 +234,19 @@ struct ast *parse_shell_command();
 struct ast *parse_if_rule(int inElif);
 
 /**
+** @brief               Parsing a while rule and an until rule
+**                      (cf sh_grammar.txt)
+* @param tokT          either WHILE or UNTIL
+*/
+struct ast *parse_while_until_rule(enum token tokT);
+
+/**
+** @brief               Parsing a for rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_for_rule();
+
+/**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
 */
 struct ast *parse_compound();
@@ -164,20 +259,22 @@ void skip_newlines();
 /**
 ** @brief               return 1 if the recursive grammar element should
 **                      stop because of an unexpected token (cf sh_grammar.txt)
+** @param list_type     0 if in a list and 1 if in compound
 */
-int check_ender_token();
+int check_ender_token(int in_compound);
 
 /**
-** @brief               return 1 if the next tokens are a redirection
-**                      (cf sh_grammar.txt)
-*/
-int is_redir();
-
-/**
-** @brief               adds @a new_redir to the redirection list @a redirs
+** @brief               adds a new_redir to the redirection list @a redirs
 **                      (cf sh_grammar.txt)
 */
 void add_to_redir_list(struct list_redir **redirs,
                        struct list_redir *new_redir);
+
+/**
+** @brief               adds @a new_var to the var assignation list @a vars
+**                      (cf sh_grammar.txt)
+*/
+void add_to_var_assign_list(struct list_var_assign **vars,
+                            struct list_var_assign *new_var);
 
 #endif // INC_42_SH_PARSER_H

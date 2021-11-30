@@ -1,22 +1,22 @@
-input:            list '\n'
+input - DONE:            list '\n'
           list EOF
         | '\n'
         | EOF
 
-list:        and_or ((';'|'&') and_or)* ['&'|';']
+list - DONE:        and_or (';' and_or)* [';']
 
-and_or:        pipeline (('&&'|'||') ('\n')* pipeline)*
+and_or - DONE:        pipeline (('&&'|'||') ('\n')* pipeline)*
 
-pipeline:    ['!'] command ('|' ('\n')* command)*
+pipeline - DONE:    ['!'] command ('|' ('\n')* command)*
 
-command:      simple_command
+command - DONE:      simple_command
         | shell_command  (redirection)*
         | funcdec (redirection)*
 
 simple_command:   (prefix)+
         | (prefix)* (element)+
 
-shell_command:      '{' compound_list '}'
+shell_command - DONE:      '{' compound_list '}'
                 | '(' compound_list ')'
                 | rule_for
                 | rule_while
@@ -24,17 +24,15 @@ shell_command:      '{' compound_list '}'
                 | rule_case
                 | rule_if
 
-funcdec:    ['function'] WORD '(' ')' ('\n')* shell_command
+funcdec:    WORD '(' ')' ('\n')* shell_command
 
-redirection:        [IONUMBER] '>' WORD
-        | [IONUMBER] '<' WORD
-        | [IONUMBER] '>>' WORD
-        | [IONUMBER] '<<' HEREDOC
-        | [IONUMBER] '<<-' HEREDOC
-        | [IONUMBER] '>&' WORD
-        | [IONUMBER] '<&' WORD
-        | [IONUMBER] '>|' WORD
-        | [IONUMBER] '<>' WORD
+redirection - IN PROGRESS:    [IONUMBER] '>' WORD
+        |   [IONUMBER] '<' WORD
+        |   [IONUMBER] '>&' WORD
+        |   [IONUMBER] '<&' WORD
+        |   [IONUMBER] '>>' WORD
+        |   [IONUMBER] '<>' WORD
+        |   [IONUMBER] '>|' WORD
 
 prefix:          ASSIGMENT_WORD
         | redirection
@@ -42,22 +40,22 @@ prefix:          ASSIGMENT_WORD
 element:      WORD
         | redirection
 
-compound_list:  ('\n')* and_or ((';'|'&'|'\n') ('\n')* and_or)* [(('&'|';'|'\n') ('\n')*)]
+compound_list - DONE:  ('\n')* and_or ((';'|'\n') ('\n')* and_or)* [(';'|'\n') ('\n')*]
 
-rule_for:     'for' WORD ('\n')* ['in' (WORD)* (';'|'\n') ('\n')*] do_group
+rule_for - DONE:      For WORD ([';']|[('\n')* 'in' (WORD)* (';'|'\n')]) ('\n')* do_group
 
-rule_while:    'while' compound_list do_group
+rule_while - DONE:    'while' compound_list do_group
 
-rule_until:    'until' compound_list do_group
+rule_until - DONE:    'until' compound_list do_group
 
 rule_case:    'case' WORD ('\n')* 'in' ('\n')* [case_clause] 'esac'
 
-rule_if:      'if' compound_list 'then' compound_list [else_clause] 'fi'
+rule_if - DONE:      'if' compound_list 'then' compound_list [else_clause] 'fi'
 
-else_clause:        'else' compound_list
+else_clause - DONE:        'else' compound_list
         | 'elif' compound_list 'then' compound_list [else_clause]
 
-do_group:    'do' compound_list 'done'
+do_group - DONE:    'do' compound_list 'done'
 
 case_clause:     case_item (';;' ('\n')* case_item)* [;;] ('\n')*
 

@@ -1,19 +1,36 @@
 #include "execution.h"
 
 #include <err.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
+#include "builtins.h"
+#include "options.h"
 #include "xalloc.h"
 
-void exit_program(char *msg)
+extern struct options *opt;
+
+void exit_program(const char *msg)
 {
     xfree_all();
     err(1, "%s", msg);
 }
 
-int execute(char *cmd, char *args, struct pipeline *pipeline)
+int execute(char *cmd, char **args)
 {
+    if (!cmd)
+        return 0;
+    if (opt && opt->verbose)
+    {
+        fprintf(stderr, "Executing command -> %s\nWith args -> \n", cmd);
+    }
+    int index;
+    if ((index = get_builins_index(cmd)) != -1)
+    {
+        int res = exec_builtin(index, args);
+        return res;
+    }
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -21,26 +38,18 @@ int execute(char *cmd, char *args, struct pipeline *pipeline)
     }
     if (pid == 0)
     {
-        if (pipeline->out != -1)
+        if (execvp(cmd, args) == -1)
         {
-            dup2(pipeline->fd[pipeline->out],
-                 ((pipeline->out) ? STDOUT_FILENO : STDIN_FILENO));
-            close(pipeline->fd[!(pipeline->out)]);
-        }
-        if (execlp(cmd, cmd, args, NULL) == -1)
-        {
-            // TODO : handle exec error
-            err(1, "Failed to exec");
+            fprintf(stderr, "42SH: %s: not found\n", cmd);
+            exit(127);
         }
     }
     else
     {
         int wstatus;
-        if (!(pipeline->out))
-            close(pipeline->fd[1]);
         if (waitpid(pid, &wstatus, 0) == -1)
             exit_program("Failed to wait");
-        return wstatus;
+        return WEXITSTATUS(wstatus);
     }
     exit_program("Failed");
     return 0;

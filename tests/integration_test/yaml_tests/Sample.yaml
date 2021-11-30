@@ -1,0 +1,56 @@
+- name: Echo basic
+  input: echo coucou
+  type: success
+
+- name: Bad command
+  input: bad bad bad
+  checks: exitcode stdout err_msg
+  type: failed
+
+- name: Bad command with command after
+  input: bad bad bad ; echo coucou
+  checks: stdout exitcode err_msg
+
+- name: Simple ls
+  input: ls
+  checks: exitcode stdout
+  type: success
+
+- name: Pipe no end
+  input: echo coucou |
+  type: failed
+
+- name: Error if condition
+  input: if true echo coucu
+  type: failed
+
+- name: If condition with test
+  input: if [ 1 -ne 0 ]; then echo coucou; else echo coucou2; fi
+  checks: exitcode stdout stderr
+  type: success
+
+- name: If condition with test and keyword in echo
+  input: if [ 1 -ne 0 ]; then echo coucou; else echo done; fi
+  type: success
+
+- name: Multiple pipe
+  input: echo hallo | tr a e | tr l k | cat -e
+  type: success
+
+- name: Simple if clausure
+  input: |
+    if true
+    then
+      echo coucou
+    else
+      exit 1; fi
+  type: success
+
+- name: Bad if clausure
+  input: |
+    if true
+    then
+      echo coucou
+    else;
+      exit 1; fi
+  type: failed
