@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from contextlib import contextmanager
 from os import listdir
 from os.path import isfile, join
+import subprocess
 import signal
 import time
 import shutil
@@ -104,11 +105,11 @@ def print_summary(passed: int, failed: int, start_time: float, end_time: float):
         print(f"{termcolor.colored(f' {round((passed / (failed + passed)) * 100, 2)}%', 'yellow')} ", end='')
 
     if passed == 0:
-        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'magenta')}", end='')
+        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'magenta')}")
     elif failed == 0:
-        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'green')}", end='')
+        print(f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'green')}")
     else:
-        print(f"in {round(end_time - start_time, 2)} secs ========]", end='')
+        print(f"in {round(end_time - start_time, 2)} secs ========]")
 
 
 if __name__ == "__main__":
@@ -121,6 +122,8 @@ if __name__ == "__main__":
     binary_path = args.binary.absolute()
     categories = args.category
     ref = args.reference
+
+    os.system(f"cd ../../cmake-build-debug ; make {args.binary}")
 
     if os.path.exists(f"../../cmake-build-debug/{args.binary}"):
         shutil.copy(f"../../cmake-build-debug/{args.binary}", "./")
