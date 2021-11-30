@@ -41,7 +41,7 @@ char *read_stdin(void)
     while ((r = read(STDIN_FILENO, buffer + total, 2048)) > 0)
     {
         total += r;
-        xrecalloc(buffer, total + 2049);
+        buffer = xrecalloc(buffer, total + 2049);
     }
     if (r == -1)
     {
@@ -69,7 +69,7 @@ int launch_program(int argc, char **argv)
     {
         char *read = read_stdin();
         if (opt->verbose)
-            printf("Executing command \n\'%s\'\n", opt->commands[0]);
+            printf("Executing command \n\'%s\'\n", read);
         res = exec_script(read,
                           strlen(read));
     }

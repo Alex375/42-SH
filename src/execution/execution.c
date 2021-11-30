@@ -11,7 +11,7 @@
 
 extern struct options *opt;
 
-void exit_program(char *msg)
+void exit_program(const char *msg)
 {
     xfree_all();
     err(1, "%s", msg);

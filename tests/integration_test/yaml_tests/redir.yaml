@@ -1,0 +1,33 @@
+- name: Simple redir
+  input: |
+    echo coucou > test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir input
+  input: cat < requierments.txt
+  type: success
+
+- name: Simple redir input
+  input: cat < fail
+  type: failed
+
+- name: Simple redir 2
+  input: |
+    if true; then
+        echo coucou
+    fi > test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir 2
+  input: |
+    if true; then
+        echo coucou
+    fi; > test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
