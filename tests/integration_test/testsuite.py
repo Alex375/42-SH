@@ -51,21 +51,21 @@ def diff(expected: str, actual: str) -> str:
     expected_lines = expected.splitlines(keepends=True)
     actual_lines = actual.splitlines(keepends=True)
     return ''.join(
-        unified_diff(expected_lines, actual_lines, fromfile='excpected',
+        unified_diff(expected_lines, actual_lines, fromfile='expected',
                      tofile='actual'))
 
 
-def perform_checks(excpected: sp.CompletedProcess, actual: sp.CompletedProcess,
+def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
                    checks):
     res = ""
     if "err_msg" in checks and actual.stderr == "":
         res += "Something was expected on stderr\n"
-    if "exitcode" in checks and excpected.returncode != actual.returncode:
-        res += f"Exited with {actual.returncode} expected {excpected.returncode}\n"
-    if "stdout" in checks and excpected.stdout != actual.stdout:
-        res += f"Stdout differ \n{diff(excpected.stdout, actual.stdout)}\n"
-    if "stderr" in checks and excpected.stderr != actual.stderr:
-        res += f"Stderr differ \n{diff(excpected.stdout, actual.stderr)}\n"
+    if "exitcode" in checks and expected.returncode != actual.returncode:
+        res += f"Exited with {actual.returncode} expected {expected.returncode}\n"
+    if "stdout" in checks and expected.stdout != actual.stdout:
+        res += f"Stdout differ \n{diff(expected.stdout, actual.stdout)}\n"
+    if "stderr" in checks and expected.stderr != actual.stderr:
+        res += f"Stderr differ \n{diff(expected.stdout, actual.stderr)}\n"
     if len(res) > 0:
         res = res[:-1]
     return res
@@ -122,11 +122,10 @@ if __name__ == "__main__":
     categories = args.category
     ref = args.reference
 
-    if not os.path.exists(binary_path):
+    if os.path.exists(f"../../cmake-build-debug/{args.binary}"):
         shutil.copy(f"../../cmake-build-debug/{args.binary}", "./")
         if not os.path.exists(binary_path):
             raise FileNotFoundError(f"Tried to copy file but {binary_path} not found")
-
 
     if ref is None:
         ref = "dash"

@@ -17,3 +17,7 @@
 - name: Echo withe mutltiple and option in
   input: echo -na coucou -n coucoure
   type: success
+
+- name: Most used cmd
+  input: cut -d ' ' -f 1 '/home/alexandre.josien/.bashrc' | sort -d | uniq -c | tr -s ' ' | sort -nr  | head | cut -d ' ' -f2-
+  type: success
