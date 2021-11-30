@@ -1,0 +1,61 @@
+- name: simple dot
+  input: |
+    cd .
+    ls
+  type: success
+
+- name: double dot
+  input: |
+    cd ..
+    ls
+  type: success
+
+- name: no args (goto HOME)
+  input: |
+    cd
+    ls
+  type: success
+
+- name: lot of simple dot
+  input: |
+    cd ./././././././././././././././././././
+    ls
+  type: success
+
+- name: back & come again
+  input: |
+    cd ../integration_test
+    ls
+  type: success
+
+- name: absolute
+  input: |
+    cd /
+    ls
+  type: success
+
+- name: hard one
+  input: |
+    cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
+    ls
+  type: success
+
+- name: TDB 1
+  input: |
+    cd $(echo './')
+    ls
+  type: success
+
+- name: TDB 2
+  input: |
+    cd `echo './'`
+    ls
+  type: success
+
+- name: Failed
+  input: |
+    cd efw
+    ls
+  type: failed
+
+
