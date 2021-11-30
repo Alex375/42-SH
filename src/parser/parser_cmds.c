@@ -40,11 +40,11 @@ struct ast *parse_command()
             || tok.type == T_UNTIL) // T_CASE
     {
         ast = parse_shell_command();
-        redirs = parse_redirs();
+        parse_redirs(&redirs);
     }
     else
     {
-        ast = parse_simple_command();
+        ast = parse_simple_command(&redirs);
     }
 
     if (!ast || errno != 0)
@@ -53,10 +53,45 @@ struct ast *parse_command()
     return build_cmd(ast, redirs);
 }
 
-struct list_redir *parse_redirs()
+static int is_chev(enum token tokT)
 {
-    struct list_redir *res = NULL;
+    if (tokT >= T_REDIR_1 && tokT <= T_REDIR_PIPE)
+        return 1;
 
+    return 0;
+}
+
+static int err_redir()
+{
+    enum token t0 = get_next_token().type;
+    enum token t1 = look_forward_token(1).type;
+    enum token t2 = look_forward_token(2).type;
+    if ((is_chev(t0) && t1 != T_WORD)
+        || (t0 == T_IONUMBER
+            && ((!is_chev(t1)) || t2 != T_WORD)))
+    {
+        errno = ERROR_PARSING;
+        return 1;
+    }
+
+    return 0;
+}
+
+
+static int is_redir()
+{
+    enum token t0 = get_next_token().type;
+    enum token t1 = look_forward_token(1).type;
+    enum token t2 = look_forward_token(2).type;
+    if ((is_chev(t0) && t1 == T_WORD)
+        || (t0 == T_IONUMBER && is_chev(t1) && t2 == T_WORD))
+        return 1;
+
+    return 0;
+}
+
+void *parse_redirs(struct list_redir **redirs)
+{
     while (1)
     {
         if (err_redir() || !is_redir())
@@ -86,28 +121,23 @@ struct list_redir *parse_redirs()
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
             xstrdup(tok.command);
 
-        add_to_redir_list(&res, new_redir);
+        add_to_redir_list(redirs, new_redir);
     }
 
-    return res;
+    return NULL;
 }
 
-struct ast *parse_simple_command()
+struct ast *parse_simple_command(struct list_redir **redirs)
 {
-    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
-
-        if (tok.type != T_WORD)
-    {
-        errno = ERROR_PARSING;
+    struct list_var_assign *vars = NULL;
+    vars = parse_var_assignement(redirs);
+    if (errno)
         return NULL;
-    }
 
-    char *cmd = xstrdup(tok.command);
-
+    struct token_info tok;
     int cap = 8;
-    int i = 1;
+    int i = 0;
     char **cmd_arg = xcalloc(cap, sizeof(char *));
-    cmd_arg[0] = cmd;
     while ((tok = get_next_token()).type == T_WORD)
     {
         if (i >= cap - 1)
@@ -117,8 +147,52 @@ struct ast *parse_simple_command()
         }
         POP_TOKEN
         cmd_arg[i] = xstrdup(tok.command);
+
+        parse_redirs(redirs);
+        if (errno)
+            return NULL;
+
         i++;
     }
 
-    return build_s_cmd(cmd, cmd_arg);
+    char *cmd = NULL;
+    if (i > 0)
+        cmd = xstrdup(cmd_arg[0]);
+
+    return build_s_cmd(cmd, cmd_arg, vars);
+}
+
+struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
+{
+    parse_redirs(redirs);
+    if (errno)
+        return NULL;
+
+    struct list_var_assign *res = NULL;
+
+    struct token_info tok;
+    while ((tok = get_next_token()).type == T_VAR_INIT)
+    {
+        struct list_var_assign *new =
+            xcalloc(1, sizeof(struct list_var_assign));
+
+        new->name = xstrdup(tok.command);
+
+        POP_TOKEN
+
+        if ((tok = get_next_token()).type == T_VAR_VALUE)
+        {
+            new->value = xstrdup(tok.command);
+            POP_TOKEN
+        }
+        else
+            new->value = xcalloc(1, 1);
+
+        parse_redirs(redirs);
+        if (errno)
+            return NULL;
+        add_to_var_assign_list(&res, new);
+    }
+
+    return res;
 }

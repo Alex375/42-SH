@@ -76,7 +76,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
     case AST_CMD:
         cmd = ast->t_ast;
         // TODO exec redirs
-        return eval_ast(cmd->ast);
+        return exec_redirs(cmd->ast, cmd->redirs);
     default:
         errx(1, "Mettez un default svp ça fait crash cmake ok | j'ai mis un default");
     }

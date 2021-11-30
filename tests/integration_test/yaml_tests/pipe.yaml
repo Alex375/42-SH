@@ -1,3 +1,7 @@
-- name: Test double stdout
-  input: echo coucou|echo coucou|cat
+- name: Pipe multi command
+  input: |
+      if true; then
+        echo hallo
+      fi |
+      cat | tr a e
   type: success

@@ -161,7 +161,12 @@ if __name__ == "__main__":
         with open(f"yaml_tests/{categ}.yaml", "r") as file:
             testsuite = [TestCase(**testcase) for testcase in
                          list(yaml.safe_load(file))]
-
+        if categ == "echo":
+            ref = "bash"
+        else:
+            ref = args.reference
+            if ref is None:
+                ref = "dash"
         for testcase in testsuite:
             stdin = testcase.input
             name = testcase.name

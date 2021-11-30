@@ -11,7 +11,7 @@
 
 extern struct options *opt;
 
-void exit_program(char *msg)
+void exit_program(const char *msg)
 {
     xfree_all();
     err(1, "%s", msg);
@@ -19,7 +19,9 @@ void exit_program(char *msg)
 
 int execute(char *cmd, char **args)
 {
-    if (opt->verbose)
+    if (!cmd)
+        return 0;
+    if (opt && opt->verbose)
     {
         fprintf(stderr, "Executing command -> %s\nWith args -> \n", cmd);
     }

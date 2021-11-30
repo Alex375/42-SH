@@ -1,13 +1,15 @@
-#include <string.h>
 
+#include <string.h>
 #include "lexer.h"
 
 struct words_converter converter = {
-    28 ,
+    28,
     16,
-    { "if", "then", "elif", "else", "fi", "while", "until", "for", "in", "do", "done", "!", "||", "&&", "\n", ";", "{", "}",
-      "(", ")", "|", ">", "<", ">&", "<&", ">>", "<>", ">|" },
-    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&", ">>", "<>", ">|"  }
+    { "if",   "then", "elif", "else", "fi", "while", "until", "for", "in", "do",
+      "done", "!",    "||",   "&&",   "\n", ";",     "{",     "}",   "(",  ")",
+      "|",    ">",    "<",    ">&",   "<&", ">>",    "<>",    ">|" },
+    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&",
+      ">>", "<>", ">|" }
 };
 
 int separatorify(const char *token_str)
@@ -31,8 +33,11 @@ int separatorify(const char *token_str)
 
 int is_token_seperator(enum token token)
 {
-    enum token sep[] = { T_AND, T_OR, T_NEWLINE, T_SEMICOLON, T_C_PRTH, T_O_PRTH, T_PIPE, T_EOF, T_REDIR_1, T_REDIR_2, T_REDIR_O_2, T_REDIR_O_2, T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE};
-    size_t nb_sep = sizeof(sep) / sizeof (enum token);
+    enum token sep[] = { T_AND,     T_OR,        T_NEWLINE,   T_SEMICOLON,
+                         T_C_PRTH,  T_O_PRTH,    T_PIPE,      T_EOF,
+                         T_REDIR_1, T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
+                         T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE };
+    size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
     {
@@ -61,9 +66,41 @@ enum token tokenify(const char *token_str)
     return i;
 }
 
-int look_ahead_token(struct string *accumulator, char next_char)
+
+int check_special(struct string *accumulator, char next_char)
 {
-    if (g_lexer_info.exp_context == IN_SQUOTE_EXP)
+
+    if (g_lexer_info.var_context == IN_VAR && !is_valid_var(accumulator->data))
+    {
+        accumulator->size--;
+        accumulator->data[accumulator->size] = '\0';
+        g_lexer_info.pos--;
+        return 1;
+    }
+
+    if (g_lexer_info.soft_expansion == IN_DQUOTE && g_lexer_info.exp_context == IN_ESCAPE_EXP)
+    {
+        char next[2] = { next_char, 0} ;
+        if (fnmatch("[$\\\"`]", next, FNM_EXTMATCH) == 0)
+        {
+            accumulator->size--;
+            accumulator->data[accumulator->size] = '\0';
+        }
+    }
+
+    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT && g_lexer_info.exp_context == GENERAL_EXP_HARD)
+    {
+        if (fnmatch("+([a-zA-Z0-9_])=", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.var_context = IN_VAR_NAME;
+            return 1;
+        }
+    }
+
+
+    if (g_lexer_info.exp_context != GENERAL_EXP_HARD
+        || g_lexer_info.last_exp_context == IN_ESCAPE_EXP
+        || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
     {
         return 0;
     }

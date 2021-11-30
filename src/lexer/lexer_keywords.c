@@ -9,6 +9,16 @@ int look_ahead_keywords(const char *script, size_t size)
 
     struct string *accumulator = string_create();
 
+    if (script[i] == '$' && i > 0 && script[i - 1] == '$')
+    {
+        return 1;
+    }
+    if (script[i] == '$' && i > 0)
+    {
+        return 0;
+    }
+
+
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {
@@ -35,7 +45,7 @@ struct token_info lex_keywords(struct token_info res, struct string *string)
 {
     if (res.type == T_FOR)
     {
-        g_lexer_info.for_context = IN_FOR;
+        g_lexer_info.for_context = VAR_FOR;
     }
     string_free(string);
     return res;

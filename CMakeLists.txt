@@ -15,9 +15,15 @@ include_directories(src/program_start/headers)
 include_directories(src/execution/headers)
 include_directories(src/builtins/headers)
 
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c)
 
-add_executable(42SH ${SRC} src/main.c)
+file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c)
+
+if (APPLE)
+    include_directories(src/xfnmatch)
+    add_executable(42SH ${SRC} src/main.c src/xfnmatch/xfnmatch.c)
+else()
+    add_executable(42SH ${SRC} src/main.c)
+endif()
 
 #Test executable
 add_executable(lexer_test ${SRC} tests/unit_tests/lexer_test.c)
@@ -27,3 +33,4 @@ add_executable(echo_main ${SRC} tests/unit_tests/echo_tests/echo_main.c)
 
 target_link_libraries(lexer_test PUBLIC -lcriterion)
 target_link_libraries(echo_test PUBLIC -lcriterion)
+target_link_libraries(42SH PUBLIC -fsanitize=address)
