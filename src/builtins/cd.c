@@ -51,8 +51,6 @@ int cd(char **args)
     if (strcmp(current_path, final_path) == 0)
         return 0;
 
-    xfree(final_path);
-    xfree(path);
-    xfree(current_path);
+    //printf("You are now ->%s\n", final_path);
     return 0;
 }
