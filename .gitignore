@@ -31,3 +31,4 @@ venv/
 
 debug.sh
 /tests/integration_test/42SH
+/src/xfnmatch/
