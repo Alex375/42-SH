@@ -848,11 +848,11 @@ Test(VAR, DUR)
 
 
 
-int main()
-{
-    char *script = "echo a=2 in text";
-    lexer_start(script, strlen(script));
-    struct token_info tk;
-    while ((tk = pop_token()).type != T_EOF)
-        continue;
-}
+//int main()
+//{
+//    char *script = "echo a=2 in text";
+//    lexer_start(script, strlen(script));
+//    struct token_info tk;
+//    while ((tk = pop_token()).type != T_EOF)
+//        continue;
+//}
