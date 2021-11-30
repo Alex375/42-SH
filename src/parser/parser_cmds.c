@@ -53,6 +53,43 @@ struct ast *parse_command()
     return build_cmd(ast, redirs);
 }
 
+static int is_chev(enum token tokT)
+{
+    if (tokT >= T_REDIR_1 && tokT <= T_REDIR_PIPE)
+        return 1;
+
+    return 0;
+}
+
+static int err_redir()
+{
+    enum token t0 = get_next_token().type;
+    enum token t1 = look_forward_token(1).type;
+    enum token t2 = look_forward_token(2).type;
+    if ((is_chev(t0) && t1 != T_WORD)
+        || (is_chev(t1)
+            && ((t0 != T_WORD && t0 != T_IONUMBER) || t2 != T_WORD)))
+    {
+        errno = ERROR_PARSING;
+        return 1;
+    }
+
+    return 0;
+}
+
+
+static int is_redir()
+{
+    enum token t0 = get_next_token().type;
+    enum token t1 = look_forward_token(1).type;
+    enum token t2 = look_forward_token(2).type;
+    if ((is_chev(t0) && t1 == T_WORD)
+        || (t0 == T_IONUMBER && is_chev(t1) && t2 == T_WORD))
+        return 1;
+
+    return 0;
+}
+
 void *parse_redirs(struct list_redir **redirs)
 {
     while (1)
@@ -92,7 +129,10 @@ void *parse_redirs(struct list_redir **redirs)
 
 struct ast *parse_simple_command(struct list_redir **redirs)
 {
-    parse_redirs(redirs);
+    struct list_var_assign *vars = NULL;
+    vars = parse_var_assignement(redirs);
+    if (errno)
+        return NULL;
 
     struct token_info tok;
     int cap = 8;
@@ -109,6 +149,8 @@ struct ast *parse_simple_command(struct list_redir **redirs)
         cmd_arg[i] = xstrdup(tok.command);
 
         parse_redirs(redirs);
+        if (errno)
+            return NULL;
 
         i++;
     }
@@ -117,5 +159,40 @@ struct ast *parse_simple_command(struct list_redir **redirs)
     if (i > 0)
         cmd = xstrdup(cmd_arg[0]);
 
-    return build_s_cmd(cmd, cmd_arg);
+    return build_s_cmd(cmd, cmd_arg, vars);
+}
+
+struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
+{
+    parse_redirs(redirs);
+    if (errno)
+        return NULL;
+
+    struct list_var_assign *res = NULL;
+
+    struct token_info tok;
+    while ((tok = get_next_token()).type == T_VAR_INIT)
+    {
+        struct list_var_assign *new =
+            xcalloc(1, sizeof(struct list_var_assign));
+
+        new->name = xstrdup(tok.command);
+
+        POP_TOKEN
+
+        if ((tok = get_next_token()).type == T_VAR_VALUE)
+        {
+            new->value = xstrdup(tok.command);
+            POP_TOKEN
+        }
+        else
+            new->value = xcalloc(1, 1);
+
+        parse_redirs(redirs);
+        if (errno)
+            return NULL;
+        add_to_var_assign_list(&res, new);
+    }
+
+    return res;
 }

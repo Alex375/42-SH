@@ -24,42 +24,6 @@ int check_ender_token(int in_compound)
     return 0;
 }
 
-static int is_chev(enum token tokT)
-{
-    if (tokT >= T_REDIR_1 && tokT <= T_REDIR_PIPE)
-        return 1;
-
-    return 0;
-}
-
-int err_redir()
-{
-    enum token t0 = get_next_token().type;
-    enum token t1 = look_forward_token(1).type;
-    enum token t2 = look_forward_token(2).type;
-    if ((is_chev(t0) && t1 != T_WORD)
-        || (is_chev(t1)
-            && ((t0 != T_WORD && t0 != T_IONUMBER) || t2 != T_WORD)))
-    {
-        errno = ERROR_PARSING;
-        return 1;
-    }
-
-    return 0;
-}
-
-int is_redir()
-{
-    enum token t0 = get_next_token().type;
-    enum token t1 = look_forward_token(1).type;
-    enum token t2 = look_forward_token(2).type;
-    if ((is_chev(t0) && t1 == T_WORD)
-        || (t0 == T_IONUMBER && is_chev(t1) && t2 == T_WORD))
-        return 1;
-
-    return 0;
-}
-
 void add_to_redir_list(struct list_redir **redirs, struct list_redir *new_redir)
 {
     if (!*redirs)
@@ -69,4 +33,15 @@ void add_to_redir_list(struct list_redir **redirs, struct list_redir *new_redir)
     }
 
     add_to_redir_list(&(*redirs)->next, new_redir);
+}
+
+void add_to_var_assign_list(struct list_var_assign **vars, struct list_var_assign *new_var)
+{
+    if (!*vars)
+    {
+        *vars = new_var;
+        return;
+    }
+
+    add_to_var_assign_list(&(*vars)->next, new_var);
 }

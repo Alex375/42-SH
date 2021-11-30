@@ -28,6 +28,21 @@ void print_redir(struct list_redir *redirs,  int prof)
     }
 }
 
+void print_assign(struct list_var_assign *vars,  int prof)
+{
+    if (vars)
+    {
+        tab(prof);
+        printf("ASSIGNEMENT : ");
+        while (vars)
+        {
+            printf("%s = %s | ", vars->name, vars->value);
+            vars = vars->next;
+        }
+        printf("\n");
+    }
+}
+
 void pp_rec(struct ast *ast, int prof)
 {
     if (!ast)
@@ -53,6 +68,7 @@ void pp_rec(struct ast *ast, int prof)
         while (s_cmd_ast->cmd_arg[i])
             printf("%s ", s_cmd_ast->cmd_arg[i++]);
         printf("\n");
+        print_assign(s_cmd_ast->vars, prof);
         break;
     case AST_IF:
         if_ast = ast->t_ast;

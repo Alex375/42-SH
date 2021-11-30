@@ -140,7 +140,7 @@ struct ast *parse_for_rule()
     char **seq = xcalloc(cap, sizeof(char *));
     struct ast *statement = NULL;
 
-    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD)
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_VAR)
 
         name = xstrdup(tok.command);
 

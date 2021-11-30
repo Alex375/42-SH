@@ -42,6 +42,7 @@ struct n_s_cmd
 {
     char *cmd;
     char **cmd_arg;
+    struct list_var_assign *vars;
 };
 
 /**
@@ -50,8 +51,8 @@ struct n_s_cmd
 struct n_if
 {
     struct ast *condition;
-    struct ast * true_c;
-    struct ast * false_c;
+    struct ast *true_c;
+    struct ast *false_c;
 };
 
 /**
@@ -61,17 +62,6 @@ struct n_binary
 {
     struct ast *left;
     struct ast *right;
-};
-
-/**
-** @brief                   chained list of redirections.
-*/
-struct list_redir
-{
-    char *ionumber;
-    enum token redir_type;
-    char *word;
-    struct list_redir *next;
 };
 
 /**
@@ -93,6 +83,31 @@ struct n_for
     struct ast *statement;
 };
 
+////////////////
+
+/**
+** @brief                   chained list of variable assignation.
+*/
+struct list_var_assign
+{
+    char *name;
+    char *value;
+    struct list_var_assign *next;
+};
+
+/**
+** @brief                   chained list of redirections.
+*/
+struct list_redir
+{
+    char *ionumber;
+    enum token redir_type;
+    char *word;
+    struct list_redir *next;
+};
+
+///////////////
+
 /**
 ** @brief               builds a n_binary node
 ** @param type          type to build
@@ -108,16 +123,17 @@ struct ast *build_binary(enum AST_TYPE type, struct ast *left,
 ** @param left          left child ast
 ** @param right         right child ast
 */
-struct ast *build_if(struct ast *condition, struct ast * true_c,
-                     struct ast * false_c);
+struct ast *build_if(struct ast *condition, struct ast *true_c,
+                     struct ast *false_c);
 
 /**
 ** @brief               builds a n_s_cmd node
 ** @param cmd           name of the command
 ** @param cmd_arg       string list containing all the command arguments
- *                      separated by spaces.
+*                      separated by spaces.
 */
-struct ast *build_s_cmd(char *cmd, char **cmd_arg);
+struct ast *build_s_cmd(char *cmd, char **cmd_arg,
+                        struct list_var_assign *vars);
 
 /**
 ** @brief               builds a n_command node
@@ -130,9 +146,9 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
 ** @brief               builds a n_for node
 ** @param name          name of the variable of for
 ** @param seq           list on what the name variable is going to
- *                      take it's values
+*                      take it's values
 ** @param statement     ast inside the for
- */
+*/
 struct ast *build_for(char *name, char **seq, struct ast *statement);
 
 #include <stddef.h>
@@ -189,15 +205,21 @@ struct ast *parse_command();
 
 /**
 ** @brief               Parsing a list of redirections (cf sh_grammar.txt)
- * @param redirs        list of redir to append to
+* @param redirs         list of redir to append to
 */
 void *parse_redirs(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a simple command (cf sh_grammar.txt)
- * @param redirs        list of redir to append to
+* @param redirs        list of redir to append to
 */
 struct ast *parse_simple_command(struct list_redir **redirs);
+
+/**
+** @brief               Parsing a prefix (cf sh_grammar.txt)
+* @param redirs        list of redir to append to
+*/
+struct list_var_assign *parse_var_assignement(struct list_redir **redirs);
 
 /**
 ** @brief               Parsing a shell command (cf sh_grammar.txt)
@@ -214,7 +236,7 @@ struct ast *parse_if_rule(int inElif);
 /**
 ** @brief               Parsing a while rule and an until rule
 **                      (cf sh_grammar.txt)
- * @param tokT          either WHILE or UNTIL
+* @param tokT          either WHILE or UNTIL
 */
 struct ast *parse_while_until_rule(enum token tokT);
 
@@ -242,23 +264,17 @@ void skip_newlines();
 int check_ender_token(int in_compound);
 
 /**
-** @brief               return 1 if there is a redir token not following
- *                      the grammar (sets errno)
-**                      (cf sh_grammar.txt)
-*/
-int err_redir();
-
-/**
-** @brief               return 1 if the next tokens are a redirection
-**                      (cf sh_grammar.txt)
-*/
-int is_redir();
-
-/**
-** @brief               adds @a new_redir to the redirection list @a redirs
+** @brief               adds a new_redir to the redirection list @a redirs
 **                      (cf sh_grammar.txt)
 */
 void add_to_redir_list(struct list_redir **redirs,
                        struct list_redir *new_redir);
+
+/**
+** @brief               adds @a new_var to the var assignation list @a vars
+**                      (cf sh_grammar.txt)
+*/
+void add_to_var_assign_list(struct list_var_assign **vars,
+                            struct list_var_assign *new_var);
 
 #endif // INC_42_SH_PARSER_H
