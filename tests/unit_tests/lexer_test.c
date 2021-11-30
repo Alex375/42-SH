@@ -131,7 +131,7 @@ Test(IF, WRONG)
 Test(IF, HARD_QUOTE)
 {
     char *script = "if true; then\n echo test\nelif false; then\n   echo "
-                   "true\nelse\n   'echo' '&&;;echo grosse merde'\nfi";
+                   "true\nelse\n   'echo' '&&;;echo gentil monsieur'\nfi";
     struct token_info expected[] = {
         { T_IF, NULL },        { T_WORD, "true" },
         { T_SEMICOLON, NULL }, { T_THEN, NULL },
@@ -142,7 +142,7 @@ Test(IF, HARD_QUOTE)
         { T_NEWLINE, NULL },   { T_WORD, "echo" },
         { T_WORD, "true" },    { T_NEWLINE, NULL },
         { T_ELSE, NULL },      { T_NEWLINE, NULL },
-        { T_WORD, "echo" },    { T_WORD, "&&;;echo grosse merde" },
+        { T_WORD, "echo" },    { T_WORD, "&&;;echo gentil monsieur" },
         { T_NEWLINE, NULL },   { T_FI, NULL }
     };
 
@@ -159,9 +159,9 @@ Test(QUOTE, EASY)
 
 Test(QUOTE, MEDIUM)
 {
-    char *script = "echo      '      pute'";
+    char *script = "echo      '      salut'";
     struct token_info expected[] = { { T_WORD, "echo" },
-                                     { T_WORD, "      pute" } };
+                                     { T_WORD, "      salut" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -176,11 +176,11 @@ Test(QUOTE, EMPTY)
 
 Test(QUOTE, HARD)
 {
-    char *script = " i'f''&&'&&'ec'ho '%% pute'";
+    char *script = " i'f''&&'&&'ec'ho '%% salut'";
     struct token_info expected[] = { { T_WORD, "if&&" },
                                      { T_AND, NULL },
                                      { T_WORD, "echo" },
-                                     { T_WORD, "%% pute" } };
+                                     { T_WORD, "%% salut" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -311,10 +311,10 @@ Test(REDIR, MEDIUM2_io)
 
 Test(REDIR, MEDIUM2_WRONG_IO)
 {
-    char *script = "echo test caca<test.txt";
+    char *script = "echo test hello<test.txt";
     struct token_info expected[] = { { T_WORD, "echo" },
                                      { T_WORD, "test" },
-                                     { T_WORD, "caca" },
+                                     { T_WORD, "hello" },
                                      { T_REDIR_I_1, NULL },
                                      { T_WORD, "test.txt" } };
 
@@ -367,11 +367,11 @@ Test(AND, MEDIUM)
 
 Test(WHILE, EASY)
 {
-    char *script = "while true\ndo\necho caca\ndone";
+    char *script = "while true\ndo\necho hello\ndone";
     struct token_info expected[] = { { T_WHILE, NULL },   { T_WORD, "true" },
                                      { T_NEWLINE, NULL }, { T_DO, NULL },
                                      { T_NEWLINE, NULL }, { T_WORD, "echo" },
-                                     { T_WORD, "caca" },  { T_NEWLINE, NULL },
+                                     { T_WORD, "hello" },  { T_NEWLINE, NULL },
                                      { T_DONE, NULL } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -379,11 +379,11 @@ Test(WHILE, EASY)
 
 Test(UNTIL, EASY)
 {
-    char *script = "until true\ndo\necho caca\ndone";
+    char *script = "until true\ndo\necho hello\ndone";
     struct token_info expected[] = { { T_UNTIL, NULL },   { T_WORD, "true" },
                                      { T_NEWLINE, NULL }, { T_DO, NULL },
                                      { T_NEWLINE, NULL }, { T_WORD, "echo" },
-                                     { T_WORD, "caca" },  { T_NEWLINE, NULL },
+                                     { T_WORD, "hello" },  { T_NEWLINE, NULL },
                                      { T_DONE, NULL } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -555,7 +555,9 @@ Test(VAR, MEDIUM2)
 Test(VAR, MEDIUM3)
 {
     char *script = "echo $a$b";
-    struct token_info expected[] = { { T_WORD, "echo" }, { T_VAR, "a" }, { T_VAR, "b" }};
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_VAR, "a" },
+                                     { T_VAR, "b" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -571,7 +573,7 @@ Test(VAR, MEDIUM_QUOTE)
 Test(VAR, HARDQUOTE)
 {
     char *script = "echo $'a'";
-    struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "$a" }};
+    struct token_info expected[] = { { T_WORD, "echo" }, { T_WORD, "$a" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -671,7 +673,7 @@ Test(DOUBLE_QUOTE, SIMPLE3)
 
 Test(DOUBLE_QUOTE, MEDIUM)
 {
-    char *script = "echo \"$i < && > $test";
+    char *script = "echo \"$i < && > $test\"";
     struct token_info expected[] = { { T_WORD, "echo" },
                                      { T_VAR, "i" },
                                      { T_WORD, " < && > " },
@@ -682,10 +684,10 @@ Test(DOUBLE_QUOTE, MEDIUM)
 
 Test(DOUBLE_QUOTE, MEDIUM2)
 {
-    char *script = "echo \"$i $test $test< && > $test";
-    struct token_info expected[] = { { T_WORD, "echo" },   { T_VAR, "i" },
-                                     { T_WORD, " " },      { T_VAR, "test" },
-                                     { T_WORD, " " },      { T_VAR, "test" },
+    char *script = "echo \"$i $test $test< && > $test\"";
+    struct token_info expected[] = { { T_WORD, "echo" },    { T_VAR, "i" },
+                                     { T_WORD, " " },       { T_VAR, "test" },
+                                     { T_WORD, " " },       { T_VAR, "test" },
                                      { T_WORD, "< && > " }, { T_VAR, "test" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -694,19 +696,152 @@ Test(DOUBLE_QUOTE, MEDIUM2)
 Test(DOUBLE_QUOTE, MEDIUM3)
 {
     char *script = "echo \"Hello $world, if this is $working then is good ! \"";
-    struct token_info expected[] = { { T_WORD, "echo" },   { T_WORD, "Hello " },
-                                     { T_VAR, "world" },      { T_WORD, ", if this is " },
-                                     { T_VAR, "working" },      { T_WORD, " then is good ! " }};
+    struct token_info expected[] = {
+        { T_WORD, "echo" },   { T_WORD, "Hello " },
+        { T_VAR, "world" },   { T_WORD, ", if this is " },
+        { T_VAR, "working" }, { T_WORD, " then is good ! " }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(DOUBLE_QUOTE, SPECIAL_VAR)
+{
+    char *script = "echo \"hello $$\"";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "hello " },
+                                     { T_VAR, "$" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(DOUBLE_QUOTE, SPECIAL_VAR2)
+{
+    char *script = "echo \"hello $*\"";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "hello " },
+                                     { T_VAR, "*" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, SPECIAL_VAR)
+{
+    char *script = "echo hello $$";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "hello" },
+                                     { T_VAR, "$" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(DOUBLE_QUOTE, ESCAPE)
+{
+    char *script = "echo \"ceci est une quote : \\\"\"";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "ceci est une quote : \"" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(QUOTE, ESCAPE)
+{
+    char *script = "echo \'ceci est une quote : \"\'";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "ceci est une quote : \"" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(QUOTE, ESCAPE2)
+{
+    char *script = "echo \'ceci est un escape : \\\'";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "ceci est un escape : \\" } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(QUOTE, DOUBLE_QUOTE_MISSING)
+{
+    char *script = "echo \"test";
+    struct token_info expected[] = { { T_WORD, "echo" },
+                                     { T_WORD, "test" },
+                                     { T_ERROR, NULL } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(QUOTE, HARD2)
+{
+    char *script = "e\"c\"h\"o\"\"\"\"     ${test}\"";
+    struct token_info expected[] = {
+        { T_WORD, "echo     " },
+        { T_VAR, "test" },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(ESCAPE, DQUOTE)
+{
+    char *script = "echo \"\\test\"";
+    struct token_info expected[] = {
+        { T_WORD, "echo" },
+        { T_WORD, "\\test" },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, DECLARATION)
+{
+    char *script = "test=salut";
+    struct token_info expected[] = {
+        { T_VAR_INIT, "test" },
+        { T_VAR_VALUE, "salut" },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, DECLARATION_QUOTE)
+{
+    char *script = "test=\"    salut\"";
+    struct token_info expected[] = {
+        { T_VAR_INIT, "test" },
+        { T_VAR_VALUE, "    salut" },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, BAD_DECLARATION_QUOTE)
+{
+    char *script = "te@t=te";
+    struct token_info expected[] = {
+        { T_WORD, "te@t=te" },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, COLLE)
+{
+    char *script = "echo te$te";
+    struct token_info expected[] = {
+        { T_WORD, "echo" }, { T_WORD, "te" }, { T_VAR, "te" },
+        };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
 
-/*int main()
-{
-    char *script = "echo $test";
-     lexer_start(script, strlen(script));
-     struct token_info tk;
-     while ((tk = pop_token()).type != T_EOF)
-         continue;
- }*/
+//int main()
+//{
+//    char *script = "a=b";
+//    lexer_start(script, strlen(script));
+//    struct token_info tk;
+//    while ((tk = pop_token()).type != T_EOF)
+//        continue;
+//}

@@ -1,3 +1,5 @@
+#include <fnmatch.h>
+
 #include "lexer.h"
 
 int skip_character(char c)
@@ -6,7 +8,7 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '\\' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
+    if (c == '\\' && g_lexer_info.exp_context == GENERAL_EXP_HARD && g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
     {
         return 1;
     }
@@ -50,7 +52,7 @@ int detect_context(char c)
     {
         g_lexer_info.var_context = IN_VAR;
     }
-    else if (c == '"')
+    else if (c == '"' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {
         g_lexer_info.last_soft = IN_DQUOTE;
         g_lexer_info.soft_expansion = (g_lexer_info.soft_expansion == IN_DQUOTE)

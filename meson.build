@@ -17,6 +17,7 @@ add_project_arguments(cflags, language: 'c')
 
 #Sources
 sources = [
+
     'src/execution/execution.c',
     'src/execution/pipe.c',
     'src/data_types/token_vec.c',
@@ -41,6 +42,11 @@ sources = [
     'src/lexer/lexer_keywords.c',
     'src/lexer/lexer_squote.c',
     'src/lexer/lexer_redir.c',
+    'src/lexer/lexer_dquote.c',
+    'src/lexer/lexer_operations.c',
+    'src/lexer/lexer_for.c',
+    'src/lexer/lexer_squote.c',
+    'src/lexer/lexer_var.c',
     'src/lexer/recognize_words.c',
     'src/lexer/lexer_command.c',
     'src/eval_ast/eval_ast.c',

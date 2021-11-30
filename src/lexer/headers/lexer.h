@@ -36,7 +36,9 @@ enum for_context
 enum var_context
 {
     GENERAL_VAR,
-    IN_VAR
+    IN_VAR,
+    IN_VAR_NAME,
+    IN_VAR_VALUE
 };
 
 /**
@@ -90,11 +92,17 @@ int is_ionumber(struct token_info res, struct string *string);
 
 int look_ahead_var(const char *script, size_t size);
 
+int is_valid_var(const char *string);
+
+struct token_info lex_varvalue(struct token_info res, struct string *string);
+
+struct token_info lex_varname(struct token_info res, struct string *string);
+
 struct token_info lex_var(struct token_info res, struct string *string);
 
 struct token_info lex_ionumber(struct token_info res, struct string *string);
 
-int look_ahead_token(struct string *accumulator, char next_char);
+int check_special(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 

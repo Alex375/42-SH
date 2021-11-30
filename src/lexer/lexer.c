@@ -21,7 +21,7 @@ void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
         (*cursor)++;
 }
 
-static int look_ahead(const char* script, size_t size)
+static int look_ahead(const char *script, size_t size)
 {
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD)
     {
@@ -43,11 +43,20 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
-    if (g_lexer_info.for_context != GENERAL_FOR)
+    if  (g_lexer_info.var_context == IN_VAR_NAME)
+    {
+        res = lex_varname(res, string);
+    }
+    else if (g_lexer_info.var_context == IN_VAR_VALUE)
+    {
+        res = lex_varvalue(res, string);
+    }
+    else if (g_lexer_info.for_context != GENERAL_FOR)
     {
         res = lex_for(res, string);
     }
-    else if (g_lexer_info.var_context != GENERAL_VAR)
+    else if (g_lexer_info.var_context != GENERAL_VAR
+             && g_lexer_info.last_exp_context != IN_SQUOTE_EXP)
     {
         res = lex_var(res, string);
     }
@@ -56,7 +65,8 @@ static struct token_info lex_accumulator(struct token_info res,
         res = lex_ionumber(res, string);
     }
     else if (res.type == T_WORD
-             || g_lexer_info.last_exp_context != GENERAL_EXP_HARD || g_lexer_info.last_soft == IN_DQUOTE
+             || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
+             || g_lexer_info.last_soft == IN_DQUOTE
              || g_lexer_info.word_context == IN_COMMAND)
     {
         res = lex_command(res, string);
@@ -85,6 +95,12 @@ struct token_info tokenify_next(const char *script, size_t size)
     if (script[g_lexer_info.pos] == '\0' || g_lexer_info.pos >= size)
     {
         res.type = T_EOF;
+        if (g_lexer_info.soft_expansion == IN_DQUOTE)
+        {
+            g_lexer_info.soft_expansion = GENERAL_EXP_SOFT;
+            res.type = T_ERROR;
+        }
+
         return res;
     }
 
@@ -98,7 +114,7 @@ struct token_info tokenify_next(const char *script, size_t size)
         detect_context(script[g_lexer_info.pos]);
         g_lexer_info.pos++;
 
-        if (look_ahead_token(accumulator, script[g_lexer_info.pos]))
+        if (check_special(accumulator, script[g_lexer_info.pos]))
             break;
     } while (look_ahead(script, size));
 

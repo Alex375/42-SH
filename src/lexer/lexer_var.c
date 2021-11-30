@@ -1,6 +1,33 @@
+#define _GNU_SOURCE
 #include "lexer.h"
 #include <ctype.h>
+#include <fnmatch.h>
 
+int is_valid_var(const char *string)
+{
+    return fnmatch("$?(+([a-zA-Z0-9_])|[@*?$#])", string, FNM_EXTMATCH) == 0;
+}
+
+struct token_info lex_varname(struct token_info res, struct string *string)
+{
+    res.type = T_VAR_INIT;
+
+    g_lexer_info.var_context = IN_VAR_VALUE;
+    string->data[--string->size] = '\0';
+
+    res.command = string_get(string);
+    return res;
+}
+
+struct token_info lex_varvalue(struct token_info res, struct string *string)
+{
+    res.type = T_VAR_VALUE;
+
+    g_lexer_info.var_context = GENERAL_VAR;
+
+    res.command = string_get(string);
+    return res;
+}
 
 struct token_info lex_var(struct token_info res, struct string *string)
 {
@@ -12,8 +39,10 @@ struct token_info lex_var(struct token_info res, struct string *string)
     {
         res.type = T_VAR;
     }
+    size_t size = string->size;
     res.command = string_get(string);
-    if (string->data[0] == '$' && string->size > 1)
+
+    if (size > 1 && res.command[0] == '$')
     {
         res.command++;
     }

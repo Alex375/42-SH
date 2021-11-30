@@ -68,23 +68,42 @@ enum token tokenify(const char *token_str)
     return i;
 }
 
-static int is_valid_var(const char *string)
-{
-    return fnmatch("$?(*[a-zA-Z0-9_]|[@*?$#])", string, FNM_EXTMATCH) == 0;
-}
 
-int look_ahead_token(struct string *accumulator, char next_char)
+int check_special(struct string *accumulator, char next_char)
 {
-    if (g_lexer_info.exp_context != GENERAL_EXP_HARD
-        || g_lexer_info.last_exp_context == IN_ESCAPE_EXP
-        || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
-    {
-        return 0;
-    }
 
     if (g_lexer_info.var_context == IN_VAR && !is_valid_var(accumulator->data))
     {
         accumulator->size--;
+        accumulator->data[accumulator->size] = '\0';
+        g_lexer_info.pos--;
+        return 1;
+    }
+
+    if (g_lexer_info.soft_expansion == IN_DQUOTE && g_lexer_info.exp_context == IN_ESCAPE_EXP)
+    {
+        char next[2] = { next_char, 0} ;
+        if (fnmatch("[$\\\"`]", next, FNM_EXTMATCH) == 0)
+        {
+            accumulator->size--;
+            accumulator->data[accumulator->size] = '\0';
+        }
+    }
+
+    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT && g_lexer_info.exp_context == GENERAL_EXP_HARD)
+    {
+        if (fnmatch("+([a-zA-Z0-9_])=", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.var_context = IN_VAR_NAME;
+            return 1;
+        }
+    }
+
+
+    if (g_lexer_info.exp_context != GENERAL_EXP_HARD
+        || g_lexer_info.last_exp_context == IN_ESCAPE_EXP
+        || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
+    {
         return 0;
     }
 
