@@ -1,6 +1,13 @@
 #ifndef INC_42_SH_TYPE_H
 #define INC_42_SH_TYPE_H
 
+#if __APPLE__
+    #include "xfnmatch.h"
+#else
+    #define _GNU_SOURCE
+    #include <fnmatch.h>
+#endif
+
 #include <stddef.h>
 
 #include "token_vec.h"

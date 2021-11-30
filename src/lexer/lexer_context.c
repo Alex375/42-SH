@@ -1,5 +1,3 @@
-#include <fnmatch.h>
-
 #include "lexer.h"
 
 int skip_character(char c)

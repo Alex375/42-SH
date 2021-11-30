@@ -1,7 +1,5 @@
-#define _GNU_SOURCE
 
 #include <string.h>
-#include <fnmatch.h>
 #include "lexer.h"
 
 struct words_converter converter = {

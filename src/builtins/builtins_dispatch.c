@@ -8,6 +8,8 @@ extern struct options *opt;
 
 int get_builins_index(char *function)
 {
+    if (function == NULL)
+        return -1;
     char *builints[1] = { "echo" };
     for (int i = 0; i < 1; i++)
     {

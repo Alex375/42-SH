@@ -1,7 +1,5 @@
-#define _GNU_SOURCE
 #include "lexer.h"
 #include <ctype.h>
-#include <fnmatch.h>
 
 int is_valid_var(const char *string)
 {
