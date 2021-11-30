@@ -48,6 +48,12 @@ enum var_context
     IN_VAR_VALUE
 };
 
+enum redir_context
+{
+    GENERAL_REDIR,
+    IN_REDIR
+};
+
 /**
 ** @brief                   Global info for the lexer
 ** @param nb_token          The number of token in the token converter.
@@ -59,6 +65,7 @@ enum var_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum redir_context redir_context;
     enum soft_expansion last_soft;
     enum soft_expansion soft_expansion;
     enum var_context var_context;
@@ -116,6 +123,8 @@ int look_ahead_keywords(const char *script, size_t size);
 struct token_info lex_for(struct token_info res, struct string *string);
 
 struct token_info lex_keywords(struct token_info res, struct string *string);
+
+int is_command(struct token_info res);
 
 struct token_info lex_command(struct token_info res, struct string *string);
 

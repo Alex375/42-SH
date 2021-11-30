@@ -47,6 +47,10 @@ struct token_info lex_keywords(struct token_info res, struct string *string)
     {
         g_lexer_info.for_context = VAR_FOR;
     }
+    else if (res.type >= T_REDIR_1 && res.type <= T_REDIR_PIPE)
+    {
+        g_lexer_info.redir_context = IN_REDIR;
+    }
     string_free(string);
     return res;
 }

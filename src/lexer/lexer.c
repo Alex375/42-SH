@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 struct lexer_info g_lexer_info = { NULL,
+                                   GENERAL_REDIR,
                                    GENERAL_EXP_SOFT,
                                    GENERAL_EXP_SOFT,
                                    GENERAL_VAR,
@@ -64,10 +65,7 @@ static struct token_info lex_accumulator(struct token_info res,
     {
         res = lex_ionumber(res, string);
     }
-    else if (res.type == T_WORD
-             || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
-             || g_lexer_info.last_soft == IN_DQUOTE
-             || g_lexer_info.word_context == IN_COMMAND)
+    else if (is_command(res))
     {
         res = lex_command(res, string);
     }
@@ -80,6 +78,8 @@ static struct token_info lex_accumulator(struct token_info res,
     g_lexer_info.last_exp_context = GENERAL_EXP_HARD;
     if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
         g_lexer_info.last_soft = GENERAL_EXP_SOFT;
+    if (res.type == T_WORD)
+        g_lexer_info.redir_context = GENERAL_REDIR;
     return res;
 }
 
