@@ -28,7 +28,7 @@ Your virtual environment is now setup to run the testsuite.
 
 ### Run the test suite
 Test suite argument :
-- `--binary` (required): binary file to test, if the binary is not found it will copy the binary from `cmake-build-debug`
+- `--binary` (required): binary file to test, if the binary exists in `cmake-build-debug` it will copy it
 - `--reference` (optional) : reference program (`dash` by default)
 - `--category` (optional) : categories of test to be run categories are files stored in`yaml_tests` (by default all categories are run)
 Exemple :
