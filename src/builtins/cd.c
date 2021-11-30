@@ -5,37 +5,54 @@
 #include <xstrdup.h>
 #include <stdlib.h>
 
-void cd(char **args)
+#include "xalloc.h"
+
+/*
+ Cette fonction permet de recuperer le path actuel, c'est a dire de recuperer
+ le path avant modification de chdir().
+ */
+char *current_path_init(void)
 {
-    if (args[1] == NULL)
-        errx(1, "cd: Path is HOME");
-
-    char *path = xstrdup(args[1]); // on recup le path passe en arg
-
-    int buffer_size = 1024;
-    char *current_path = calloc(1024, sizeof(char));
-    while (getcwd(current_path, buffer_size) == NULL)
+    int current_size = 1024;
+    char *current_path = xcalloc(1024, sizeof(char));
+    while (getcwd(current_path, current_size) == NULL)
     {
-        buffer_size += 1024;
-        current_path = realloc(current_path, buffer_size);
+        current_size += 1024;
+        current_path = xrecalloc(current_path, current_size);
     }
-    current_path = getcwd(current_path, buffer_size);
+    current_path = getcwd(current_path, current_size);
 
-    // print le current directory
-    printf("You are ->%s\n", current_path);
-    printf("Go to -> %s\n\n", path);
-    chdir(path);
-    char *new_path = calloc(1024, sizeof(char));
-    new_path = getcwd(new_path, buffer_size);
-    if (current_path == new_path)
-        errx(1, "Pas possible to cd");
-
-    printf("You are now ->%s\n", new_path);
+    return current_path;
 }
 
-int main()
+int cd(char **args)
 {
-    char *arr[] = { "bite", "bite"};
-    printf("RUN TEST:\n\n");
-    cd(arr);
+    char *path;
+    if (args[1] == NULL)
+        path = xstrdup(getenv("HOME")); // si pas d'arg
+
+    else
+        path = xstrdup(args[1]); // on recup le path passe en arg
+
+    char *current_path = current_path_init();
+
+    int code_cd = chdir(path);
+    if (code_cd == -1)
+    {
+        fprintf(stderr, "%s: No such file or directory", path);
+        return 2;
+    }
+
+    // On recup la len max pour cree notre derniere location (on on est apres
+    // cd)
+    int final_len = strlen(current_path) + strlen(path);
+    char *final_path = xcalloc(final_len, sizeof(char));
+    final_path = getcwd(final_path, final_len);
+    if (strcmp(current_path, final_path) == 0)
+        return 0;
+
+    xfree(final_path);
+    xfree(path);
+    xfree(current_path);
+    return 0;
 }
