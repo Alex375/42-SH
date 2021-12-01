@@ -1,4 +1,5 @@
 import os.path
+import pathlib
 from argparse import ArgumentParser
 from pathlib import Path
 import subprocess as sp
@@ -114,24 +115,23 @@ def print_summary(passed: int, failed: int, start_time: float, end_time: float):
 
 if __name__ == "__main__":
     parser = ArgumentParser("Testsuite")
-    parser.add_argument("--binary", required=True, type=Path)
+    parser.add_argument("--binary", required=False, type=Path, default="42SH")
     parser.add_argument("--category", required=False, type=str)
-    parser.add_argument("--reference", required=False, type=str)
+    parser.add_argument("--reference", required=False, type=str, default="dash")
+    parser.add_argument("--builddir", required=False, type=Path, default="../../cmake-build-debug")
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
     categories = args.category
     ref = args.reference
+    build_dir = args.builddir
 
-    os.system(f"cd ../../cmake-build-debug ; make {args.binary}")
+    os.system(f"cd {build_dir} ; make {args.binary}")
 
-    if os.path.exists(f"../../cmake-build-debug/{args.binary}"):
-        shutil.copy(f"../../cmake-build-debug/{args.binary}", "./")
+    if os.path.exists(f"{build_dir}/{args.binary}"):
+        shutil.copy(f"{build_dir}/{args.binary}", "./")
         if not os.path.exists(binary_path):
             raise FileNotFoundError(f"Tried to copy file but {binary_path} not found")
-
-    if ref is None:
-        ref = "dash"
 
     if categories is not None:
         categories = categories.split(' ')
