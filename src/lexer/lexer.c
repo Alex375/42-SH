@@ -116,6 +116,7 @@ struct token_info tokenify_next(const char *script, size_t size)
 
         if (check_special(accumulator, script[g_lexer_info.pos]))
             break;
+
     } while (look_ahead(script, size));
 
     return lex_accumulator(res, accumulator);

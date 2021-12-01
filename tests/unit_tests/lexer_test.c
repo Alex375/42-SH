@@ -30,6 +30,18 @@ void test_lexer(char *script, size_t size, struct token_info expected[])
     lexer_reset();
 }
 
+TestSuite(PARENTHESIS, .timeout=1);
+TestSuite(COMMAND, .timeout=1);
+TestSuite(IF, .timeout=1);
+TestSuite(WHILE, .timeout=1);
+TestSuite(FOR, .timeout=1);
+TestSuite(REDIR, .timeout=1);
+TestSuite(QUOTE, .timeout=1);
+TestSuite(AND, .timeout=1);
+TestSuite(OR, .timeout=1);
+TestSuite(ESCAPE, .timeout=1);
+TestSuite(DOUBLE_QUOTE, .timeout=1);
+
 Test(PARENTHESIS, SIMPLE_LS)
 {
     char *script = "(ls -la)";
@@ -192,6 +204,14 @@ Test(QUOTE, ERROR)
                                      { T_WORD, "cest" },
                                      { T_WORD, "une" },
                                      { T_ERROR, NULL } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(QUOTE, IF)
+{
+    char *script = "i'f'";
+    struct token_info expected[] = { { T_WORD, "if" }};
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -836,6 +856,36 @@ Test(VAR, COLLE)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(VAR, CONCAT_QUOTE)
+{
+    char *script = "echo \"$te$te\"";
+    struct token_info expected[] = {
+        { T_WORD, "echo" }, { T_VAR_INQUOTE, "te" }, { T_VAR_INQUOTE, "te" },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, CONCAT_QUOTE2)
+{
+    char *script = "echo $te\"$te$te\"$te";
+    struct token_info expected[] = {
+        { T_WORD, "echo" }, { T_VAR, "te" }, { T_VAR_INQUOTE, "te" }, { T_VAR_INQUOTE, "te" }, { T_VAR, "te" },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, CONCAT_QUOTE3)
+{
+    char *script = "echo $te'$te$te'$te";
+    struct token_info expected[] = {
+        { T_WORD, "echo" }, { T_VAR, "te" }, { T_WORD, "$te$te" }, { T_VAR, "te" },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
 Test(VAR, DUR)
 {
     char *script = "1< test a=2 echo a=3";
@@ -850,7 +900,7 @@ Test(VAR, DUR)
 
 //int main()
 //{
-//    char *script = "echo a=2 in text";
+//    char *script = "echo $te'$te$te'$te";
 //    lexer_start(script, strlen(script));
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

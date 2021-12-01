@@ -18,6 +18,8 @@ int look_ahead_keywords(const char *script, size_t size)
         return 0;
     }
 
+    if (g_lexer_info.var_context == IN_VAR && i > 0 && script[i - 1] != '$' &&  (script[i] == '"' || script[i] == '\''))
+        return 0;
 
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
