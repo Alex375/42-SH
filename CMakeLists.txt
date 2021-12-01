@@ -23,14 +23,17 @@ if (APPLE)
     add_executable(42SH ${SRC} src/main.c src/xfnmatch/xfnmatch.c)
 else()
     add_executable(42SH ${SRC} src/main.c)
+    target_link_libraries(42SH PRIVATE -fsanitize=address)
 endif()
 
 #Test executable
 add_executable(lexer_test ${SRC} tests/unit_tests/lexer_test.c)
+target_link_libraries(lexer_test PRIVATE -fsanitize=address)
+target_link_libraries(lexer_test PUBLIC -lcriterion)
 
 add_executable(echo_test ${SRC} tests/unit_tests/echo_tests/echo_tests.c)
+target_link_libraries(echo_test PUBLIC -lcriterion)
+
 add_executable(echo_main ${SRC} tests/unit_tests/echo_tests/echo_main.c)
 
-target_link_libraries(lexer_test PUBLIC -lcriterion)
-target_link_libraries(echo_test PUBLIC -lcriterion)
-target_link_libraries(42SH PUBLIC -fsanitize=address)
+

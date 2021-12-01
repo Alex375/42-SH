@@ -30,17 +30,17 @@ void test_lexer(char *script, size_t size, struct token_info expected[])
     lexer_reset();
 }
 
-TestSuite(PARENTHESIS, .timeout=1);
-TestSuite(COMMAND, .timeout=1);
-TestSuite(IF, .timeout=1);
-TestSuite(WHILE, .timeout=1);
-TestSuite(FOR, .timeout=1);
-TestSuite(REDIR, .timeout=1);
-TestSuite(QUOTE, .timeout=1);
-TestSuite(AND, .timeout=1);
-TestSuite(OR, .timeout=1);
-TestSuite(ESCAPE, .timeout=1);
-TestSuite(DOUBLE_QUOTE, .timeout=1);
+TestSuite(PARENTHESIS, .timeout = 1);
+TestSuite(COMMAND, .timeout = 1);
+TestSuite(IF, .timeout = 1);
+TestSuite(WHILE, .timeout = 1);
+TestSuite(FOR, .timeout = 1);
+TestSuite(REDIR, .timeout = 1);
+TestSuite(QUOTE, .timeout = 1);
+TestSuite(AND, .timeout = 1);
+TestSuite(OR, .timeout = 1);
+TestSuite(ESCAPE, .timeout = 1);
+TestSuite(DOUBLE_QUOTE, .timeout = 1);
 
 Test(PARENTHESIS, SIMPLE_LS)
 {
@@ -211,7 +211,7 @@ Test(QUOTE, ERROR)
 Test(QUOTE, IF)
 {
     char *script = "i'f'";
-    struct token_info expected[] = { { T_WORD, "if" }};
+    struct token_info expected[] = { { T_WORD, "if" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -391,7 +391,7 @@ Test(WHILE, EASY)
     struct token_info expected[] = { { T_WHILE, NULL },   { T_WORD, "true" },
                                      { T_NEWLINE, NULL }, { T_DO, NULL },
                                      { T_NEWLINE, NULL }, { T_WORD, "echo" },
-                                     { T_WORD, "hello" },  { T_NEWLINE, NULL },
+                                     { T_WORD, "hello" }, { T_NEWLINE, NULL },
                                      { T_DONE, NULL } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -403,7 +403,7 @@ Test(UNTIL, EASY)
     struct token_info expected[] = { { T_UNTIL, NULL },   { T_WORD, "true" },
                                      { T_NEWLINE, NULL }, { T_DO, NULL },
                                      { T_NEWLINE, NULL }, { T_WORD, "echo" },
-                                     { T_WORD, "hello" },  { T_NEWLINE, NULL },
+                                     { T_WORD, "hello" }, { T_NEWLINE, NULL },
                                      { T_DONE, NULL } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -463,6 +463,27 @@ Test(FOR, MEDIUM)
                                      { T_SEMICOLON, NULL }, { T_DO, NULL },
                                      { T_NEWLINE, NULL },   { T_WORD, "test" },
                                      { T_NEWLINE, NULL },   { T_DONE, NULL } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FOR, A_LOT)
+{
+    char *script = "for in in in in in in in in in in in in in in in in in in "
+                   "in in in in in in in; do\n  echo bonjour!\ndone";
+    struct token_info expected[] = {
+        { T_FOR, NULL },     { T_VAR, "in" },       { T_IN, NULL },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },    { T_WORD, "in" },      { T_WORD, "in" },
+        { T_WORD, "in" },   { T_WORD, "in" }, { T_SEMICOLON, NULL }, { T_DO, NULL },
+        { T_NEWLINE, NULL }, { T_WORD, "echo" }, { T_WORD, "bonjour!" },   { T_NEWLINE, NULL },
+        { T_DONE, NULL }
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -705,10 +726,12 @@ Test(DOUBLE_QUOTE, MEDIUM)
 Test(DOUBLE_QUOTE, MEDIUM2)
 {
     char *script = "echo \"$i $test $test< && > $test\"";
-    struct token_info expected[] = { { T_WORD, "echo" },    { T_VAR_INQUOTE, "i" },
-                                     { T_WORD, " " },       { T_VAR_INQUOTE, "test" },
-                                     { T_WORD, " " },       { T_VAR_INQUOTE, "test" },
-                                     { T_WORD, "< && > " }, { T_VAR_INQUOTE, "test" } };
+    struct token_info expected[] = {
+        { T_WORD, "echo" },    { T_VAR_INQUOTE, "i" },
+        { T_WORD, " " },       { T_VAR_INQUOTE, "test" },
+        { T_WORD, " " },       { T_VAR_INQUOTE, "test" },
+        { T_WORD, "< && > " }, { T_VAR_INQUOTE, "test" }
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -717,7 +740,7 @@ Test(DOUBLE_QUOTE, MEDIUM3)
 {
     char *script = "echo \"Hello $world, if this is $working then is good ! \"";
     struct token_info expected[] = {
-        { T_WORD, "echo" },   { T_WORD, "Hello " },
+        { T_WORD, "echo" },           { T_WORD, "Hello " },
         { T_VAR_INQUOTE, "world" },   { T_WORD, ", if this is " },
         { T_VAR_INQUOTE, "working" }, { T_WORD, " then is good ! " }
     };
@@ -820,7 +843,19 @@ Test(VAR, DECLARATION)
     struct token_info expected[] = {
         { T_VAR_INIT, "test" },
         { T_VAR_VALUE, "salut" },
-        };
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, WITH_SEMI)
+{
+    char *script = "test=salut; echo $test";
+    struct token_info expected[] = { { T_VAR_INIT, "test" },
+                                     { T_VAR_VALUE, "salut" },
+                                     { T_SEMICOLON, NULL },
+                                     { T_WORD, "echo" },
+                                     { T_VAR, "test" } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -831,7 +866,7 @@ Test(VAR, DECLARATION_QUOTE)
     struct token_info expected[] = {
         { T_VAR_INIT, "test" },
         { T_VAR_VALUE, "    salut" },
-        };
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -841,7 +876,7 @@ Test(VAR, BAD_DECLARATION_QUOTE)
     char *script = "te@t=te";
     struct token_info expected[] = {
         { T_WORD, "te@t=te" },
-        };
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -850,8 +885,10 @@ Test(VAR, COLLE)
 {
     char *script = "echo te$te";
     struct token_info expected[] = {
-        { T_WORD, "echo" }, { T_WORD, "te" }, { T_VAR, "te" },
-        };
+        { T_WORD, "echo" },
+        { T_WORD, "te" },
+        { T_VAR, "te" },
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -860,7 +897,9 @@ Test(VAR, CONCAT_QUOTE)
 {
     char *script = "echo \"$te$te\"";
     struct token_info expected[] = {
-        { T_WORD, "echo" }, { T_VAR_INQUOTE, "te" }, { T_VAR_INQUOTE, "te" },
+        { T_WORD, "echo" },
+        { T_VAR_INQUOTE, "te" },
+        { T_VAR_INQUOTE, "te" },
     };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -870,7 +909,8 @@ Test(VAR, CONCAT_QUOTE2)
 {
     char *script = "echo $te\"$te$te\"$te";
     struct token_info expected[] = {
-        { T_WORD, "echo" }, { T_VAR, "te" }, { T_VAR_INQUOTE, "te" }, { T_VAR_INQUOTE, "te" }, { T_VAR, "te" },
+        { T_WORD, "echo" },      { T_VAR, "te" }, { T_VAR_INQUOTE, "te" },
+        { T_VAR_INQUOTE, "te" }, { T_VAR, "te" },
     };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -880,7 +920,10 @@ Test(VAR, CONCAT_QUOTE3)
 {
     char *script = "echo $te'$te$te'$te";
     struct token_info expected[] = {
-        { T_WORD, "echo" }, { T_VAR, "te" }, { T_WORD, "$te$te" }, { T_VAR, "te" },
+        { T_WORD, "echo" },
+        { T_VAR, "te" },
+        { T_WORD, "$te$te" },
+        { T_VAR, "te" },
     };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -890,19 +933,44 @@ Test(VAR, DUR)
 {
     char *script = "1< test a=2 echo a=3";
     struct token_info expected[] = {
-        { T_IONUMBER, "1" }, { T_REDIR_I_1, NULL }, { T_WORD, "test" }, { T_VAR_INIT, "a" }, { T_VAR_VALUE, "2" }, { T_WORD, "echo" },
-        { T_WORD, "a=3" }};
+        { T_IONUMBER, "1" }, { T_REDIR_I_1, NULL }, { T_WORD, "test" },
+        { T_VAR_INIT, "a" }, { T_VAR_VALUE, "2" },  { T_WORD, "echo" },
+        { T_WORD, "a=3" }
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(NOT, ECHO)
+{
+    char *script = "echo salut!";
+    struct token_info expected[] = {
+        { T_WORD, "echo" },
+        { T_WORD, "salut!" },
+    };
 
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
 
-//int main()
+Test(DOUBLE_QUOTE, SPACES)
+{
+    char *script = "echo \"            salut j'ai plein d'espace dans mon      "
+                   " echo       !!     \"";
+    struct token_info expected[] = {
+        { T_WORD, "echo" },
+        { T_WORD,
+          "            salut j'ai plein d'espace dans mon       echo       !!  "
+          "   " },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+// int main()
 //{
-//    char *script = "echo $te'$te$te'$te";
-//    lexer_start(script, strlen(script));
-//    struct token_info tk;
-//    while ((tk = pop_token()).type != T_EOF)
-//        continue;
-//}
+//     char *script = "echo $te'$te$te'$te";
+//     lexer_start(script, strlen(script));
+//     struct token_info tk;
+//     while ((tk = pop_token()).type != T_EOF)
+//         continue;
+// }

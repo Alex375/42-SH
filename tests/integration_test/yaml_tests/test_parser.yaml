@@ -52,3 +52,8 @@
         echo coucou
     fi; > test.txt
   type: success
+
+- name: weird quote
+  input: "'ec'ho"
+  type: noerrcheck
+
