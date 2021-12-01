@@ -71,10 +71,3 @@ includes = [
 sh_sources = sources + ['src/main.c']
 sh_bin = executable('42sh', sh_sources, include_directories: includes)
 
-#criterion depencie
-criterion_dep = gcc.find_library('criterion')
-
-#Test lexer binary
-test_lexer_sources = sources + ['tests/unit_tests/lexer_test.c']
-test_lexer_bin = executable('check', test_lexer_sources, include_directories: includes, dependencies: criterion_dep)
-
