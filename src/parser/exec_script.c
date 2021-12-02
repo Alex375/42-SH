@@ -4,9 +4,9 @@
 
 #include "eval_ast.h"
 #include "options.h"
-#include "parser.h"
 #include "read_script.h"
 #include "xalloc.h"
+#include "xparser.h"
 
 extern struct options *opt;
 
