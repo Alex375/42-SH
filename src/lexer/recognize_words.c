@@ -90,7 +90,7 @@ int check_special(struct string *accumulator, char next_char)
 
     if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT
         && g_lexer_info.exp_context == GENERAL_EXP_HARD
-        && g_lexer_info.word_context == GENERAL_VAR)
+        && g_lexer_info.word_context == GENERAL)
     {
         if (fnmatch("+([a-zA-Z0-9_])=", accumulator->data, FNM_EXTMATCH) == 0)
         {

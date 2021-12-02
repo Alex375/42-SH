@@ -34,6 +34,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
     char *flag;
     switch (redir->redir_type)
     {
+    case T_REDIR_PIPE:
     case T_REDIR_1:
         flag = "w";
         break;
@@ -42,6 +43,9 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         break;
     case T_REDIR_2:
         flag = "a";
+        break;
+    case T_REDIR_O_2:
+        flag = "wr";
         break;
     case T_REDIR_A:
         temp = strtol(redir->word, &end_ptr, 10);
@@ -60,6 +64,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         redirInfo->temp_fd = dup(redirInfo->io_number);
         dup2(temp, redirInfo->io_number);
         return 0;
+
 
     default:
         err(127, "Unimplemented features");
@@ -108,7 +113,7 @@ int exec_redirs(struct ast *ast, struct list_redir *listRedir)
         new->temp_fd = -1;
         redirInfo = append_redir(redirInfo, new);
         if ((res = apply_redir(temp, new)) != 0)
-            return 2;
+            return res;
         temp = temp->next;
     }
     res = eval_ast(ast);

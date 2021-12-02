@@ -121,3 +121,50 @@
     echo coucou2 >&3
     ls
   type: failed
+
+- name: Simple redir pipe
+  input: |
+    echo coucou >| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+
+- name: Simple redir 2 pipe
+  input: |
+    echo coucou 3>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir high fd pipe
+  input: |
+    echo coucou 10>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir higher fd pipe
+  input: |
+    echo coucou 11>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir very high fd pipe
+  input: |
+    echo coucou 1100>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir bad fd pipe
+  input: |
+    echo coucou fzer>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir exit pipe
+  input: exit 3 >| test.txt ; echo coucou ; rm test.txt
+  type: success
