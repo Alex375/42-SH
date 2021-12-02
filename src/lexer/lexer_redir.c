@@ -1,9 +1,12 @@
 #include <ctype.h>
+#include <string.h>
 
 #include "lexer.h"
 
 static int is_number(const char *str)
 {
+    if (strlen(str) != 1) // Check if the ionumber is < 10
+        return 0;
     int i = 0;
 
     while (str[i])

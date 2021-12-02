@@ -9,16 +9,6 @@
 #include "parser.h"
 
 /*!
- * @brief Pipelin struct containing infos on pipline and redir
- * @param out State param of the pipeline
- * @param fd  File descriptors arrays for (piped if currently use)
- */
-struct pipeline
-{
-    int fd[2];
-};
-
-/*!
  * @brief Execute a command including builtins
  * @param cmd       Command string to be executed
  * @param args      Arguments string associated with the command
