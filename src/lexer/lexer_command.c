@@ -2,9 +2,10 @@
 
 int is_command(struct token_info res)
 {
-    return res.type == T_WORD || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
-    || g_lexer_info.last_soft == IN_DQUOTE
-    || g_lexer_info.word_context == IN_COMMAND;
+    return res.type == T_WORD
+        || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
+        || g_lexer_info.last_soft == IN_DQUOTE
+        || g_lexer_info.word_context == IN_COMMAND;
 }
 
 struct token_info lex_command(struct token_info res, struct string *string)

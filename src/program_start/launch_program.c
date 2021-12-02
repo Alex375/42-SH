@@ -1,9 +1,9 @@
-#include <parser.h>
+#include <err.h>
 #include <stdio.h>
 #include <string.h>
-#include <xalloc.h>
 #include <unistd.h>
-#include <err.h>
+#include <xalloc.h>
+#include <xparser.h>
 
 #include "options.h"
 #include "read_script.h"
@@ -70,8 +70,7 @@ int launch_program(int argc, char **argv)
         char *read = read_stdin();
         if (opt->verbose)
             printf("Executing command \n\'%s\'\n", read);
-        res = exec_script(read,
-                          strlen(read));
+        res = exec_script(read, strlen(read));
     }
     xfree_all();
     return res;

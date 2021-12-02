@@ -2,10 +2,10 @@
 #define INC_42_SH_TYPE_H
 
 #if __APPLE__
-    #include "xfnmatch.h"
+#    include "xfnmatch.h"
 #else
-    #define _GNU_SOURCE
-    #include <fnmatch.h>
+#    define _GNU_SOURCE
+#    include <fnmatch.h>
 #endif
 
 #include <stddef.h>
@@ -134,7 +134,7 @@ void context_update(struct token_info res);
 
 int detect_context(char c);
 
-int look_ahead_dquote(const char* script, size_t size);
+int look_ahead_dquote(const char *script, size_t size);
 
 int look_ahead_squote(size_t size);
 

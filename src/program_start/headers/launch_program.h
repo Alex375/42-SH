@@ -31,6 +31,4 @@ char *read_stdin(void);
  */
 int launch_program(int argc, char **argv);
 
-
-
 #endif // INC_42_SH_LAUNCH_PROGRAMM_H

@@ -1,11 +1,15 @@
-- name: Simple return code
-  input: return 42
-  type: success
-
 - name: Pipe
   input: echo hallo | tr a e
   type: success
 
 - name: Simple exit code
   input: exit 42
+  type: success
+
+- name: Simple exit wrong
+  input: exit 42ze
+  type: failed
+
+- name: Simple exit hard
+  input: exit 12345 erg
   type: success

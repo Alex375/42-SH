@@ -1,5 +1,4 @@
 #include "lexer.h"
-#include <ctype.h>
 
 int is_valid_var(const char *string)
 {

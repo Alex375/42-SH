@@ -1,5 +1,5 @@
-#ifndef INC_42_SH_PARSER_H
-#define INC_42_SH_PARSER_H
+#ifndef INC_42_SH_XPARSER_H
+#define INC_42_SH_XPARSER_H
 
 #include "lexer.h"
 
@@ -277,4 +277,4 @@ void add_to_redir_list(struct list_redir **redirs,
 void add_to_var_assign_list(struct list_var_assign **vars,
                             struct list_var_assign *new_var);
 
-#endif // INC_42_SH_PARSER_H
+#endif // INC_42_SH_XPARSER_H

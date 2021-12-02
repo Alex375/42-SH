@@ -6,7 +6,8 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '\\' && g_lexer_info.exp_context == GENERAL_EXP_HARD && g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
+    if (c == '\\' && g_lexer_info.exp_context == GENERAL_EXP_HARD
+        && g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
     {
         return 1;
     }

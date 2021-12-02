@@ -1,9 +1,8 @@
-#include "parser.h"
-
 #include <errno.h>
 #include <stddef.h>
 
-#include "xalloc.h"
+#include "ast_xalloc.h"
+#include "xparser.h"
 #include "xstrdup.h"
 
 #define CHECK_SEG_ERROR(condition)                                             \
