@@ -6,6 +6,8 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
+extern struct vars_vect *vars;
+
 struct vars_vect *init_vars_vect()
 {
     struct vars_vect *res = xcalloc(1, sizeof(struct vars_vect));
@@ -16,7 +18,7 @@ struct vars_vect *init_vars_vect()
     return res;
 }
 
-void add_var(struct vars_vect *vars, char *name, char *value)
+void add_var(char *name, char *value)
 {
     int pos = 0;
     for (; pos < vars->len; ++pos)
@@ -45,7 +47,7 @@ void add_var(struct vars_vect *vars, char *name, char *value)
     vars->len++;
 }
 
-char *get_var(struct vars_vect *vars, char *name)
+char *get_var(char *name)
 {
     int pos = 0;
     for (; pos < vars->len; ++pos)

@@ -7,8 +7,10 @@
 
 #include "options.h"
 #include "read_script.h"
+#include "vars.h"
 
 struct options *opt = NULL;
+struct vars_vect *vars = NULL;
 
 int launch_script(void)
 {
@@ -53,6 +55,8 @@ char *read_stdin(void)
 
 int launch_program(int argc, char **argv)
 {
+    vars = init_vars_vect();
+
     opt = xcalloc(1, sizeof(struct options));
     get_option(opt, argc, argv);
     if (opt->help)

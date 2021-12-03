@@ -95,7 +95,7 @@ void *parse_redirs(struct list_redir **redirs)
 
         new_redir->word = init_tok_vect();
 
-        if (!add_word_vect(new_redir->word))
+        if (!add_word_vect(new_redir->word, 1))
         {
             errno = ERROR_PARSING;
             return NULL;
@@ -116,7 +116,7 @@ struct ast *parse_simple_command(struct list_redir **redirs)
 
     struct tok_vect *cmd_arg = init_tok_vect();
 
-    while (add_word_vect(cmd_arg))
+    while (add_word_vect(cmd_arg, 0))
     {
         parse_redirs(redirs);
         if (errno)
@@ -149,7 +149,7 @@ struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
         else
         {
             new->value = init_tok_vect();
-            add_word_vect(new->value);
+            add_word_vect(new->value, 1);
         }
 
         parse_redirs(redirs);

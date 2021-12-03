@@ -6,7 +6,7 @@
 #include "xstrdup.h"
 #include "xstring.h"
 
-char *get_word(struct vars_vect *vars, struct tok_vect *tok_vect, int *i,
+char *get_word(struct tok_vect *tok_vect, int *i,
                int *nb_strtok)
 {
     struct string *res = string_create();
@@ -15,10 +15,10 @@ char *get_word(struct vars_vect *vars, struct tok_vect *tok_vect, int *i,
         if (tok_vect->list[*i].type == T_WORD)
             string_concat(res, tok_vect->list[*i].command);
         else if (tok_vect->list[*i].type == T_VAR_INQUOTE)
-            string_concat(res, get_var(vars, tok_vect->list[*i].command));
+            string_concat(res, get_var(tok_vect->list[*i].command));
         else
         {
-            char *copy = xstrdup(get_var(vars, tok_vect->list[*i].command));
+            char *copy = xstrdup(get_var(tok_vect->list[*i].command));
             char *w = NULL;
             for (int j = 0; j < *nb_strtok + 1; ++j)
             {
@@ -44,7 +44,7 @@ char *get_word(struct vars_vect *vars, struct tok_vect *tok_vect, int *i,
     return string_get(res);
 }
 
-char **expand_vars_vect(struct vars_vect *vars, struct tok_vect *tok_vect)
+char **expand_vars_vect(struct tok_vect *tok_vect)
 {
     int cap = 8;
     int len = 0;
@@ -66,7 +66,7 @@ char **expand_vars_vect(struct vars_vect *vars, struct tok_vect *tok_vect)
             xrecalloc(res, cap * sizeof(char *));
         }
 
-        res[len++] = get_word(vars, tok_vect, &i, &nb_strtok);
+        res[len++] = get_word(tok_vect, &i, &nb_strtok);
     }
 
     return res;

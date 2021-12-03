@@ -23,7 +23,7 @@ int execute(char **args);
  * @param right    Right ast node of the pipe node to be executed
  * @return         Return the exit code of the left node execution
  */
-int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars);
+int exec_pipe(struct ast *left, struct ast *right);
 
 /*!
  * @brief           Apply redirections, execute ast under redirections and
@@ -32,7 +32,7 @@ int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars);
  * @param listRedir List of redirections to be apply
  * @return          Return the exit code of the executed ast
  */
-int exec_redirs(struct ast *ast, struct list_redir *listRedir, struct vars_vect *vars);
+int exec_redirs(struct ast *ast, struct list_redir *listRedir);
 
 /*!
  * @brief           Chained list containing infos about the current redirections

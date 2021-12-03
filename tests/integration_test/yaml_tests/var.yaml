@@ -55,5 +55,5 @@
     a="tst oo"
     echo 1 >$a
     cat "tst oo"
-    rm tst oo"
+    rm "tst oo"
   type: success

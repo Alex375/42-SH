@@ -132,7 +132,7 @@ struct ast *parse_for_rule()
     {
         seq = init_tok_vect();
 
-        while (add_word_vect(seq))
+        while (add_word_vect(seq, 0))
             ;
 
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_SEMICOLON

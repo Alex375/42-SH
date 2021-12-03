@@ -26,13 +26,13 @@ static int is_valid_fd(int fd)
     return fcntl(fd, F_GETFL) != -1 || errno != EBADF;
 }
 
-int apply_redir(struct list_redir *redir, struct redir_info *redirInfo, struct vars_vect *vars)
+int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 {
     char *end_ptr;
     redirInfo->io_number = strtol(redir->ionumber, &end_ptr, 10);
     int temp;
     char *flag;
-    char **word = expand_vars_vect(vars, redir->word);
+    char **word = expand_vars_vect(redir->word);
     switch (redir->redir_type)
     {
     case T_REDIR_PIPE:
@@ -103,7 +103,7 @@ struct redir_info *append_redir(struct redir_info *redirInfo,
     return redirInfo;
 }
 
-int exec_redirs(struct ast *ast, struct list_redir *listRedir, struct vars_vect *vars)
+int exec_redirs(struct ast *ast, struct list_redir *listRedir)
 {
     struct list_redir *temp = listRedir;
     struct redir_info *redirInfo = NULL;
@@ -114,11 +114,11 @@ int exec_redirs(struct ast *ast, struct list_redir *listRedir, struct vars_vect 
         new->file_fd = -1;
         new->temp_fd = -1;
         redirInfo = append_redir(redirInfo, new);
-        if ((res = apply_redir(temp, new, vars)) != 0)
+        if ((res = apply_redir(temp, new)) != 0)
             return res;
         temp = temp->next;
     }
-    res = eval_ast(ast, vars);
+    res = eval_ast(ast);
     struct redir_info *temp2 = redirInfo;
     while (temp2)
     {

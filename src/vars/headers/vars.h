@@ -16,14 +16,27 @@ struct vars_vect
     struct var *vars;
 };
 
+/**
+** @brief               alloc and inits the token vector
+*/
 struct vars_vect *init_vars_vect();
 
-void add_var(struct vars_vect *vars, char *name, char *value);
+/**
+** @brief               add a variable to the global variable vars
+*/
+void add_var(char *name, char *value);
 
-char *get_var(struct vars_vect *vars, char *name);
+/**
+** @brief               gets value of a variable in the global variable vars
+ *                      if name does not exist, it returns "";
+*/
+char *get_var(char *name);
 
 //////////////////
 
-char **expand_vars_vect(struct vars_vect *vars, struct tok_vect *tok_vect);
+/**
+** @brief               tansforms a list of tokens into a char **
+*/
+char **expand_vars_vect(struct tok_vect *tok_vect);
 
 #endif // INC_42_SH_VARS_H

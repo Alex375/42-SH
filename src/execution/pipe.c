@@ -10,7 +10,7 @@
 
 extern struct options *opt;
 
-int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars) {
+int exec_pipe(struct ast *left, struct ast *right) {
     int fd[2];
     pipe(fd);
 
@@ -26,7 +26,7 @@ int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars) {
     {
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
-        exit(eval_ast(left, vars));
+        exit(eval_ast(left));
     }
     else
     {
@@ -38,7 +38,7 @@ int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars) {
         if (pid2 == 0)
         {
             dup2(fd[0], STDIN_FILENO);
-            exit(eval_ast(right, vars));
+            exit(eval_ast(right));
         }
         else
         {
