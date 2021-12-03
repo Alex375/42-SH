@@ -1,6 +1,6 @@
 #include <errno.h>
 
-#include "headers/parser.h"
+#include "headers/xparser.h"
 #include "xstrdup.h"
 
 void skip_newlines()

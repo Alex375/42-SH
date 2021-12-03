@@ -1,7 +1,7 @@
 #Project settings
 cmake_minimum_required(VERSION 3.19)
 project(42_SH C)
-add_compile_options(-Werror -Wall -Wextra)
+add_compile_options(-Werror -Wall -Wextra -pedantic)
 set(CMAKE_C_STANDARD 99)
 
 #Include headers

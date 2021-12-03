@@ -1,9 +1,9 @@
 #include <err.h>
-#include <parser.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <xalloc.h>
+#include <xparser.h>
 
 #include "options.h"
 #include "read_script.h"
