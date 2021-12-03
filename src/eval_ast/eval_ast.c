@@ -56,6 +56,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         char **seq = expand_vars_vect(for_ast->seq);
         for (int i = 0; seq[i]; ++i)
         {
+            add_var(for_ast->name, seq[i]);
             res = eval_ast(for_ast->statement);
         }
 

@@ -31,7 +31,7 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
         if (tok_vect->len >= tok_vect->cap - 1)
         {
             tok_vect->cap *= 2;
-            xrecalloc(tok_vect->list,
+            tok_vect->list = xrecalloc(tok_vect->list,
                       tok_vect->cap * sizeof(struct token_info));
         }
         pop_token();

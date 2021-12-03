@@ -1,30 +1,38 @@
 
+- name: Useless variable declaration
+  input: "test=value; echo test!"
+  type: success
+
+- name: Basic variable use
+  input: "test=value; echo $test"
+  type: success
+
+- name: Basic variable use with bracket
+  input: "test=value; echo ${test}"
+  type: success
+
 - name: simple var
   input: |
     a=yee
     echo $a
-    done
   type: success
 
 - name: simple var quote
   input: |
     a="yee   no"
     echo "$a"
-    done
   type: success
 
 - name: simple var dequote
   input: |
     a="yee   no"
     echo $a
-    done
   type: success
 
 - name: var NULL
   input: |
     a=
     echo $a y
-    done
   type: success
 
 - name: var of for

@@ -38,11 +38,11 @@ void add_var(char *name, char *value)
     if (vars->len >= vars->cap - 1)
     {
         vars->cap *= 2;
-        xrecalloc(vars->vars, vars->cap * sizeof(struct var));
+        vars->vars = xrecalloc(vars->vars, vars->cap * sizeof(struct var));
     }
 
     vars->vars[vars->len].name = xstrdup(name);
-    vars->vars[vars->len].name = xstrdup(value);
+    vars->vars[vars->len].value = xstrdup(value);
 
     vars->len++;
 }

@@ -6,40 +6,44 @@
 #include "xstrdup.h"
 #include "xstring.h"
 
-char *get_word(struct tok_vect *tok_vect, int *i,
-               int *nb_strtok)
+char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok)
 {
     struct string *res = string_create();
+    int empty = 0;
     do
     {
-        if (tok_vect->list[*i].type == T_WORD)
+        if ((empty = 0) || tok_vect->list[*i].type == T_WORD)
             string_concat(res, tok_vect->list[*i].command);
-        else if (tok_vect->list[*i].type == T_VAR_INQUOTE)
-            string_concat(res, get_var(tok_vect->list[*i].command));
         else
         {
-            char *copy = xstrdup(get_var(tok_vect->list[*i].command));
-            char *w = NULL;
-            for (int j = 0; j < *nb_strtok + 1; ++j)
+            char *var_value = get_var(tok_vect->list[*i].command);
+            if ((!var_value || !var_value[0]) && (empty = 1))
             {
-                w = strtok(copy, " \t\n\r");
+                continue;
             }
-            if (!w)
-                (*nb_strtok) = 0;
+
+            if (tok_vect->list[*i].type == T_VAR_INQUOTE)
+                string_concat(res, var_value);
             else
             {
-                string_concat(res, w);
-                (*nb_strtok)++;
-                w = strtok(copy, " \t\n\r");
+                char *w = strtok(xstrdup(var_value), " \t\n\r");
+
+                for (int j = 0; j < *nb_strtok; ++j)
+                {
+                    w = strtok(NULL, " \t\n\r");
+                }
                 if (w)
-                    break;
-                else
-                    (*nb_strtok) = 0;
+                {
+                    string_concat(res, w);
+                    (*nb_strtok)++;
+                    if (strtok(NULL, " \t\n\r"))
+                        break;
+                }
+                (*nb_strtok) = 0;
             }
         }
-
-        (*i)++;
-    } while (*i < tok_vect->len && tok_vect->list[*i - 1].is_space_after == 0);
+    } while (++(*i) < tok_vect->len
+             && (empty || tok_vect->list[*i - 1].is_space_after == 0));
 
     return string_get(res);
 }
@@ -56,6 +60,11 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
         return res;
     }
 
+    if (tok_vect->len == 0)
+    {
+        res[0] = xcalloc(1, sizeof(char));
+    }
+
     int i = 0;
     int nb_strtok = 0;
     while (i < tok_vect->len)
@@ -63,7 +72,7 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
         if (len >= cap - 1)
         {
             cap *= 2;
-            xrecalloc(res, cap * sizeof(char *));
+            res = xrecalloc(res, cap * sizeof(char *));
         }
 
         res[len++] = get_word(tok_vect, &i, &nb_strtok);
