@@ -48,10 +48,6 @@ static struct token_info lex_accumulator(struct token_info res,
     {
         res = lex_varname(res, string);
     }
-    else if (g_lexer_info.var_context == IN_VAR_VALUE)
-    {
-        res = lex_varvalue(res, string);
-    }
     else if (g_lexer_info.for_context != GENERAL_FOR)
     {
         res = lex_for(res, string);
@@ -86,7 +82,7 @@ static struct token_info lex_accumulator(struct token_info res,
 /* MAIN LEXER */
 struct token_info tokenify_next(const char *script, size_t size)
 {
-    struct token_info res = { 0, NULL , 1};
+    struct token_info res = { 0, NULL , 0};
 
     if (g_lexer_info.soft_expansion != IN_DQUOTE)
         skip_class(isblank, script, &g_lexer_info.pos);
@@ -118,6 +114,8 @@ struct token_info tokenify_next(const char *script, size_t size)
             break;
 
     } while (look_ahead(script, size));
+
+    res.is_space_after = script[g_lexer_info.pos] == ' ';
 
     return lex_accumulator(res, accumulator);
 }

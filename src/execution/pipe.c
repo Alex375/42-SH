@@ -1,5 +1,6 @@
 #include <err.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "eval_ast.h"
 #include "execution.h"

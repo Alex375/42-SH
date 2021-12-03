@@ -8,19 +8,9 @@ int is_valid_var(const char *string)
 struct token_info lex_varname(struct token_info res, struct string *string)
 {
     res.type = T_VAR_INIT;
-
-    g_lexer_info.var_context = IN_VAR_VALUE;
-    string->data[--string->size] = '\0';
-
-    res.command = string_get(string);
-    return res;
-}
-
-struct token_info lex_varvalue(struct token_info res, struct string *string)
-{
-    res.type = T_VAR_VALUE;
-
     g_lexer_info.var_context = GENERAL_VAR;
+
+    string->data[--string->size] = '\0';
 
     res.command = string_get(string);
     return res;

@@ -44,8 +44,7 @@ enum var_context
 {
     GENERAL_VAR,
     IN_VAR,
-    IN_VAR_NAME,
-    IN_VAR_VALUE
+    IN_VAR_NAME
 };
 
 enum redir_context
