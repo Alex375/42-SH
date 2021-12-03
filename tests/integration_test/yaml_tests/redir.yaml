@@ -46,11 +46,11 @@
   type: success
 
 - name: Simple redir input
-  input: cat < requierments.txt
+  input: cat < testsuite.py
   type: success
 
 - name: Simple redir input fd
-  input: 1< requierments.txt
+  input: 1< testsuite.py
   type: success
 
 - name: Simple redir input
@@ -113,12 +113,16 @@
   type: success
 
 - name: Redir bad file descriptor number
+  input: echo coucou2 >&5
+  type: failed
+
+- name: Redir bad file descriptor number
   input: echo coucou2 >&3
   type: failed
 
 - name: Redir bad file descriptor number command
   input: |
-    echo coucou2 >&3
+    echo coucou2 >&5
     ls
   type: failed
 
@@ -168,3 +172,7 @@
 - name: Simple redir exit pipe
   input: exit 3 >| test.txt ; echo coucou ; rm test.txt
   type: success
+
+- name: Redir quote in fd
+  input: "echo coucou >&'"
+  type: failed

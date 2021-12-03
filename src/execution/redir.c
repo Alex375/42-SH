@@ -20,13 +20,13 @@ static int open_file(char *filename, char *flag)
     int fd = fileno(f);
     return fd;
 }
-int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 
 static int is_valid_fd(int fd)
 {
-    return fcntl(fd, F_GETFL) != -1 || errno != EBADF;
+    return fcntl(fd, F_GETFL) != -1 && errno != EBADF;
 }
 
+int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 {
     char *end_ptr;
     redirInfo->io_number = strtol(redir->ionumber, &end_ptr, 10);
@@ -58,11 +58,16 @@ static int is_valid_fd(int fd)
         if (!is_valid_fd(temp))
         {
             fprintf(stderr, "%d Bad fd number", temp);
-            xfree_all();
             return 2;
         }
         redirInfo->temp_fd = dup(redirInfo->io_number);
-        dup2(temp, redirInfo->io_number);
+
+        if (redirInfo->temp_fd == -1 || dup2(temp, redirInfo->io_number) == -1)
+        {
+            fprintf(stderr, "%d Bad fd number", temp);
+            return 2;
+        }
+        fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
         return 0;
 
 
@@ -72,6 +77,7 @@ static int is_valid_fd(int fd)
     redirInfo->file_fd = open_file(redir->word, flag);
     redirInfo->temp_fd = dup(redirInfo->io_number);
     dup2(redirInfo->file_fd, redirInfo->io_number);
+    fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
     return 0;
 }
 

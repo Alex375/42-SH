@@ -37,3 +37,11 @@
 - name: Echo hard expansion with e and n
   input: "echo -e -n 'cou\nco\tu'"
   type: success
+
+- name: Echo empty
+  input: echo
+  type: success
+
+- name: Echo empty -n
+  input: echo -n
+  type: success
