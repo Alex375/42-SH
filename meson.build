@@ -10,6 +10,16 @@ project(
     ],
 )
 
+# print a summary of the build configuration before each build starts
+summary({
+    'optimization': get_option('optimization'),
+    'debug': get_option('debug'),
+    'b_sanitize': get_option('b_sanitize'),
+    'warning_level': get_option('warning_level'),
+    'werror': get_option('werror'),
+})
+
+
 
 #Compile options
 gcc = meson.get_compiler('c')
@@ -70,3 +80,7 @@ includes = [
 #42SH binary
 sh_sources = sources + ['src/main.c']
 sh_bin = executable('42sh', sh_sources, include_directories: includes)
+
+if get_option('doc')
+    subdir('doc')
+endif
