@@ -86,7 +86,7 @@ static struct token_info lex_accumulator(struct token_info res,
 /* MAIN LEXER */
 struct token_info tokenify_next(const char *script, size_t size)
 {
-    struct token_info res = { 0, NULL };
+    struct token_info res = { 0, NULL , 1};
 
     if (g_lexer_info.soft_expansion != IN_DQUOTE)
         skip_class(isblank, script, &g_lexer_info.pos);

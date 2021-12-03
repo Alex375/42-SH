@@ -21,7 +21,7 @@ void print_redir(struct list_redir *redirs, int prof)
         printf("REDIRS : ");
         while (redirs)
         {
-            printf("%s into %s | ", redirs->ionumber, redirs->word);
+            printf("%s into ... | ", redirs->ionumber);
             redirs = redirs->next;
         }
         printf("\n");
@@ -36,7 +36,7 @@ void print_assign(struct list_var_assign *vars, int prof)
         printf("ASSIGNEMENT : ");
         while (vars)
         {
-            printf("%s = %s | ", vars->name, vars->value);
+            printf("%s = ... | ", vars->name);
             vars = vars->next;
         }
         printf("\n");
@@ -63,11 +63,13 @@ void pp_rec(struct ast *ast, int prof)
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
         tab(prof);
+        printf("COMMAND\n");
+        /*
         printf("COMMAND = %s ", s_cmd_ast->cmd_arg[0]);
         int i = 1;
         while (s_cmd_ast->cmd_arg[i])
             printf("%s ", s_cmd_ast->cmd_arg[i++]);
-        printf("\n");
+        printf("\n");*/
         print_assign(s_cmd_ast->vars, prof);
         break;
     case AST_IF:
@@ -108,11 +110,12 @@ void pp_rec(struct ast *ast, int prof)
         printf("FOR------\n");
         tab(prof + 1);
         printf("%s ", for_ast->name);
+        /*
         int j = 0;
         if (for_ast->seq[0])
             printf("--IN-- ");
         while (for_ast->seq[j])
-            printf("%s ", for_ast->seq[j++]);
+            printf("%s ", for_ast->seq[j++]);*/
         printf("\n");
         tab(prof);
         printf("DO------\n");

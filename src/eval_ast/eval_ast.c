@@ -64,7 +64,7 @@ int eval_ast(struct ast *ast, struct vars_vect *vars) // TODO alloc pipline with
         return 0;
     case AST_PIPE:
         b_ast = ast->t_ast;
-        return exec_pipe(b_ast->left, b_ast->right);
+        return exec_pipe(b_ast->left, b_ast->right, vars);
     case AST_REDIR:
         return 0;
     case AST_FUNC:

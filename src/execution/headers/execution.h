@@ -23,7 +23,7 @@ int execute(char **args);
  * @param right    Right ast node of the pipe node to be executed
  * @return         Return the exit code of the left node execution
  */
-int exec_pipe(struct ast *left, struct ast *right);
+int exec_pipe(struct ast *left, struct ast *right, struct vars_vect *vars);
 
 /*!
  * @brief           Apply redirections, execute ast under redirections and
