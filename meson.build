@@ -34,6 +34,7 @@ sources = [
     'src/parser/parser_shell_cmds.c',
     'src/parser/exec_script.c',
     'src/parser/parser.c',
+    'src/parser/vector_tokens.c',
     'src/program_start/options.c',
     'src/program_start/read_script.c',
     'src/program_start/launch_program.c',
@@ -53,6 +54,7 @@ sources = [
     'src/lexer/recognize_words.c',
     'src/lexer/lexer_command.c',
     'src/eval_ast/eval_ast.c',
+    'src/vars/expand_vars.c',
 ]
 
 includes = [
@@ -65,6 +67,7 @@ includes = [
     'src/program_start/headers',
     'src/data_types/headers',
     'src/builtins/headers'
+    'src/vars/headers'
 ]
 
 #42SH binary

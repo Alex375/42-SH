@@ -14,9 +14,10 @@ include_directories(src/data_types/headers)
 include_directories(src/program_start/headers)
 include_directories(src/execution/headers)
 include_directories(src/builtins/headers)
+include_directories(src/vars/headers)
 
 
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c)
+file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c src/vars/*.c)
 
 if (APPLE)
     include_directories(src/xfnmatch)

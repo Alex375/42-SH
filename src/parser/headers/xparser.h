@@ -171,13 +171,6 @@ int exec_script(char *script, size_t size);
 void ast_pretty_print(struct ast *ast);
 
 /**
-** @brief               start the parsing of a script
-** @param script        string containing block
-** @param size          len of script parameter
-*/
-struct ast *start_parse(char *script, size_t size);
-
-/**
 ** @brief               Parsing an input (cf sh_grammar.txt)
 */
 struct ast *parse_input();

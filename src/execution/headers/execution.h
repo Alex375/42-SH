@@ -7,6 +7,7 @@
 
 #include "execution.h"
 #include "xparser.h"
+#include "vars.h"
 
 /*!
  * @brief Execute a command including builtins
@@ -31,7 +32,7 @@ int exec_pipe(struct ast *left, struct ast *right);
  * @param listRedir List of redirections to be apply
  * @return          Return the exit code of the executed ast
  */
-int exec_redirs(struct ast *ast, struct list_redir *listRedir);
+int exec_redirs(struct ast *ast, struct list_redir *listRedir, struct vars_vect *vars);
 
 /*!
  * @brief           Chained list containing infos about the current redirections

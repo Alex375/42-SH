@@ -26,12 +26,13 @@ static int is_valid_fd(int fd)
     return fcntl(fd, F_GETFL) != -1 || errno != EBADF;
 }
 
-int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
+int apply_redir(struct list_redir *redir, struct redir_info *redirInfo, struct vars_vect *vars)
 {
     char *end_ptr;
     redirInfo->io_number = strtol(redir->ionumber, &end_ptr, 10);
     int temp;
     char *flag;
+    char **word = expand_vars_vect(vars, redir->word);
     switch (redir->redir_type)
     {
     case T_REDIR_PIPE:
@@ -48,7 +49,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         flag = "wr";
         break;
     case T_REDIR_A:
-        temp = strtol(redir->word, &end_ptr, 10);
+        temp = strtol(word[0], &end_ptr, 10);
         if (*end_ptr != '\0' || temp >= 10)
         {
             fprintf(stderr, "%d Bad fd number", temp);
@@ -69,7 +70,8 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
     default:
         err(127, "Unimplemented features");
     }
-    redirInfo->file_fd = open_file(redir->word, flag);
+
+    redirInfo->file_fd = open_file(word[0], flag);
     redirInfo->temp_fd = dup(redirInfo->io_number);
     dup2(redirInfo->file_fd, redirInfo->io_number);
     return 0;
@@ -101,7 +103,7 @@ struct redir_info *append_redir(struct redir_info *redirInfo,
     return redirInfo;
 }
 
-int exec_redirs(struct ast *ast, struct list_redir *listRedir)
+int exec_redirs(struct ast *ast, struct list_redir *listRedir, struct vars_vect *vars)
 {
     struct list_redir *temp = listRedir;
     struct redir_info *redirInfo = NULL;
@@ -112,11 +114,11 @@ int exec_redirs(struct ast *ast, struct list_redir *listRedir)
         new->file_fd = -1;
         new->temp_fd = -1;
         redirInfo = append_redir(redirInfo, new);
-        if ((res = apply_redir(temp, new)) != 0)
+        if ((res = apply_redir(temp, new, vars)) != 0)
             return res;
         temp = temp->next;
     }
-    res = eval_ast(ast);
+    res = eval_ast(ast, vars);
     struct redir_info *temp2 = redirInfo;
     while (temp2)
     {

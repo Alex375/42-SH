@@ -1,5 +1,4 @@
-#include <errno.h>
-#include <stddef.h>
+#include "vector_tokens.h"
 
 #include "xalloc.h"
 #include "xparser.h"
