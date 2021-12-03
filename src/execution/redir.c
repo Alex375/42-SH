@@ -20,13 +20,13 @@ static int open_file(char *filename, char *flag)
     int fd = fileno(f);
     return fd;
 }
-int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 
 static int is_valid_fd(int fd)
 {
     return fcntl(fd, F_GETFL) != -1 || errno != EBADF;
 }
 
+int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 {
     char *end_ptr;
     redirInfo->io_number = strtol(redir->ionumber, &end_ptr, 10);

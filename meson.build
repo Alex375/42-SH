@@ -62,7 +62,7 @@ sources = [
     'src/lexer/lexer_var.c',
     'src/lexer/recognize_words.c',
     'src/lexer/lexer_command.c',
-    'src/eval_ast/eval_ast.c',
+    'src/eval_ast/eval_ast.c'
 ]
 
 includes = [
