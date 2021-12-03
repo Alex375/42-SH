@@ -5,29 +5,6 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-#define CHECK_SEG_ERROR(condition)                                             \
-    if (condition)                                                             \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define POP_TOKEN                                                              \
-    pop_token();                                                               \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define GET_TOKEN                                                              \
-    get_next_token();                                                          \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
 struct ast *parse_shell_command()
 {
     struct token_info tok =
@@ -136,8 +113,7 @@ struct ast *parse_while_until_rule(enum token tokT)
 struct ast *parse_for_rule()
 {
     char *name = NULL;
-    int cap = 8;
-    char **seq = xcalloc(cap, sizeof(char *));
+    struct tok_vect *seq = NULL;
     struct ast *statement = NULL;
 
     struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_VAR)
@@ -150,22 +126,14 @@ struct ast *parse_for_rule()
 
         if (tok.type != T_DO)
     {
-        POP_TOKEN;
+        POP_TOKEN
     }
     if (tok.type == T_IN)
     {
-        int i = 0;
-        while ((tok = get_next_token()).type == T_WORD)
-        {
-            if (i >= cap - 1)
-            {
-                cap *= 2;
-                xrecalloc(seq, cap * sizeof(char *));
-            }
-            POP_TOKEN;
-            seq[i] = xstrdup(tok.command);
-            i++;
-        }
+        seq = init_tok_vect();
+
+        while (add_word_vect(seq))
+            ;
 
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_SEMICOLON
                                         && tok.type != T_NEWLINE)

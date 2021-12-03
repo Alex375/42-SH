@@ -14,7 +14,7 @@
  * @param args      Arguments string associated with the command
  * @return          Return the exit command of the executed command
  */
-int execute(char *cmd, char **args);
+int execute(char **args);
 
 /*!
  * @brief Creating a pipeline between to ast node and execute both nodes

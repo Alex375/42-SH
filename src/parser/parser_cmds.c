@@ -5,29 +5,6 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-#define CHECK_SEG_ERROR(condition)                                             \
-    if (condition)                                                             \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define POP_TOKEN                                                              \
-    pop_token();                                                               \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define GET_TOKEN                                                              \
-    get_next_token();                                                          \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
 struct ast *parse_command()
 {
     void *ast = NULL;
@@ -116,8 +93,13 @@ void *parse_redirs(struct list_redir **redirs)
 
         tok = POP_TOKEN new_redir->redir_type = tok.type;
 
-        tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_WORD) new_redir->word =
-            xstrdup(tok.command);
+        new_redir->word = init_tok_vect();
+
+        if (!add_word_vect(new_redir->word))
+        {
+            errno = ERROR_PARSING;
+            return NULL;
+        }
 
         add_to_redir_list(redirs, new_redir);
     }
@@ -132,32 +114,16 @@ struct ast *parse_simple_command(struct list_redir **redirs)
     if (errno)
         return NULL;
 
-    struct token_info tok;
-    int cap = 8;
-    int i = 0;
-    char **cmd_arg = xcalloc(cap, sizeof(char *));
-    while ((tok = get_next_token()).type == T_WORD)
-    {
-        if (i >= cap - 1)
-        {
-            cap *= 2;
-            xrecalloc(cmd_arg, cap * sizeof(char *));
-        }
-        POP_TOKEN
-        cmd_arg[i] = xstrdup(tok.command);
+    struct tok_vect *cmd_arg = init_tok_vect();
 
+    while (add_word_vect(cmd_arg))
+    {
         parse_redirs(redirs);
         if (errno)
             return NULL;
-
-        i++;
     }
 
-    char *cmd = NULL;
-    if (i > 0)
-        cmd = xstrdup(cmd_arg[0]);
-
-    return build_s_cmd(cmd, cmd_arg, vars);
+    return build_s_cmd(cmd_arg, vars);
 }
 
 struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
@@ -178,13 +144,13 @@ struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
 
         POP_TOKEN
 
-        if ((tok = get_next_token()).type == T_VAR_VALUE)
-        {
-            new->value = xstrdup(tok.command);
-            POP_TOKEN
-        }
+        if (tok.is_space_after)
+            new->value = NULL;
         else
-            new->value = xcalloc(1, 1);
+        {
+            new->value = init_tok_vect();
+            add_word_vect(new->value);
+        }
 
         parse_redirs(redirs);
         if (errno)

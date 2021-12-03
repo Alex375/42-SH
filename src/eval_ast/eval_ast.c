@@ -21,7 +21,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
     {
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
-        res = execute(s_cmd_ast->cmd, s_cmd_ast->cmd_arg);
+        res = execute(s_cmd_ast->cmd_arg);
         return res;
     case AST_IF:
         if_ast = ast->t_ast;

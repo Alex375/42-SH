@@ -54,6 +54,7 @@ struct token_info
 {
     enum token type;
     char *command;
+    char is_space_after;
 };
 
 #endif // INC_42_SH_TOKENS_H

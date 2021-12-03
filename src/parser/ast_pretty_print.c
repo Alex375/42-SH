@@ -63,7 +63,7 @@ void pp_rec(struct ast *ast, int prof)
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
         tab(prof);
-        printf("COMMAND = %s ", s_cmd_ast->cmd);
+        printf("COMMAND = %s ", s_cmd_ast->cmd_arg[0]);
         int i = 1;
         while (s_cmd_ast->cmd_arg[i])
             printf("%s ", s_cmd_ast->cmd_arg[i++]);

@@ -1,0 +1,59 @@
+
+- name: simple var
+  input: |
+    a=yee
+    echo $a
+    done
+  type: success
+
+- name: simple var quote
+  input: |
+    a="yee   no"
+    echo "$a"
+    done
+  type: success
+
+- name: simple var dequote
+  input: |
+    a="yee   no"
+    echo $a
+    done
+  type: success
+
+- name: var NULL
+  input: |
+    a=
+    echo $a y
+    done
+  type: success
+
+- name: var of for
+  input: |
+    for b in 1 2   3; do
+    echo $b
+    done
+  type: success
+
+- name: var in for
+  input: |
+    a="1 2"
+    for b in $a; do
+    echo $b
+    done
+  type: success
+
+- name: var in for association
+  input: |
+    a="1 2"
+    for b in x$a   b  "$a"z; do
+    echo $b
+    done
+  type: success
+
+- name: var one word redir
+  input: |
+    a="tst oo"
+    echo 1 >$a
+    cat "tst oo"
+    rm tst oo"
+  type: success
