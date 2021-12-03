@@ -23,6 +23,34 @@
     echo "$a"
   type: success
 
+- name: double var no quote
+  input: |
+    a="yee   no"
+    b=$a
+    echo $b
+  type: success
+
+- name: double var
+  input: |
+    a="yee   no"
+    b=$a
+    echo "$b"
+  type: success
+
+- name: double var quoted inv
+  input: |
+    a="yee   no"
+    b="$a"
+    echo $b
+  type: success
+
+- name: double var quoted
+  input: |
+    a="yee   no"
+    b="$a"
+    echo "$b"
+  type: success
+
 - name: simple var dequote
   input: |
     a="yee   no"
@@ -50,7 +78,15 @@
     done
   type: success
 
-- name: var in for association
+- name: var in for association 1
+  input: |
+    a="1 2"
+    for b in x$a   b  z"$a"; do
+    echo $b
+    done
+  type: success
+
+- name: var in for association 2
   input: |
     a="1 2"
     for b in x$a   b  "$a"z; do

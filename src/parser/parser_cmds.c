@@ -40,11 +40,13 @@ static int is_chev(enum token tokT)
 
 static int err_redir()
 {
-    enum token t0 = get_next_token().type;
-    enum token t1 = look_forward_token(1).type;
-    enum token t2 = look_forward_token(2).type;
-    if ((is_chev(t0) && t1 != T_WORD)
-        || (t0 == T_IONUMBER && ((!is_chev(t1)) || t2 != T_WORD)))
+    struct token_info t0 = get_next_token();
+    struct token_info t1 = look_forward_token(1);
+    struct token_info t2 = look_forward_token(2);
+    if ((is_chev(t0.type) && !is_part_word(t1.type))
+        || (t0.type == T_IONUMBER
+            && ((!is_chev(t1.type))
+                || !is_part_word(t2.type))))
     {
         errno = ERROR_PARSING;
         return 1;
@@ -56,10 +58,7 @@ static int err_redir()
 static int is_redir()
 {
     enum token t0 = get_next_token().type;
-    enum token t1 = look_forward_token(1).type;
-    enum token t2 = look_forward_token(2).type;
-    if ((is_chev(t0) && t1 == T_WORD)
-        || (t0 == T_IONUMBER && is_chev(t1) && t2 == T_WORD))
+    if (is_chev(t0) || t0 == T_IONUMBER)
         return 1;
 
     return 0;
@@ -69,7 +68,7 @@ void *parse_redirs(struct list_redir **redirs)
 {
     while (1)
     {
-        if (err_redir() || !is_redir())
+        if (!is_redir() || err_redir())
             break;
 
         struct token_info tok = GET_TOKEN

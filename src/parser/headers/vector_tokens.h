@@ -1,12 +1,19 @@
 #ifndef INC_42_SH_VECTOR_TOKENS_H
 #define INC_42_SH_VECTOR_TOKENS_H
 
+#include "lexer.h"
+
 struct tok_vect
 {
     int len;
     int cap;
     struct token_info *list;
 };
+
+/**
+** @brief               return 1 if the token type is possibly part of a word
+*/
+int is_part_word(enum token t);
 
 /**
 ** @brief               alloc and inits the token vector

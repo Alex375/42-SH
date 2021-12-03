@@ -4,7 +4,7 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-static int is_part_word(enum token t)
+int is_part_word(enum token t)
 {
     return t == T_WORD || t == T_VAR || t == T_VAR_INQUOTE;
 }
