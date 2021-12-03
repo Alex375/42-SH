@@ -44,3 +44,5 @@ tests/integration_test/test.txt
 ya
 
 test.txt
+
+tests/integration_test/env/

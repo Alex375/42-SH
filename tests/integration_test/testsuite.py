@@ -162,17 +162,22 @@ def get_categories(category: str, reference: str) -> List[TestCategory]:
     return categlist
 
 
+def copy_binary(build_path: Path, binary: Path):
+    if os.path.exists(f"{build_path}/{binary}"):
+        shutil.copy(f"{build_path}/{binary}", "./")
+        if not os.path.exists(binary):
+            raise FileNotFoundError(
+                f"Tried to copy file but {binary.absolute()} not found")
+    else:
+        print(f"{termcolor.colored(f'Could found binary at {build_path}/{binary}', 'red')}")
+
+
 def build_binary(binary: Path, build_path: Path):
     print(termcolor.colored("Building binary", 'blue'))
     os.system(f"cd {build_path} ; make {binary}")
     print(termcolor.colored("Done binary", 'blue'))
 
     print(termcolor.colored("Copying binary to test directory", 'blue'))
-    if os.path.exists(f"{build_path}/{binary}"):
-        shutil.copy(f"{build_path}/{binary}", "./")
-        if not os.path.exists(binary):
-            raise FileNotFoundError(
-                f"Tried to copy file but {binary.absolute()} not found")
 
 
 if __name__ == "__main__":
@@ -182,13 +187,17 @@ if __name__ == "__main__":
     parser.add_argument("--reference", required=False, type=str, default="dash")
     parser.add_argument("--builddir", required=False, type=Path,
                         default="../../cmake-build-debug")
+    parser.add_argument("--no_compile", required=False, action='store_true')
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
     ref = args.reference
     build_dir = args.builddir
+    no_compile = args.no_compile
+    if not no_compile:
+        build_binary(args.binary, build_dir)
 
-    build_binary(args.binary, build_dir)
+    copy_binary(build_dir, args.binary)
 
     categories: List[TestCategory] = get_categories(args.category, ref)
 
