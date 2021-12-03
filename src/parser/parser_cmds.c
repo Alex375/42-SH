@@ -141,7 +141,7 @@ struct ast *parse_simple_command(struct list_redir **redirs)
         if (i >= cap - 1)
         {
             cap *= 2;
-            xrecalloc(cmd_arg, cap * sizeof(char *));
+            cmd_arg = xrecalloc(cmd_arg, cap * sizeof(char *));
         }
         POP_TOKEN
         cmd_arg[i] = xstrdup(tok.command);

@@ -160,7 +160,7 @@ struct ast *parse_for_rule()
             if (i >= cap - 1)
             {
                 cap *= 2;
-                xrecalloc(seq, cap * sizeof(char *));
+                seq = xrecalloc(seq, cap * sizeof(char *));
             }
             POP_TOKEN;
             seq[i] = xstrdup(tok.command);

@@ -21,6 +21,7 @@ file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_as
 if (APPLE)
     include_directories(src/xfnmatch)
     add_executable(42SH ${SRC} src/main.c src/xfnmatch/xfnmatch.c)
+    target_link_libraries(42SH PRIVATE -fsanitize=address)
 else()
     add_executable(42SH ${SRC} src/main.c)
     target_link_libraries(42SH PRIVATE -fsanitize=address)
