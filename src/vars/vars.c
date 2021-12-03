@@ -44,3 +44,18 @@ void add_var(struct vars_vect *vars, char *name, char *value)
 
     vars->len++;
 }
+
+char *get_var(struct vars_vect *vars, char *name)
+{
+    int pos = 0;
+    for (; pos < vars->len; ++pos)
+    {
+        if (!strcmp(vars->vars[pos].name, name))
+            break;
+    }
+
+    if (pos != vars->len)
+        return vars->vars[pos].value;
+    else
+        return "";
+}

@@ -20,6 +20,8 @@ struct vars_vect *init_vars_vect();
 
 void add_var(struct vars_vect *vars, char *name, char *value);
 
+char *get_var(struct vars_vect *vars, char *name);
+
 //////////////////
 
 char **expand_vars_vect(struct vars_vect *vars, struct tok_vect *tok_vect);
