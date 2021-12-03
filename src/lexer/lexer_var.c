@@ -1,5 +1,4 @@
 #include "lexer.h"
-#include <ctype.h>
 
 int is_valid_var(const char *string)
 {
@@ -36,6 +35,8 @@ struct token_info lex_var(struct token_info res, struct string *string)
     else if (string->size != 0)
     {
         res.type = T_VAR;
+        if (g_lexer_info.last_soft == IN_DQUOTE)
+            res.type = T_VAR_INQUOTE;
     }
     size_t size = string->size;
     res.command = string_get(string);

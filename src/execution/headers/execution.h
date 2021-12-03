@@ -6,17 +6,7 @@
 #define INC_42_SH_EXECUTION_H
 
 #include "execution.h"
-#include "parser.h"
-
-/*!
- * @brief Pipelin struct containing infos on pipline and redir
- * @param out State param of the pipeline
- * @param fd  File descriptors arrays for (piped if currently use)
- */
-struct pipeline
-{
-    int fd[2];
-};
+#include "xparser.h"
 
 /*!
  * @brief Execute a command including builtins

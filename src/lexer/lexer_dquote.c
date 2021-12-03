@@ -1,7 +1,8 @@
-#include "lexer.h"
 #include <ctype.h>
 
-int look_ahead_dquote(const char* script, size_t size)
+#include "lexer.h"
+
+int look_ahead_dquote(const char *script, size_t size)
 {
     size_t i = g_lexer_info.pos;
 
@@ -13,7 +14,6 @@ int look_ahead_dquote(const char* script, size_t size)
     {
         return 0;
     }
-
 
     if (i > size)
         return 0;

@@ -5,8 +5,52 @@
     rm test.txt
   type: success
 
+
+- name: Simple redir 2
+  input: |
+    echo coucou 3> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir high fd
+  input: |
+    echo coucou 10> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir higher fd
+  input: |
+    echo coucou 11> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir very high fd
+  input: |
+    echo coucou 1100> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir bad fd
+  input: |
+    echo coucou fzer> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir exit
+  input: exit 3 > test.txt ; echo coucou ; rm test.txt
+  type: success
+
 - name: Simple redir input
-  input: cat < requierments.txt
+  input: cat < testsuite.py
+  type: success
+
+- name: Simple redir input fd
+  input: 1< testsuite.py
   type: success
 
 - name: Simple redir input
@@ -31,3 +75,104 @@
     rm test.txt
   type: success
 
+- name: Simple redir with append redir
+  input: |
+    echo coucou > test.txt
+    cat test.txt
+    echo coucou2 >> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Redir append no file
+  input: |
+    echo coucou2 >> test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Redir file d
+  input: echo coucou2 >&2
+  type: success
+
+- name: Redir bad fd number
+  input: |
+    echo coucou2 >&te
+    ls
+  type: failed
+
+- name: Redir bad fd number file exist
+  input: |
+    touch test.txt
+    echo coucou >&test.txt
+    cat test.txt
+  type: failed
+
+- name: Remove file
+  input: rm -f test.txt
+  type: success
+
+- name: Redir bad file descriptor number
+  input: echo coucou2 >&5
+  type: failed
+
+- name: Redir bad file descriptor number
+  input: echo coucou2 >&3
+  type: failed
+
+- name: Redir bad file descriptor number command
+  input: |
+    echo coucou2 >&5
+    ls
+  type: failed
+
+- name: Simple redir pipe
+  input: |
+    echo coucou >| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+
+- name: Simple redir 2 pipe
+  input: |
+    echo coucou 3>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir high fd pipe
+  input: |
+    echo coucou 10>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir higher fd pipe
+  input: |
+    echo coucou 11>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir very high fd pipe
+  input: |
+    echo coucou 1100>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir bad fd pipe
+  input: |
+    echo coucou fzer>| test.txt
+    cat test.txt
+    rm test.txt
+  type: success
+
+- name: Simple redir exit pipe
+  input: exit 3 >| test.txt ; echo coucou ; rm test.txt
+  type: success
+
+- name: Redir quote in fd
+  input: "echo coucou >&'"
+  type: failed

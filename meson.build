@@ -5,7 +5,8 @@ project(
     version: 'dev',
     default_options: [
         'c_std=c99',
-        'warning_level=3'
+        'warning_level=3',
+        'werror=true'
     ],
 )
 
@@ -20,10 +21,12 @@ sources = [
 
     'src/execution/execution.c',
     'src/execution/pipe.c',
+    'src/execution/redir.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
     'src/builtins/builtins_dispatch.c',
     'src/builtins/echo.c',
+    'src/builtins/exit.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',
@@ -67,11 +70,3 @@ includes = [
 #42SH binary
 sh_sources = sources + ['src/main.c']
 sh_bin = executable('42sh', sh_sources, include_directories: includes)
-
-#criterion depencie
-criterion_dep = gcc.find_library('criterion')
-
-#Test lexer binary
-test_lexer_sources = sources + ['tests/unit_tests/lexer_test.c']
-test_lexer_bin = executable('test_lexer', test_lexer_sources, include_directories: includes, dependencies: criterion_dep)
-

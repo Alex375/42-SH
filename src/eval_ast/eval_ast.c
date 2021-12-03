@@ -1,5 +1,7 @@
 #include "eval_ast.h"
+
 #include <err.h>
+
 #include "execution.h"
 
 int eval_ast(struct ast *ast) // TODO alloc pipline with null
@@ -32,14 +34,13 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
     case AST_UNTIL:
         b_ast = ast->t_ast;
         while ((ast->type == AST_UNTIL && eval_ast(b_ast->left))
-                || (ast->type == AST_WHILE
-                    && eval_ast(b_ast->left) == 0))
+               || (ast->type == AST_WHILE && eval_ast(b_ast->left) == 0))
             res = eval_ast(b_ast->right);
 
         return res;
     case AST_FOR:
         for_ast = ast->t_ast;
-        //TODO set var name to for_ast->seq[i] inside for line
+        // TODO set var name to for_ast->seq[i] inside for line
         for (int i = 0; for_ast->seq[i]; ++i)
         {
             res = eval_ast(for_ast->statement);
@@ -63,12 +64,10 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         return !eval_ast(ast->t_ast);
     case AST_AND:
         b_ast = ast->t_ast;
-        return eval_ast(b_ast->left)
-            || eval_ast(b_ast->right);
+        return eval_ast(b_ast->left) || eval_ast(b_ast->right);
     case AST_OR:
         b_ast = ast->t_ast;
-        return eval_ast(b_ast->left)
-            && eval_ast(b_ast->right);
+        return eval_ast(b_ast->left) && eval_ast(b_ast->right);
     case AST_BRACKET:
         return 0;
     case AST_PARENTH:
@@ -78,6 +77,8 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         // TODO exec redirs
         return exec_redirs(cmd->ast, cmd->redirs);
     default:
-        errx(1, "Mettez un default svp ça fait crash cmake ok | j'ai mis un default");
+        errx(1,
+             "Mettez un default svp ça fait crash cmake ok | j'ai mis un "
+             "default");
     }
 }

@@ -77,6 +77,8 @@ int echo(char **args)
     }
     if (new_s->size > 0 && new_s->data[new_s->size - 1] == ' ')
         new_s->data[new_s->size - 1] = (flag_n) ? '\0' : '\n';
+    if (new_s->size == 0 && !flag_n)
+        string_append(new_s, '\n');
     printf("%s", new_s->data);
     fflush(stdout);
     string_free(new_s);

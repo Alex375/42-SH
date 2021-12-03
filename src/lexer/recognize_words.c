@@ -1,5 +1,6 @@
 
 #include <string.h>
+
 #include "lexer.h"
 
 struct words_converter converter = {
@@ -66,10 +67,8 @@ enum token tokenify(const char *token_str)
     return i;
 }
 
-
 int check_special(struct string *accumulator, char next_char)
 {
-
     if (g_lexer_info.var_context == IN_VAR && !is_valid_var(accumulator->data))
     {
         accumulator->size--;
@@ -78,9 +77,10 @@ int check_special(struct string *accumulator, char next_char)
         return 1;
     }
 
-    if (g_lexer_info.soft_expansion == IN_DQUOTE && g_lexer_info.exp_context == IN_ESCAPE_EXP)
+    if (g_lexer_info.soft_expansion == IN_DQUOTE
+        && g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
-        char next[2] = { next_char, 0} ;
+        char next[2] = { next_char, 0 };
         if (fnmatch("[$\\\"`]", next, FNM_EXTMATCH) == 0)
         {
             accumulator->size--;
@@ -88,7 +88,9 @@ int check_special(struct string *accumulator, char next_char)
         }
     }
 
-    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT && g_lexer_info.exp_context == GENERAL_EXP_HARD)
+    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT
+        && g_lexer_info.exp_context == GENERAL_EXP_HARD
+        && g_lexer_info.word_context == GENERAL)
     {
         if (fnmatch("+([a-zA-Z0-9_])=", accumulator->data, FNM_EXTMATCH) == 0)
         {
@@ -97,9 +99,8 @@ int check_special(struct string *accumulator, char next_char)
         }
     }
 
-
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD
-        || g_lexer_info.last_exp_context == IN_ESCAPE_EXP
+        || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
         || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
     {
         return 0;

@@ -33,10 +33,6 @@
   input: if [ 1 -ne 0 ]; then echo coucou; else echo done; fi
   type: success
 
-- name: Pipe
-  input: echo hallo | tr a e
-  type: success
-
 - name: Multiple pipe
   input: echo hallo | tr a e | tr l k | cat -e
   type: success
