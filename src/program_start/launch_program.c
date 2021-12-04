@@ -10,29 +10,6 @@
 
 struct options *opt = NULL;
 
-int launch_script(void)
-{
-    if (opt->nb_script == 0)
-        return -1;
-    size_t size;
-    char *temp = read_script(opt->scripts[0], &size);
-    if (opt->verbose)
-        printf("Executing script \n%s\n-_-_-_-_-_-_-_-_-_-_-_-_-_\n\n", temp);
-
-    int res = exec_script(temp, size);
-    xfree(temp);
-    return res;
-}
-
-int launch_command(void)
-{
-    if (opt->nb_command == 0)
-        return -1;
-    if (opt->verbose)
-        printf("Executing command \n\'%s\'\n", opt->commands[0]);
-    return exec_script(opt->commands[0], strlen(opt->commands[0]));
-}
-
 char *read_stdin(void)
 {
     char *buffer = xcalloc(1, 2049);
@@ -54,24 +31,33 @@ char *read_stdin(void)
 int launch_program(int argc, char **argv)
 {
     opt = xcalloc(1, sizeof(struct options));
-    get_option(opt, argc, argv);
+
+    int prog_index = preparseopt(argc, argv);
+    char **options = dupplicate(prog_index, argv);
+    get_option(opt, prog_index, options);
     if (opt->help)
     {
         print_usage();
         return 0;
     }
 
-    int res = launch_script();
-    if (res == -1)
-        res = launch_command();
 
-    if (res == -1)
+    if (opt->script == NULL && prog_index < argc)
     {
-        char *read = read_stdin();
-        if (opt->verbose)
-            printf("Executing command \n\'%s\'\n", read);
-        res = exec_script(read, strlen(read));
+        opt->script = read_script(argv[prog_index]);
+        opt->argv = argv + prog_index;
+        opt->argc = argc - prog_index;
     }
+
+    if (opt->script == NULL)
+    {
+        opt->argv = argv;
+        opt->argc = 1;
+        opt->script = read_stdin();
+    }
+    if (opt->verbose)
+        printf("Executing command \n\'%s\'\n", opt->script);
+    int res = exec_script(opt->script, strlen(opt->script));
     xfree_all();
     return res;
 }
