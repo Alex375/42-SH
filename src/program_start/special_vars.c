@@ -29,7 +29,7 @@ void set_special_vars(int argc, char **argv)
 
     set_at_star_n(argc, argv);
 
-    set_var_int("#", argc);
+    set_var_int("#", argc - 1);
 
     add_var("RANDOM", "0");
 

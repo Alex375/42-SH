@@ -8,11 +8,13 @@
 #include "xalloc.h"
 #include "xparser.h"
 #include "vars.h"
+#include "special_vars.h"
 
 extern struct options *opt;
 
 int exec_script(char *script, size_t size)
 {
+    set_special_vars(opt->argc, opt->argv);
     struct ast *ast;
     errno = 0;
 

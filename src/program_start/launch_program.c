@@ -8,7 +8,6 @@
 #include "options.h"
 #include "read_script.h"
 #include "vars.h"
-#include "special_vars.h"
 
 struct options *opt = NULL;
 struct vars_vect *vars = NULL;
