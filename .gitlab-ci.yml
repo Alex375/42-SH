@@ -4,13 +4,13 @@ default:
   image: registry.cri.epita.fr/cri/infrastructure/nixpie/nixos-pie
   before_script:
     - mkdir -p /tmp /var/tmp
-    - meson setup builddir
+    - meson setup -Ddoc=true builddir
 
 stages:
   - build
   - test
   - qa
-  #- doc
+  - doc
 
 build:
   stage: build
@@ -43,12 +43,12 @@ clang-format:
     expose_as: clang-format diff
     when: on_failure
 
-#doc:
-#  stage: doc
-#  needs: []
-#  script:
-#    - meson compile -C builddir doxygen_doc
-#  artifacts:
-#    paths:
-#      - builddir/doxygen_doc
-#    expose_as: documentation
+doc:
+  stage: doc
+  needs: []
+  script:
+    - meson compile -C builddir doxygen_doc
+  artifacts:
+    paths:
+      - builddir/doxygen_doc
+    expose_as: documentation
