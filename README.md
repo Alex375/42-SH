@@ -22,7 +22,7 @@ $ source env/bin/activate
   - Then run :
 ```sh
 $ cd tests/integration_test
-$ pip install -r requierments.txt 
+$ pip install -r requirements.txt 
 ```
 Your virtual environment is now setup to run the testsuite.
 

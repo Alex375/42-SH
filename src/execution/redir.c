@@ -23,7 +23,7 @@ static int open_file(char *filename, char *flag)
 
 static int is_valid_fd(int fd)
 {
-    return fcntl(fd, F_GETFL) != -1 || errno != EBADF;
+    return fcntl(fd, F_GETFL) != -1 && errno != EBADF;
 }
 
 int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
@@ -59,11 +59,16 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         if (!is_valid_fd(temp))
         {
             fprintf(stderr, "%d Bad fd number", temp);
-            xfree_all();
             return 2;
         }
         redirInfo->temp_fd = dup(redirInfo->io_number);
-        dup2(temp, redirInfo->io_number);
+
+        if (redirInfo->temp_fd == -1 || dup2(temp, redirInfo->io_number) == -1)
+        {
+            fprintf(stderr, "%d Bad fd number", temp);
+            return 2;
+        }
+        fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
         return 0;
 
 
@@ -74,6 +79,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
     redirInfo->file_fd = open_file(word[0], flag);
     redirInfo->temp_fd = dup(redirInfo->io_number);
     dup2(redirInfo->file_fd, redirInfo->io_number);
+    fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
     return 0;
 }
 

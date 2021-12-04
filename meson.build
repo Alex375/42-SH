@@ -74,4 +74,3 @@ includes = [
 #42SH binary
 sh_sources = sources + ['src/main.c']
 sh_bin = executable('42sh', sh_sources, include_directories: includes)
-

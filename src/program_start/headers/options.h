@@ -9,25 +9,21 @@
 
 /**
 ** @brief                   Struct representing the arguments of the program
-** @param nb_command        Number of commands if commands option is active (0
-* otherwise)
-** @param command           List of commands if option is active (NULL
-* otherwise)
 ** @param print             True if print is active
 ** @param help              True if help is active
 ** @param verbose           True if verbose is active
-** @param nb_script         Number of scripts files passed as arguments
-** @param scripts           List of script file
+** @param script            Script to be executed (string NULL terminated)
+** @param argc              Argument count of the script (including argv[0])
+** @param argv              List of argument for the script (containing argv[0])
 */
 struct options
 {
-    size_t nb_command;
-    char **commands;
     int print;
     int help;
     int verbose;
-    size_t nb_script;
-    char **scripts;
+    char *script;
+    int argc;
+    char **argv;
 };
 
 /**
@@ -40,6 +36,22 @@ void print_usage(void);
 ** @param argc              Program argc
 ** @param argv              Program argv
 */
-int get_option(struct options *options, int argc, char **argv);
+void get_option(struct options *options, int argc, char **argv);
+
+/*!
+ * @brief Pre parsing for option
+ * @param argc Argc of the program
+ * @param argv Argv of the program
+ * @return Return the index ending the option part
+ */
+int preparseopt(int argc, char **argv);
+
+/*!
+ * @brief Duplicate an array
+ * @param argc argc
+ * @param argv argv
+ * @return Return the duplicated array (dynamically xallocated)
+ */
+char **dupplicate(int argc, char **argv);
 
 #endif // INC_42_SH_OPTIONS_H

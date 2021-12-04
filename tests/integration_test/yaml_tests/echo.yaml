@@ -69,3 +69,11 @@
 - name: Echo escape
   input: "echo 'ceci est un escape : \\'"
   type: success
+
+- name: Echo empty
+  input: echo
+  type: success
+
+- name: Echo empty -n
+  input: echo -n
+  type: success
