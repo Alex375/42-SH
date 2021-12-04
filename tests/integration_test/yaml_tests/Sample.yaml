@@ -2,6 +2,10 @@
   input: echo coucou
   type: success
 
+- name: Basic script args
+  arguments: ../../debug.sh arg1 arg2
+  type: success
+
 - name: Bad command
   input: bad bad bad
   checks: exitcode stdout err_msg

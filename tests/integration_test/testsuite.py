@@ -26,11 +26,11 @@ KO_TAG = f"[ {termcolor.colored('KO', 'red')} ]"
 @dataclass
 class TestCase:
     name: str
-    input: str
-    type: str = field(
-        default_factory=lambda: "")
+    input: str = field(default_factory=lambda: "")
+    type: str = field(default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
+    arguments: str = field(default_factory=lambda: "")
 
 
 @dataclass
@@ -82,8 +82,11 @@ def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
     return res
 
 
-def run_shell(shell: str, stdin: str) -> sp.CompletedProcess:
-    return sp.run([shell], input=stdin, capture_output=True, text=True)
+def run_shell(shell: str, stdin: str, arguments: str) -> sp.CompletedProcess:
+    progargs = []
+    if len(arguments) > 0:
+        progargs = arguments.split(' ')
+    return sp.run([shell] + progargs, input=stdin, capture_output=True, text=True)
 
 
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
@@ -229,8 +232,8 @@ if __name__ == "__main__":
                 else:
                     check = test_types[testcase.type]
                 with timeout(1):
-                    dash_proc = run_shell(categ.reference, stdin)
-                    sh_proc = run_shell(binary_path, stdin)
+                    dash_proc = run_shell(categ.reference, stdin, testcase.arguments)
+                    sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_repport = perform_checks(dash_proc, sh_proc,
                                                   check)
             except Exception as err:
@@ -241,14 +244,13 @@ if __name__ == "__main__":
                     print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
                 else:
                     print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith arguments : '{stdin}'\n{err}\n")
+                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments : '{testcase.arguments}'\nInput '{stdin}'\n{err}\n")
             else:
                 if len(test_repport) == 0:
                     passed += 1
                     print(f"{OK_TAG} {categ.name} - {name}")
                 else:
                     failed += 1
-                    print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith arguments : '{stdin}'\n{test_repport}\n")
+                    print(f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
     end_time = time.perf_counter()
     print_summary(passed, failed, start_time, end_time)
