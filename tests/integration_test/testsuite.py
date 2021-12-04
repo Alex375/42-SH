@@ -26,11 +26,11 @@ KO_TAG = f"[ {termcolor.colored('KO', 'red')} ]"
 @dataclass
 class TestCase:
     name: str
-    input: str
-    type: str = field(
-        default_factory=lambda: "")
+    input: str = field(default_factory=lambda: "")
+    type: str = field(default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
+    arguments: str = field(default_factory=lambda: "")
 
 
 @dataclass
@@ -82,8 +82,11 @@ def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
     return res
 
 
-def run_shell(shell: str, stdin: str) -> sp.CompletedProcess:
-    return sp.run([shell], input=stdin, capture_output=True, text=True)
+def run_shell(shell: str, stdin: str, arguments: str) -> sp.CompletedProcess:
+    progargs = []
+    if len(arguments) > 0:
+        progargs = arguments.split(' ')
+    return sp.run([shell] + progargs, input=stdin, capture_output=True, text=True)
 
 
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
@@ -162,17 +165,22 @@ def get_categories(category: str, reference: str) -> List[TestCategory]:
     return categlist
 
 
+def copy_binary(build_path: Path, binary: Path):
+    if os.path.exists(f"{build_path}/{binary}"):
+        shutil.copy(f"{build_path}/{binary}", "./")
+        if not os.path.exists(binary):
+            raise FileNotFoundError(
+                f"Tried to copy file but {binary.absolute()} not found")
+    else:
+        print(f"{termcolor.colored(f'Could found binary at {build_path}/{binary}', 'red')}")
+
+
 def build_binary(binary: Path, build_path: Path):
     print(termcolor.colored("Building binary", 'blue'))
     os.system(f"cd {build_path} ; make {binary}")
     print(termcolor.colored("Done binary", 'blue'))
 
     print(termcolor.colored("Copying binary to test directory", 'blue'))
-    if os.path.exists(f"{build_path}/{binary}"):
-        shutil.copy(f"{build_path}/{binary}", "./")
-        if not os.path.exists(binary):
-            raise FileNotFoundError(
-                f"Tried to copy file but {binary.absolute()} not found")
 
 
 if __name__ == "__main__":
@@ -182,13 +190,17 @@ if __name__ == "__main__":
     parser.add_argument("--reference", required=False, type=str, default="dash")
     parser.add_argument("--builddir", required=False, type=Path,
                         default="../../cmake-build-debug")
+    parser.add_argument("--no_compile", required=False, action='store_true')
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
     ref = args.reference
     build_dir = args.builddir
+    no_compile = args.no_compile
+    if not no_compile:
+        build_binary(args.binary, build_dir)
 
-    build_binary(args.binary, build_dir)
+    copy_binary(build_dir, args.binary)
 
     categories: List[TestCategory] = get_categories(args.category, ref)
 
@@ -220,8 +232,8 @@ if __name__ == "__main__":
                 else:
                     check = test_types[testcase.type]
                 with timeout(1):
-                    dash_proc = run_shell(categ.reference, stdin)
-                    sh_proc = run_shell(binary_path, stdin)
+                    dash_proc = run_shell(categ.reference, stdin, testcase.arguments)
+                    sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_repport = perform_checks(dash_proc, sh_proc,
                                                   check)
             except Exception as err:
@@ -232,14 +244,13 @@ if __name__ == "__main__":
                     print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
                 else:
                     print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith arguments : '{stdin}'\n{err}\n")
+                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments : '{testcase.arguments}'\nInput '{stdin}'\n{err}\n")
             else:
                 if len(test_repport) == 0:
                     passed += 1
                     print(f"{OK_TAG} {categ.name} - {name}")
                 else:
                     failed += 1
-                    print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith arguments : '{stdin}'\n{test_repport}\n")
+                    print(f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
     end_time = time.perf_counter()
     print_summary(passed, failed, start_time, end_time)

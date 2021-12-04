@@ -1,3 +1,6 @@
+- name: Empty test
+  type: success
+
 - name: Empty echo
   input: "echo"
   type: success
