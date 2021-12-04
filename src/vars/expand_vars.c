@@ -6,6 +6,36 @@
 #include "xstrdup.h"
 #include "xstring.h"
 
+char *my_strsep(char *copy, char *ifs, int nb_strtok)
+{
+    const char *whitespace = " \t\n";
+    int wh_sp_present[3] = { 0, 0, 0 };
+    for (int i = 0; ifs[i]; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            if (ifs[i] == whitespace[j] && !wh_sp_present[j])
+                wh_sp_present[j] = 1;
+        }
+    }
+
+    char **cpp = &copy;
+
+    char *w = NULL;
+    for (int j = 0; j < nb_strtok + 1; ++j)
+    {
+        while (*cpp && ((wh_sp_present[0] && *cpp[0] == ' ')
+               || (wh_sp_present[1] && *cpp[0] == '\t')
+               || (wh_sp_present[2] && *cpp[0] == '\n')))
+        {
+            (*cpp)++;
+        }
+        w = strsep(cpp, ifs);
+    }
+
+    return w;
+}
+
 char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok)
 {
     struct string *res = string_create();
@@ -26,17 +56,15 @@ char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok)
                 string_concat(res, var_value);
             else
             {
-                char *w = strtok(xstrdup(var_value), get_var("IFS"));
+                char *w =
+                    my_strsep(xstrdup(var_value), get_var("IFS"), *nb_strtok);
 
-                for (int j = 0; j < *nb_strtok; ++j)
-                {
-                    w = strtok(NULL, get_var("IFS"));
-                }
                 if (w)
                 {
                     string_concat(res, w);
                     (*nb_strtok)++;
-                    if (strtok(NULL, get_var("IFS")))
+                    if (my_strsep(xstrdup(var_value), get_var("IFS"),
+                                  *nb_strtok))
                         break;
                 }
                 (*nb_strtok) = 0;

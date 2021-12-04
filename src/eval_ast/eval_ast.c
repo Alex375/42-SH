@@ -4,6 +4,11 @@
 
 #include "execution.h"
 
+#define RETURN(val)   \
+    res = val;\
+    set_var_int("?", res);                                                     \
+    return res;
+
 int eval_ast(struct ast *ast) // TODO alloc pipline with null
 {
     if (!ast)
@@ -35,14 +40,14 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         }
         else
             res = execute(cmd_arg);
-        return res;
+        RETURN(res)
     case AST_IF:
         if_ast = ast->t_ast;
         if (eval_ast(if_ast->condition) == 0)
             res = eval_ast(if_ast->true_c);
         else
             res = eval_ast(if_ast->false_c);
-        return res;
+        RETURN(res)
     case AST_WHILE:
     case AST_UNTIL:
         b_ast = ast->t_ast;
@@ -50,7 +55,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
                || (ast->type == AST_WHILE && eval_ast(b_ast->left) == 0))
             res = eval_ast(b_ast->right);
 
-        return res;
+        RETURN(res)
     case AST_FOR:
         for_ast = ast->t_ast;
         char **seq = expand_vars_vect(for_ast->seq);
@@ -60,35 +65,35 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
             res = eval_ast(for_ast->statement);
         }
 
-        return res;
+        RETURN(res)
     case AST_CASE:
-        return 0;
+        RETURN(0)
     case AST_PIPE:
         b_ast = ast->t_ast;
-        return exec_pipe(b_ast->left, b_ast->right);
+        RETURN(exec_pipe(b_ast->left, b_ast->right))
     case AST_REDIR:
-        return 0;
+        RETURN(0)
     case AST_FUNC:
-        return 0;
+        RETURN(0)
     case AST_LIST:
         b_ast = ast->t_ast;
         eval_ast(b_ast->left);
-        return eval_ast(b_ast->right);
+        RETURN(eval_ast(b_ast->right))
     case AST_NOT:
-        return !eval_ast(ast->t_ast);
+        RETURN(!eval_ast(ast->t_ast))
     case AST_AND:
         b_ast = ast->t_ast;
-        return eval_ast(b_ast->left) || eval_ast(b_ast->right);
+        RETURN(eval_ast(b_ast->left) || eval_ast(b_ast->right))
     case AST_OR:
         b_ast = ast->t_ast;
-        return eval_ast(b_ast->left) && eval_ast(b_ast->right);
+        RETURN(eval_ast(b_ast->left) && eval_ast(b_ast->right))
     case AST_BRACKET:
-        return 0;
+        RETURN(0)
     case AST_PARENTH:
-        return 0;
+        RETURN(0)
     case AST_CMD:
         cmd = ast->t_ast;
-        return exec_redirs(cmd->ast, cmd->redirs);
+        RETURN(exec_redirs(cmd->ast, cmd->redirs))
     default:
         errx(1,
              "Mettez un default svp ça fait crash cmake ok | j'ai mis un "

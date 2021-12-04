@@ -101,3 +101,25 @@
     cat "tst oo"
     rm "tst oo"
   type: success
+
+- name: var IFS spliting
+  input: |
+    a="1bbbbbb2"
+    IFS="b";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var oldpwd
+  input: |
+    echo $OLDPWD
+  type: success
+
+- name: var return value
+  input: |
+    echo a
+    echo $?
+    false
+    echo $?
+  type: success

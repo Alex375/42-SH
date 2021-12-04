@@ -27,6 +27,12 @@ struct vars_vect *init_vars_vect();
 void add_var(char *name, char *value);
 
 /**
+** @brief               add a variable to the global variable vars casting the
+ *                      int to a char
+*/
+void set_var_int(char *name, long value);
+
+/**
 ** @brief               gets value of a variable in the global variable vars
  *                      if name does not exist, it returns "";
 */

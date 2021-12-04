@@ -51,6 +51,14 @@ void add_var(char *name, char *value)
     vars->len++;
 }
 
+void set_var_int(char *name, long value)
+{
+    char *str = xcalloc(16, sizeof(char));
+    sprintf(str,"%ld",value);
+    add_var(name, str);
+    xfree(str);
+}
+
 char *get_var(char *name)
 {
     if (!strcmp("RANDOM", name))

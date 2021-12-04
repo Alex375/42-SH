@@ -4,6 +4,8 @@
 #include "xalloc.h"
 
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 void set_at_star_n(int argc, char **argv)
 {
@@ -21,20 +23,19 @@ void set_at_star_n(int argc, char **argv)
 
 void set_special_vars(int argc, char **argv)
 {
-
     add_var("?", "0");
-    add_var("$", "0");
+
+    set_var_int("$", geteuid());
 
     set_at_star_n(argc, argv);
 
-    char *str = xcalloc(16, sizeof(char));
-    sprintf(str,"%d",argc);
-    add_var("#", str);
-    xfree(str);
+    set_var_int("#", argc);
 
     add_var("RANDOM", "0");
-    add_var("UID", "0");
-    add_var("OLDPWD", "0");
-    add_var("IFS", " \t\n");
 
+    set_var_int("UID", getpid());
+
+    add_var("OLDPWD", getenv("OLDPWD"));
+
+    add_var("IFS", " \t\n");
 }
