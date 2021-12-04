@@ -26,17 +26,17 @@ char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok)
                 string_concat(res, var_value);
             else
             {
-                char *w = strtok(xstrdup(var_value), " \t\n\r");
+                char *w = strtok(xstrdup(var_value), get_var("IFS"));
 
                 for (int j = 0; j < *nb_strtok; ++j)
                 {
-                    w = strtok(NULL, " \t\n\r");
+                    w = strtok(NULL, get_var("IFS"));
                 }
                 if (w)
                 {
                     string_concat(res, w);
                     (*nb_strtok)++;
-                    if (strtok(NULL, " \t\n\r"))
+                    if (strtok(NULL, get_var("IFS")))
                         break;
                 }
                 (*nb_strtok) = 0;

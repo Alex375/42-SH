@@ -1,6 +1,10 @@
 #include "vars.h"
 
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
+#include "stdio.h"
+
 
 #include "xalloc.h"
 #include "xparser.h"
@@ -49,6 +53,15 @@ void add_var(char *name, char *value)
 
 char *get_var(char *name)
 {
+    if (!strcmp("RANDOM", name))
+    {
+        srand(time(NULL));
+        int r = rand() % 32768;
+        char *str = xcalloc(16, sizeof(char));
+        sprintf(str,"%d",r);
+        return str;
+    }
+
     int pos = 0;
     for (; pos < vars->len; ++pos)
     {

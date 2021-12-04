@@ -38,6 +38,7 @@ sources = [
     'src/program_start/options.c',
     'src/program_start/read_script.c',
     'src/program_start/launch_program.c',
+    'src/program_start/special_vars.c',
     'src/xalloc/xalloc.c',
     'src/io/xstrdup.c',
     'src/lexer/lexer_start.c',
