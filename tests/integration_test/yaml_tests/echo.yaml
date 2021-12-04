@@ -1,3 +1,6 @@
+- name: Empty test
+  type: success
+
 - name: Simple echo
   input: echo coucou
   type: success
