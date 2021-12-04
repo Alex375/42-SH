@@ -16,8 +16,6 @@ int exec_script(char *script, size_t size)
     struct ast *ast;
     errno = 0;
 
-    struct vars_vect *vars = init_vars_vect();
-
     int res = 0;
 
     lexer_start(script, size);
@@ -37,7 +35,7 @@ int exec_script(char *script, size_t size)
             break;
         }
         else if (ast)
-            res = eval_ast(ast, vars);
+            res = eval_ast(ast);
     }
     lexer_reset();
     return res;

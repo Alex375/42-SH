@@ -1,10 +1,16 @@
 #include "vars.h"
 
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
+#include "stdio.h"
+
 
 #include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
+
+extern struct vars_vect *vars;
 
 struct vars_vect *init_vars_vect()
 {
@@ -16,7 +22,7 @@ struct vars_vect *init_vars_vect()
     return res;
 }
 
-void add_var(struct vars_vect *vars, char *name, char *value)
+void add_var(char *name, char *value)
 {
     int pos = 0;
     for (; pos < vars->len; ++pos)
@@ -36,17 +42,26 @@ void add_var(struct vars_vect *vars, char *name, char *value)
     if (vars->len >= vars->cap - 1)
     {
         vars->cap *= 2;
-        xrecalloc(vars->vars, vars->cap * sizeof(struct var));
+        vars->vars = xrecalloc(vars->vars, vars->cap * sizeof(struct var));
     }
 
     vars->vars[vars->len].name = xstrdup(name);
-    vars->vars[vars->len].name = xstrdup(value);
+    vars->vars[vars->len].value = xstrdup(value);
 
     vars->len++;
 }
 
-char *get_var(struct vars_vect *vars, char *name)
+char *get_var(char *name)
 {
+    if (!strcmp("RANDOM", name))
+    {
+        srand(time(NULL));
+        int r = rand() % 32768;
+        char *str = xcalloc(16, sizeof(char));
+        sprintf(str,"%d",r);
+        return str;
+    }
+
     int pos = 0;
     for (; pos < vars->len; ++pos)
     {

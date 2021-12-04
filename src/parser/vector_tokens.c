@@ -4,7 +4,7 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-static int is_part_word(enum token t)
+int is_part_word(enum token t)
 {
     return t == T_WORD || t == T_VAR || t == T_VAR_INQUOTE;
 }
@@ -19,7 +19,7 @@ struct tok_vect *init_tok_vect()
     return res;
 }
 
-int add_word_vect(struct tok_vect *tok_vect)
+int add_word_vect(struct tok_vect *tok_vect, int quote_word)
 {
     int added = 0;
 
@@ -31,12 +31,14 @@ int add_word_vect(struct tok_vect *tok_vect)
         if (tok_vect->len >= tok_vect->cap - 1)
         {
             tok_vect->cap *= 2;
-            xrecalloc(tok_vect->list,
+            tok_vect->list = xrecalloc(tok_vect->list,
                       tok_vect->cap * sizeof(struct token_info));
         }
         pop_token();
 
         tok_vect->list[tok_vect->len] = tok;
+        if (quote_word && tok_vect->list[tok_vect->len].type == T_VAR)
+            tok_vect->list[tok_vect->len].type = T_VAR_INQUOTE;
         tok_vect->len++;
 
         if (tok.is_space_after)
