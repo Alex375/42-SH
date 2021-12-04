@@ -980,9 +980,67 @@ Test(VAR, SPACE_DECLARATION)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
-/* int main()
+Test(VAR, HARD)
 {
-      char *script = "test=salut";
+    char *script = "\"$a\"b";
+    struct token_info expected[] = {
+        { T_VAR_INQUOTE, "a", 0 },
+        { T_WORD, "b", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
+Test(VAR, HARD3)
+{
+    char *script = "b\"$a\"";
+    struct token_info expected[] = {
+        { T_WORD, "b", 0 },
+        { T_VAR_INQUOTE, "a", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, HARD2)
+{
+    char *script = "\"b\"$a";
+    struct token_info expected[] = {
+        { T_WORD, "b", 0 },
+        { T_VAR, "a", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, HARD4)
+{
+    char *script = "$a\"b\"";
+    struct token_info expected[] = {
+        { T_VAR, "a", 0 },
+        { T_WORD, "b", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, HARD5)
+{
+    char *script = "$a$b$c\"$a\"";
+    struct token_info expected[] = {
+        { T_VAR, "a", 0 },
+        { T_VAR, "b", 0 },
+        { T_VAR, "c", 0 },
+        { T_VAR_INQUOTE, "a", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+/*int main()
+{
+    char *script = "echo \"$i < && > $test\"";
      lexer_start(script, strlen(script));
      struct token_info tk;
      while ((tk = pop_token()).type != T_EOF)

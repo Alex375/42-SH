@@ -22,7 +22,7 @@ void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
         (*cursor)++;
 }
 
-static int look_ahead(const char *script, size_t size)
+static int look_ahead(const char *script, size_t size, struct string *acu)
 {
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD)
     {
@@ -30,7 +30,7 @@ static int look_ahead(const char *script, size_t size)
     }
     else if (g_lexer_info.soft_expansion == IN_DQUOTE)
     {
-        return look_ahead_dquote(script, size);
+        return look_ahead_dquote(script, size, acu->size);
     }
     else
     {
@@ -113,7 +113,7 @@ struct token_info tokenify_next(const char *script, size_t size)
         if (check_special(accumulator, script[g_lexer_info.pos]))
             break;
 
-    } while (look_ahead(script, size));
+    } while (look_ahead(script, size, accumulator));
 
     res.is_space_after = script[g_lexer_info.pos] == ' ';
 
