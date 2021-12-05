@@ -5,25 +5,42 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
+static struct ast *O_BRKT()
+{
+    struct ast *res = parse_compound();
+
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(
+        errno == ERROR_PARSING || tok.type == T_EOF || tok.type != T_C_BRKT)
+
+        return res;
+}
+
+static struct ast *O_PRTH()
+{
+    struct ast *ast = parse_compound();
+
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(
+        errno == ERROR_PARSING || tok.type == T_EOF || tok.type != T_C_PRTH)
+
+        struct ast *res = xcalloc(1, sizeof(struct ast));
+    res->type = AST_SUBSHELL;
+    res->t_ast = ast;
+
+    return res;
+}
+
 struct ast *parse_shell_command()
 {
     struct token_info tok =
         POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
             tok.type;
 
-    struct ast *res;
     switch (baseType)
     {
     case T_O_BRKT:
+        return O_BRKT();
     case T_O_PRTH:
-        res = parse_compound();
-
-        tok = POP_TOKEN CHECK_SEG_ERROR(
-            errno == ERROR_PARSING || tok.type == T_EOF
-            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
-            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
-
-            return res;
+        return O_PRTH();
     case T_IF:
         return parse_if_rule(0);
     case T_FOR:

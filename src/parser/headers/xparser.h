@@ -17,7 +17,7 @@ enum AST_TYPE
     AST_CASE,
     AST_UNTIL,
     AST_PIPE,
-    AST_REDIR,
+    AST_SUBSHELL,
     AST_FUNC,
     AST_LIST,
     AST_NOT,

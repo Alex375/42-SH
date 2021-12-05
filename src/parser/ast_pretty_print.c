@@ -133,7 +133,10 @@ void pp_rec(struct ast *ast, int prof)
         pp_rec(binary_ast->right, prof + 1);
 
         break;
-    case AST_REDIR:
+    case AST_SUBSHELL:
+        tab(prof);
+        printf("SUBSHELL\n");
+        pp_rec(ast->t_ast, prof + 1);
         break;
     case AST_FUNC:
         break;

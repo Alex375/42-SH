@@ -71,8 +71,9 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
     case AST_PIPE:
         b_ast = ast->t_ast;
         RETURN(exec_pipe(b_ast->left, b_ast->right))
-    case AST_REDIR:
-        RETURN(0)
+    case AST_SUBSHELL:
+        //todo fork
+        RETURN(eval_ast(ast->t_ast))
     case AST_FUNC:
         RETURN(0)
     case AST_LIST:
