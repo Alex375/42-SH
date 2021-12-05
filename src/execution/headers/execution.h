@@ -49,4 +49,11 @@ struct redir_info
     struct redir_info *next;
 };
 
+/*!
+ * @brief Execut a subshell command (fork)
+ * @param ast Ast to be executed in the subshell
+ * @return Return the exitcode of the subshell command.
+ */
+int subhsell(struct ast *ast);
+
 #endif // INC_42_SH_EXECUTION_H

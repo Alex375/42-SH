@@ -9,7 +9,7 @@
     set_var_int("?", res);                                                     \
     return res;
 
-int eval_ast(struct ast *ast) // TODO alloc pipline with null
+int eval_ast(struct ast *ast)
 {
     if (!ast)
         return 0;
@@ -72,8 +72,7 @@ int eval_ast(struct ast *ast) // TODO alloc pipline with null
         b_ast = ast->t_ast;
         RETURN(exec_pipe(b_ast->left, b_ast->right))
     case AST_SUBSHELL:
-        //todo fork
-        RETURN(eval_ast(ast->t_ast))
+        RETURN(subhsell(ast))
     case AST_FUNC:
         RETURN(0)
     case AST_LIST:
