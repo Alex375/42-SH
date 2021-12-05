@@ -9,7 +9,7 @@
 
 void set_at_star_n(int argc, char **argv)
 {
-    for (int i = 0; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         char *str = xcalloc(16, sizeof(char));
         sprintf(str,"%d",i);
