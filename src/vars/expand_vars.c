@@ -1,36 +1,58 @@
-#include <string.h>
-
 #include "vars.h"
 #include "xalloc.h"
-#include "xparser.h"
 #include "xstrdup.h"
 #include "xstring.h"
+
+static int is_in(const char *arr, char c)
+{
+    int i = 0;
+    while (arr[i])
+    {
+        if (arr[i] == c)
+            return 1;
+        i++;
+    }
+
+    return 0;
+}
 
 char *my_strsep(char *copy, char *ifs, int nb_strtok)
 {
     const char *whitespace = " \t\n";
-    int wh_sp_present[3] = { 0, 0, 0 };
-    for (int i = 0; ifs[i]; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-            if (ifs[i] == whitespace[j] && !wh_sp_present[j])
-                wh_sp_present[j] = 1;
-        }
-    }
-
-    char **cpp = &copy;
 
     char *w = NULL;
     for (int j = 0; j < nb_strtok + 1; ++j)
     {
-        while (*cpp && ((wh_sp_present[0] && *cpp[0] == ' ')
-               || (wh_sp_present[1] && *cpp[0] == '\t')
-               || (wh_sp_present[2] && *cpp[0] == '\n')))
+        if (!copy || !*copy)
+            return NULL;
+        w = copy;
+        int skipped_non_wp = 0;
+
+        while (*copy)
         {
-            (*cpp)++;
+            if (is_in(ifs, *copy))
+            {
+                if (!is_in(whitespace, *copy))
+                    skipped_non_wp = 1;
+                *copy = '\0';
+                copy++;
+                break;
+            }
+            copy++;
         }
-        w = strsep(cpp, ifs);
+
+        while (*copy && is_in(ifs, *copy))
+        {
+            if (!is_in(whitespace, *copy))
+            {
+                if (!skipped_non_wp)
+                    skipped_non_wp = 1;
+                else
+                    break;
+            }
+
+            copy++;
+        }
     }
 
     return w;

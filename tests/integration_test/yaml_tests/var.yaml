@@ -104,8 +104,26 @@
 
 - name: var IFS spliting
   input: |
-    a="1bbbbbb2"
+    a="1 b2"
+    IFS=" b";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var IFS spliting 2
+  input: |
+    a="1bbb bbb bb2"
     IFS="b";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var IFS spliting 3
+  input: |
+    a=" b  1b   bb bb  bb2  b"
+    IFS=" b ,";
     for n in $a;do
       echo $n
     done

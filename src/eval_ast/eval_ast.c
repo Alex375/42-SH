@@ -4,8 +4,8 @@
 
 #include "execution.h"
 
-#define RETURN(val)   \
-    res = val;\
+#define RETURN(val)                                                            \
+    res = val;                                                                 \
     set_var_int("?", res);                                                     \
     return res;
 
