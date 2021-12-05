@@ -141,3 +141,7 @@
     false
     echo $?
   type: success
+
+- name: var poitional at and star
+  arguments: test_var_positional_at_star.sh ya no
+  type: success
