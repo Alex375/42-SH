@@ -3,6 +3,7 @@
 
 #include "execution.h"
 #include "xparser.h"
+#include "vars.h"
 
 /**
 ** @brief               Evaluate builded ast executing commands along the way

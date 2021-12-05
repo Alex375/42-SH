@@ -39,7 +39,6 @@ enum token
     T_VAR,
     T_VAR_INQUOTE,
     T_VAR_INIT,
-    T_VAR_VALUE,
     T_WORD,
     T_ERROR
 };
@@ -54,6 +53,7 @@ struct token_info
 {
     enum token type;
     char *command;
+    char is_space_after;
 };
 
 #endif // INC_42_SH_TOKENS_H

@@ -11,7 +11,7 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP)
+    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP && g_lexer_info.soft_expansion != IN_DQUOTE)
     {
         return 1;
     }

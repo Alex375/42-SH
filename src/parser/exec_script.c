@@ -7,11 +7,14 @@
 #include "read_script.h"
 #include "xalloc.h"
 #include "xparser.h"
+#include "vars.h"
+#include "special_vars.h"
 
 extern struct options *opt;
 
 int exec_script(char *script, size_t size)
 {
+    set_special_vars(opt->argc, opt->argv);
     struct ast *ast;
     errno = 0;
 
@@ -37,16 +40,5 @@ int exec_script(char *script, size_t size)
             res = eval_ast(ast);
     }
     lexer_reset();
-    return res;
-}
-
-struct ast *start_parse(char *script, size_t size)
-{
-    lexer_start(script, size);
-
-    struct ast *res = parse_input();
-
-    lexer_reset();
-
     return res;
 }

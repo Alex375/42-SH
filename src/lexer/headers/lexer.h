@@ -44,8 +44,7 @@ enum var_context
 {
     GENERAL_VAR,
     IN_VAR,
-    IN_VAR_NAME,
-    IN_VAR_VALUE
+    IN_VAR_NAME
 };
 
 enum redir_context
@@ -134,7 +133,7 @@ void context_update(struct token_info res);
 
 int detect_context(char c);
 
-int look_ahead_dquote(const char *script, size_t size);
+int look_ahead_dquote(const char *script, size_t size, size_t acu_size);
 
 int look_ahead_squote(size_t size);
 

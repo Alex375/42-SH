@@ -15,6 +15,7 @@
 # Visual studio code
 .vscode
 launch.json
+build
 
 # Mac
 .DS_Store
