@@ -76,7 +76,7 @@ def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
     if "stdout" in checks and expected.stdout != actual.stdout:
         res += f"Stdout differ \n{diff(expected.stdout, actual.stdout)}\n"
     if "stderr" in checks and expected.stderr != actual.stderr:
-        res += f"Stderr differ \n{diff(expected.stdout, actual.stderr)}\n"
+        res += f"Stderr differ \n{diff(expected.stderr, actual.stderr)}\n"
     if len(res) > 0:
         res = res[:-1]
     return res
