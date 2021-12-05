@@ -18,6 +18,7 @@ struct vars_vect *init_vars_vect()
 
     res->cap = 8;
     res->vars = xcalloc(res->cap, sizeof(struct var));
+    res->at = xcalloc(1, sizeof(char *));
 
     return res;
 }
@@ -51,6 +52,12 @@ void add_var(char *name, char *value)
     vars->len++;
 }
 
+void set_var_at(char *value, int i)
+{
+    vars->at = xrecalloc(vars->at, (i + 2) * sizeof(char *));
+    vars->at[i] = xstrdup(value);
+}
+
 void set_var_int(char *name, long value)
 {
     char *str = xcalloc(16, sizeof(char));
@@ -59,7 +66,7 @@ void set_var_int(char *name, long value)
     xfree(str);
 }
 
-char *get_var(char *name)
+char *get_var(char *name, int *i_at)
 {
     if (!strcmp("RANDOM", name))
     {
@@ -68,6 +75,20 @@ char *get_var(char *name)
         char *str = xcalloc(16, sizeof(char));
         sprintf(str,"%d",r);
         return str;
+    }
+
+    if (!strcmp("@", name))
+    {
+        if (!vars->at[*i_at])
+        {
+            *i_at = 0;
+            return "";
+        }
+        int old = *i_at;
+        (*i_at)++;
+        if (!vars->at[*i_at])
+            *i_at = 0;
+        return vars->at[old];
     }
 
     int pos = 0;

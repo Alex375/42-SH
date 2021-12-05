@@ -16,7 +16,7 @@ static int is_in(const char *arr, char c)
     return 0;
 }
 
-char *my_strsep(char *copy, char *ifs, int nb_strtok)
+static char *my_strsep(char *copy, char *ifs, int nb_strtok)
 {
     const char *whitespace = " \t\n";
 
@@ -58,42 +58,46 @@ char *my_strsep(char *copy, char *ifs, int nb_strtok)
     return w;
 }
 
-char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok)
+static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
+                      int *nb_at)
 {
     struct string *res = string_create();
-    int empty = 0;
+    int ept = 0;
     do
     {
-        if ((empty = 0) || tok_vect->list[*i].type == T_WORD)
+        if ((ept = 0) || tok_vect->list[*i].type == T_WORD)
             string_concat(res, tok_vect->list[*i].command);
         else
         {
-            char *var_value = get_var(tok_vect->list[*i].command);
-            if ((!var_value || !var_value[0]) && (empty = 1))
+            char *val = get_var(tok_vect->list[*i].command, nb_at);
+            if ((!val || !val[0]) && (ept = 1))
             {
                 continue;
             }
 
             if (tok_vect->list[*i].type == T_VAR_INQUOTE)
-                string_concat(res, var_value);
+                string_concat(res, val);
             else
             {
                 char *w =
-                    my_strsep(xstrdup(var_value), get_var("IFS"), *nb_strtok);
+                    my_strsep(xstrdup(val), get_var("IFS", 0), *nb_strtok);
 
                 if (w)
                 {
                     string_concat(res, w);
                     (*nb_strtok)++;
-                    if (my_strsep(xstrdup(var_value), get_var("IFS"),
-                                  *nb_strtok))
+                    if (my_strsep(xstrdup(val), get_var("IFS", 0), *nb_strtok))
+                    {
+                        if (*nb_at)
+                            (*nb_at)--;
                         break;
+                    }
                 }
                 (*nb_strtok) = 0;
             }
         }
-    } while (++(*i) < tok_vect->len
-             && (empty || tok_vect->list[*i - 1].is_space_after == 0));
+    } while (!*nb_at && ++(*i) < tok_vect->len
+             && (ept || tok_vect->list[*i - 1].is_space_after == 0));
 
     return string_get(res);
 }
@@ -117,6 +121,7 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
 
     int i = 0;
     int nb_strtok = 0;
+    int nb_at = 0;
     while (i < tok_vect->len)
     {
         if (len >= cap - 1)
@@ -125,7 +130,7 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
             res = xrecalloc(res, cap * sizeof(char *));
         }
 
-        res[len++] = get_word(tok_vect, &i, &nb_strtok);
+        res[len++] = get_word(tok_vect, &i, &nb_strtok, &nb_at);
     }
 
     return res;

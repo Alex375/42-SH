@@ -2,6 +2,7 @@
 
 #include "vars.h"
 #include "xalloc.h"
+#include "string.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -9,16 +10,22 @@
 
 void set_at_star_n(int argc, char **argv)
 {
+    struct string *star = string_create();
     for (int i = 1; i < argc; ++i)
     {
         char *str = xcalloc(16, sizeof(char));
         sprintf(str,"%d",i);
         add_var(str, argv[i]);
         xfree(str);
+
+        set_var_at(argv[i], i - 1);
+
+        string_concat(star, argv[i]);
+        if (i < argc - 1)
+            string_concat(star, " ");
     }
 
-    add_var("@", "");
-    add_var("*", "");
+    add_var("*", string_get(star));
 }
 
 void set_special_vars(int argc, char **argv)
