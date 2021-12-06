@@ -5,7 +5,7 @@
 
 static int is_number(const char *str)
 {
-    if (str == NULL)
+    if (!str || strlen(str) != 1) // Check if the ionumber is < 10
         return 0;
     if (strlen(str) <= 0) // Check if the ionumber is < 10
         return 0;
