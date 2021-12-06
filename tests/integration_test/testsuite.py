@@ -30,7 +30,7 @@ class TestCase:
     type: str = field(default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
-    arguments: str = field(default_factory=lambda: "")
+    arguments: List[str] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -76,17 +76,14 @@ def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
     if "stdout" in checks and expected.stdout != actual.stdout:
         res += f"Stdout differ \n{diff(expected.stdout, actual.stdout)}\n"
     if "stderr" in checks and expected.stderr != actual.stderr:
-        res += f"Stderr differ \n{diff(expected.stdout, actual.stderr)}\n"
+        res += f"Stderr differ \n{diff(expected.stderr, actual.stderr)}\n"
     if len(res) > 0:
         res = res[:-1]
     return res
 
 
-def run_shell(shell: str, stdin: str, arguments: str) -> sp.CompletedProcess:
-    progargs = []
-    if len(arguments) > 0:
-        progargs = arguments.split(' ')
-    return sp.run([shell] + progargs, input=stdin, capture_output=True, text=True)
+def run_shell(shell: str, stdin: str, arguments: List[str]) -> sp.CompletedProcess:
+    return sp.run([shell] + arguments, input=stdin, capture_output=True, text=True)
 
 
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
@@ -183,7 +180,7 @@ def build_binary(binary: Path, build_path: Path):
     print(termcolor.colored("Copying binary to test directory", 'blue'))
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser("Testsuite")
     parser.add_argument("--binary", required=False, type=Path, default="42SH")
     parser.add_argument("--category", required=False, type=str)
@@ -254,3 +251,7 @@ if __name__ == "__main__":
                     print(f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
     end_time = time.perf_counter()
     print_summary(passed, failed, start_time, end_time)
+
+
+if __name__ == "__main__":
+    main()

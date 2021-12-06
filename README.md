@@ -67,7 +67,7 @@ Tests are composed of 1 required fields:
 There are 4 optional fields:
 
 -   `input` : stdin of the test (default empty)
--   `arguments`: Arguments arguments passed to the program **each arguments need to be splited by one and only one space** (default empty)
+-   `arguments`: List of arguments passe to the program (syntax see last test examples)(default empty)
 
 - `checks` : indicates which checks needs to be performed for the given test 4 checks are available:
   
@@ -81,7 +81,7 @@ There are 4 optional fields:
   - `failed`: `stdout err_msg exitcode`,
   - `noerrcheck`: `exitcode stdout`
   
-  ==If `type` and `ceck` aren’t indicates in the test, it will perform all the checks by default.==
+  __If `type` and `ceck` aren’t indicates in the test, it will perform all the checks by default.__
 
 ### Test examples
 Simple test
@@ -124,7 +124,10 @@ Test with arguments
 
 ```yaml
 - name: Test script
-  arguments: ../../debug.sh arg1 arg2
+  arguments: 
+  	- ../../debug.sh 
+  	- arg1 
+  	- space    arg
   type: success
 ```
 
