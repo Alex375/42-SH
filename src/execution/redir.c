@@ -1,10 +1,10 @@
+#define _POSIX_SOURCE
+
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 
 #include "eval_ast.h"
 #include "execution.h"

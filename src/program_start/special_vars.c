@@ -1,7 +1,7 @@
 #include "special_vars.h"
 
-#include "vars.h"
 #include "xalloc.h"
+#include "vars.h"
 #include "string.h"
 
 #include <stdio.h>

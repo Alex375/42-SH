@@ -1,10 +1,10 @@
-#include "vars.h"
+
 
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
 #include "stdio.h"
-
+#include "vars.h"
 
 #include "xalloc.h"
 #include "xparser.h"

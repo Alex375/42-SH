@@ -1,7 +1,8 @@
-#include "vars.h"
 #include "xalloc.h"
 #include "xstrdup.h"
 #include "xstring.h"
+
+#include "vars.h"
 
 static int is_in(const char *arr, char c)
 {

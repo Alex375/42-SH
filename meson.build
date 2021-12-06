@@ -6,7 +6,8 @@ project(
     default_options: [
         'c_std=c99',
         'warning_level=3',
-        'werror=true'
+        'werror=true',
+        'b_sanitize=address'
     ],
 )
 
@@ -32,6 +33,7 @@ sources = [
     'src/execution/execution.c',
     'src/execution/pipe.c',
     'src/execution/redir.c',
+    'src/execution/subshell.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
     'src/builtins/builtins_dispatch.c',
@@ -66,6 +68,7 @@ sources = [
     'src/lexer/lexer_command.c',
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
+    'src/vars/vars.c'
 ]
 
 includes = [
