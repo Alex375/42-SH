@@ -39,6 +39,7 @@ enum token
     T_VAR,
     T_VAR_INQUOTE,
     T_VAR_INIT,
+    T_FUN_INIT,
     T_WORD,
     T_ERROR
 };

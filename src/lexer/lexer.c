@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 struct lexer_info g_lexer_info = { NULL,
+                                   GENERAL_FUN,
                                    GENERAL_REDIR,
                                    GENERAL_EXP_SOFT,
                                    GENERAL_EXP_SOFT,
@@ -56,6 +57,10 @@ static struct token_info lex_accumulator(struct token_info res,
              && g_lexer_info.last_exp_context != IN_SQUOTE_EXP)
     {
         res = lex_var(res, string);
+    }
+    else if (g_lexer_info.fun_context == IN_FUN_NAME)
+    {
+        res = lex_fun(res, string);
     }
     else if (is_ionumber(res, string))
     {
@@ -115,7 +120,7 @@ struct token_info tokenify_next(const char *script, size_t size)
 
     } while (look_ahead(script, size, accumulator));
 
-    res.is_space_after = script[g_lexer_info.pos] == ' ';
+    res.is_space_after = isblank(script[g_lexer_info.pos]);
 
     return lex_accumulator(res, accumulator);
 }

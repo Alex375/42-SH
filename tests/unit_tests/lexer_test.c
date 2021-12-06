@@ -1038,11 +1038,75 @@ Test(VAR, HARD5)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
-/*int main()
+Test(FUNCTION, EASY)
 {
-    char *script = "echo \"$i < && > $test\"";
-     lexer_start(script, strlen(script));
-     struct token_info tk;
-     while ((tk = pop_token()).type != T_EOF)
-         continue;
-}*/
+    char *script = "foo() { echo bonjour }";
+    struct token_info expected[] = {
+        { T_FUN_INIT, "foo", 1 },
+        { T_O_BRKT, NULL, 1 },
+        { T_WORD, "echo", 1 },
+        { T_WORD, "bonjour", 1 },
+        { T_C_BRKT, NULL, 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FUNCTION, EASY2)
+{
+    char *script = "a()\n{    echo bonjour\n}";
+    struct token_info expected[] = {
+        { T_FUN_INIT, "a", 0 },
+        { T_NEWLINE, NULL, 0 },
+        { T_O_BRKT, NULL, 1 },
+        { T_WORD, "echo", 1 },
+        { T_WORD, "bonjour", 0 },
+        { T_NEWLINE, NULL, 0 },
+        { T_C_BRKT, NULL, 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FUNCTION, MEDIUM)
+{
+    char *script = "if_work()\n{    echo bonjour\n  echo monsieur\n}";
+    struct token_info expected[] = {
+        { T_FUN_INIT, "if_work", 0 },
+        { T_NEWLINE, NULL, 0 },
+        { T_O_BRKT, NULL, 1 },
+        { T_WORD, "echo", 1 },
+        { T_WORD, "bonjour", 0 },
+        { T_NEWLINE, NULL, 1},
+        { T_WORD, "echo", 1 },
+        { T_WORD, "monsieur", 0 },
+        { T_NEWLINE, NULL, 0 },
+        { T_C_BRKT, NULL, 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FUNCTION, ERROR)
+{
+    char *script = "() { echo bonjour }";
+    struct token_info expected[] = {
+        { T_O_PRTH, NULL, 0 },
+        { T_C_PRTH, NULL, 1 },
+        { T_O_BRKT, NULL, 1 },
+        { T_WORD, "echo", 1 },
+        { T_WORD, "bonjour", 1 },
+        { T_C_BRKT, NULL, 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+//int main()
+//{
+//    char *script = "if_work()\n{    echo bonjour\n  echo monsieur\n}";
+//     lexer_start(script, strlen(script));
+//     struct token_info tk;
+//     while ((tk = pop_token()).type != T_EOF)
+//         continue;
+//}

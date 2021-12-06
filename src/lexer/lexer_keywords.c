@@ -24,8 +24,20 @@ int look_ahead_keywords(const char *script, size_t size)
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {
-        string_free(accumulator);
-        return 0;
+        if (g_lexer_info.var_context == GENERAL_VAR)
+        {
+            if ((script[i] == '(' && i + 1 < size && script[i + 1] == ')') ||
+                (script[i] == ')' && i > 0 && script[i - 1] == '('))
+            {
+                return 1;
+            }
+            else
+            {
+                string_free(accumulator);
+                return 0;
+            }
+
+        }
     }
 
     i++;
@@ -35,8 +47,11 @@ int look_ahead_keywords(const char *script, size_t size)
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {
-        string_free(accumulator);
-        return 0;
+        if (g_lexer_info.var_context == GENERAL_VAR)
+        {
+            string_free(accumulator);
+            return 0;
+        }
     }
 
     string_free(accumulator);
