@@ -47,3 +47,5 @@ ya
 test.txt
 
 tests/integration_test/env/
+tests/integration_test/trash/
+tests/integration_test/42*

@@ -159,14 +159,14 @@
 
 - name: Var redir
   input: |
-    a=test.txt
+    a=trash/test.txt
     echo 'echo coucou>&$1'> $a
-    cat test.txt
+    cat trash/test.txt
   type: success
 
 - name: Var redir arguments
   arguments:
-    - test.txt
+    - trash/test.txt
     - "2"
   type: success
 

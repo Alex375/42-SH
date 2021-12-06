@@ -1,7 +1,7 @@
 - name: Simple arguments
   arguments:
     - -c
-    - echo 'echo $1; echo $2; echo $3; echo $#'> testarg.txt; cat testarg.txt
+    - echo 'echo $1; echo $2; echo $3; echo $#'> trash/testarg.txt; cat trash/testarg.txt
   type: success
 
 - name: Test bad file
@@ -32,17 +32,17 @@
 - name: Bad option multi char
   arguments:
   - -dd
-  - testarg.txt
+  - trash/testarg.txt
   type: failed
 
 - name: File
   arguments:
-  - testarg.txt
+  - trash/testarg.txt
   type: success
 
 - name: File + args
   arguments:
-  - testarg.txt
+  - trash/testarg.txt
   - arg1
   - arg    2
   type: success

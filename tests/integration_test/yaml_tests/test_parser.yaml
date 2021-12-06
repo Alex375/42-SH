@@ -43,14 +43,14 @@
 
 - name: only redir
   input: |
-    > test.txt
+    > trash/test.txt
   type: success
 
 - name: corner parse redir
   input: |
     if true; then
         echo coucou
-    fi; > test.txt
+    fi; > trash/test.txt
   type: success
 
 - name: weird quote

@@ -188,6 +188,7 @@ def main():
     parser.add_argument("--builddir", required=False, type=Path,
                         default="../../cmake-build-debug")
     parser.add_argument("--no_compile", required=False, action='store_true')
+    parser.add_argument("--clean", required=False, action='store_true')
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
@@ -203,6 +204,11 @@ def main():
 
     print(f"Test categori(es) : {categories}")
     print(f"Testing {binary_path}")
+
+    try:
+        os.mkdir("trash")
+    except FileExistsError:
+        pass
 
     test_types = {
         "success": "stdout stderr exitcode",
@@ -236,7 +242,7 @@ def main():
             except Exception as err:
                 failed += 1
                 if type(err) == TimeoutError and str(err) == "!!timeout!!":
-                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout\nWith:\nArguments : '{testcase.arguments}'\nInput '{stdin}'\n{err}\n")
+                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout\n")
                 elif type(err) == KeyError:
                     print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
                 else:
@@ -248,9 +254,17 @@ def main():
                     print(f"{OK_TAG} {categ.name} - {name}")
                 else:
                     failed += 1
-                    print(f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
+                    print(
+                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
     end_time = time.perf_counter()
     print_summary(passed, failed, start_time, end_time)
+
+    if args.clean:
+        try:
+            shutil.rmtree("trash")
+            os.remove(binary_path)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
