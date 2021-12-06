@@ -103,3 +103,15 @@ char *get_var(char *name, int *i_at)
     else
         return "";
 }
+
+int int_eq_var(char *var, int n)
+{
+    char *value = get_var(var, 0);
+    if (value[0] == '\0')
+        return 0;
+    char *en_ptr;
+    int int_value = strtol(value, &en_ptr, 10);
+    if (*en_ptr != '\0')
+        return 0;
+    return int_value == n;
+}

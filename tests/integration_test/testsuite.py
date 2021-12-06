@@ -236,7 +236,7 @@ def main():
             except Exception as err:
                 failed += 1
                 if type(err) == TimeoutError and str(err) == "!!timeout!!":
-                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout")
+                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout\nWith:\nArguments : '{testcase.arguments}'\nInput '{stdin}'\n{err}\n")
                 elif type(err) == KeyError:
                     print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
                 else:

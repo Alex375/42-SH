@@ -26,7 +26,7 @@ int execute(char **args)
         return 0;
     if (opt && opt->verbose)
     {
-        fprintf(stdout, "Executing command -> %s\nWith args -> \n", args[0]);
+        fprintf(stdout, "Executing command -> %s\nWith args1 -> %s\n", args[0], args[1]);
     }
     int index;
     if ((index = get_builins_index(args[0])) != -1)

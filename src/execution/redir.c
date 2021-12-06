@@ -48,7 +48,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         flag = "a";
         break;
     case T_REDIR_O_2:
-        flag = "wr";
+        flag = "r";
         break;
     case T_REDIR_A:
         temp = strtol(word[0], &end_ptr, 10);

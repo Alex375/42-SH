@@ -13,3 +13,7 @@
 - name: Simple exit hard
   input: exit 12345 erg
   type: success
+
+- name: Exit no args
+  input: exit
+  type: success

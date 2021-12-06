@@ -176,3 +176,7 @@
 - name: Redir quote in fd
   input: "echo coucou >&'"
   type: failed
+
+- name: Double redir
+  input: echo test > testd.txt; echo coucou <> testd.txt ; cat <> testfd.txt
+  type: success

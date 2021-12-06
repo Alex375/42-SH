@@ -21,3 +21,7 @@
 - name: Pipe test exit code 3
   input: echo coucou | cat dzef
   type: failed
+
+- name: Pipe exit
+  input: exit 42 | echo $?
+  type: success

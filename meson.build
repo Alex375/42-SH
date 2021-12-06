@@ -17,7 +17,7 @@ summary({
     'debug': get_option('debug'),
     'b_sanitize': get_option('b_sanitize'),
     'warning_level': get_option('warning_level'),
-    'werror': get_option('werror'),
+    'werror': get_option('werror')
 })
 
 
@@ -68,6 +68,7 @@ sources = [
     'src/lexer/lexer_command.c',
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
+    'src/lexer/lexer_fun.c',
     'src/vars/vars.c'
 ]
 
