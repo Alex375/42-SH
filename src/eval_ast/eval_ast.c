@@ -28,7 +28,7 @@ int eval_ast(struct ast *ast)
         s_cmd_ast = ast->t_ast;
 
         char **cmd_arg = expand_vars_vect(s_cmd_ast->cmd_arg);
-        if (!cmd_arg || !cmd_arg[0] || !cmd_arg[0][0])
+        if (!s_cmd_ast->cmd_arg->len || !cmd_arg || !cmd_arg[0])
         {
             struct list_var_assign *tmp = s_cmd_ast->vars;
             while (tmp)

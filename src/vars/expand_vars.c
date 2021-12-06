@@ -1,8 +1,9 @@
+#include <string.h>
+
+#include "vars.h"
 #include "xalloc.h"
 #include "xstrdup.h"
 #include "xstring.h"
-
-#include "vars.h"
 
 static int is_in(const char *arr, char c)
 {
@@ -64,14 +65,19 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
 {
     struct string *res = string_create();
     int ept = 0;
+    int loops = -1;
     do
     {
+        loops++;
         if ((ept = 0) || tok_vect->list[*i].type == T_WORD)
             string_concat(res, tok_vect->list[*i].command);
         else
         {
             char *val = get_var(tok_vect->list[*i].command, nb_at);
-            if ((!val || !val[0]) && (ept = 1))
+            if (((tok_vect->list[*i].type == T_VAR_INQUOTE
+                  && !strcmp(tok_vect->list[*i].command, "@"))
+                 || (tok_vect->list[*i].type == T_VAR && (!val || !val[0])))
+                && (ept = 1))
             {
                 continue;
             }
@@ -98,9 +104,14 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
             }
         }
     } while (!*nb_at && ++(*i) < tok_vect->len
-             && (ept || tok_vect->list[*i - 1].is_space_after == 0));
+             && (tok_vect->list[*i - 1].is_space_after == 0));
 
-    return string_get(res);
+    char *r = string_get(res);
+
+    if (!r[0] && loops == 0 && ept)
+        return NULL;
+
+    return r;
 }
 
 char **expand_vars_vect(struct tok_vect *tok_vect)
@@ -132,6 +143,10 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
         }
 
         res[len++] = get_word(tok_vect, &i, &nb_strtok, &nb_at);
+        //        if (!res[len - 1][0])
+        //        {
+        //            res[len - 1] = xstrdup("\"\"");
+        //        }
     }
 
     return res;
