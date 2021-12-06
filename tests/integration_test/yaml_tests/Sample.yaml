@@ -3,7 +3,10 @@
   type: success
 
 - name: Basic script args
-  arguments: ../../debug.sh arg1 arg2
+  arguments:
+    - ../../debug.sh
+    - ar  g1
+    - arg2
   type: success
 
 - name: Bad command
