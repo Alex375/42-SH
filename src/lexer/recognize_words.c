@@ -109,7 +109,7 @@ int check_special(struct string *accumulator, char next_char)
 
     int token;
 
-    if (g_lexer_info.pos + 1 < g_lexer_info.script_size)
+    if (g_lexer_info.pos + 1 < g_lexer_info.script_size && accumulator->size >= 1)
     {
         accumulator = string_append(accumulator, next_char);
         token = separatorify(accumulator->data);

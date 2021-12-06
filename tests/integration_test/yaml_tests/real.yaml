@@ -1,0 +1,9 @@
+- name: Print 3
+  arguments:
+    - yaml_tests/sample_script/print_3.sh
+  type: success
+
+- name: Generate Files
+  arguments:
+    - yaml_tests/sample_script/generate_files.sh
+  type: success
