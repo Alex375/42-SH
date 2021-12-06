@@ -7,3 +7,8 @@
   arguments:
     - yaml_tests/sample_script/generate_files.sh
   type: success
+
+- name: File test
+  arguments:
+    - yaml_tests/sample_script/file.sh
+  type: success
