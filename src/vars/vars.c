@@ -68,7 +68,7 @@ void set_var_int(char *name, long value)
 
 char *get_var(char *name, int *i_at)
 {
-    if (!strcmp("RANDOM", name))
+    if (name && !strcmp("RANDOM", name))
     {
         srand(time(NULL));
         int r = rand() % 32768;
@@ -77,7 +77,7 @@ char *get_var(char *name, int *i_at)
         return str;
     }
 
-    if (!strcmp("@", name))
+    if (name && !strcmp("@", name))
     {
         if (!vars->at[*i_at])
         {

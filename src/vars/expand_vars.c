@@ -63,6 +63,9 @@ static char *my_strsep(char *copy, char *ifs, int nb_strtok)
 static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
                       int *nb_at)
 {
+    if (*i >= tok_vect->len)
+        return NULL;
+
     struct string *res = string_create();
     int ept = 0;
     int loops = -1;
@@ -74,9 +77,11 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
         else
         {
             char *val = get_var(tok_vect->list[*i].command, nb_at);
-            if (((tok_vect->list[*i].type == T_VAR_INQUOTE
-                  && !strcmp(tok_vect->list[*i].command, "@"))
-                 || (tok_vect->list[*i].type == T_VAR && (!val || !val[0])))
+            if ((!val || !val[0])
+                && ((tok_vect->list[*i].type == T_VAR_INQUOTE
+                     && tok_vect->list[*i].command
+                     && !strcmp(tok_vect->list[*i].command, "@"))
+                    || (tok_vect->list[*i].type == T_VAR))
                 && (ept = 1))
             {
                 continue;
@@ -109,7 +114,7 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
     char *r = string_get(res);
 
     if (!r[0] && loops == 0 && ept)
-        return NULL;
+        return get_word(tok_vect, i, nb_strtok, nb_at);
 
     return r;
 }
@@ -143,10 +148,6 @@ char **expand_vars_vect(struct tok_vect *tok_vect)
         }
 
         res[len++] = get_word(tok_vect, &i, &nb_strtok, &nb_at);
-        //        if (!res[len - 1][0])
-        //        {
-        //            res[len - 1] = xstrdup("\"\"");
-        //        }
     }
 
     return res;
