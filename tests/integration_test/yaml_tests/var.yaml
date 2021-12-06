@@ -156,3 +156,17 @@
 - name: var 30 char
   input: a=thisisa30charvaraaaaaaaaaaaaaa
   type: success
+
+- name: Var redir
+  input: |
+    a=test.txt
+    echo 'echo coucou>&$1'> $a
+    cat test.txt
+  type: success
+
+- name: Var redir arguments
+  arguments:
+    - test.txt
+    - "2"
+  type: success
+

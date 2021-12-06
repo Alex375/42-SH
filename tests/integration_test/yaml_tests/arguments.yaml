@@ -1,0 +1,54 @@
+- name: Simple arguments
+  arguments:
+    - -c
+    - echo "echo $1; echo $2 echo $3 echo $#"> testarg.txt
+  type: success
+
+- name: Test bad file
+  arguments:
+  - test
+  type: failed
+
+- name: Test hard bad file
+  arguments:
+  - test
+  - -c
+  - "echo coucou"
+  type: failed
+
+- name: Command + bad file
+  arguments:
+  - -c
+  - echo coucou
+  - file
+  type: success
+
+- name: Bad option
+  arguments:
+  - -d
+  - test.txt
+  type: failed
+
+- name: Bad option multi char
+  arguments:
+  - -dd
+  - test.txt
+  type: failed
+
+- name: File
+  arguments:
+  - test.txt
+  type: success
+
+- name: File + args
+  arguments:
+  - test.txt
+  - arg1
+  - arg    2
+  type: success
+
+- name: Command rm file
+  arguments:
+  - -c
+  - rm -f testarg.txt
+  type: success

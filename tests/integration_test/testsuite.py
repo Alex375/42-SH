@@ -89,14 +89,14 @@ def run_shell(shell: str, stdin: str, arguments: List[str]) -> sp.CompletedProce
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
     if passed == 0:
         print(
-            f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'magenta')} | ",
+            f"{termcolor.colored(f'========[SUMMARY ran {passed + failed} tests ', 'magenta')} | ",
             end='')
     elif failed == 0:
         print(
-            f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'green')} | ",
+            f"{termcolor.colored(f'========[SUMMARY ran {passed + failed} tests ', 'green')} | ",
             end='')
     else:
-        print(f"[========SUMMARY ran {passed + failed} tests ", end='')
+        print(f"========[SUMMARY ran {passed + failed} tests ", end='')
     if passed == 0:
         print(f"{termcolor.colored(f'passed {passed}', 'magenta')} | ", end='')
     else:
@@ -125,12 +125,12 @@ def print_summary(passed: int, failed: int, start_time: float, end_time: float):
 
     if passed == 0:
         print(
-            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'magenta')}")
+            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs]========', 'magenta')}")
     elif failed == 0:
         print(
-            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'green')}")
+            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs]========', 'green')}")
     else:
-        print(f"in {round(end_time - start_time, 2)} secs ========]")
+        print(f"in {round(end_time - start_time, 2)} secs]========")
 
 
 def get_categories(category: str, reference: str) -> List[TestCategory]:
