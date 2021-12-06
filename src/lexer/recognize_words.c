@@ -81,7 +81,7 @@ int check_special(struct string *accumulator, char next_char)
         && g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         char next[2] = { next_char, 0 };
-        if (fnmatch("[$\\\"`]", next, FNM_EXTMATCH) == 0)
+        if (fnmatch("[$\\\\\"`]", next, FNM_EXTMATCH) == 0)
         {
             accumulator->size--;
             accumulator->data[accumulator->size] = '\0';
