@@ -20,9 +20,9 @@ void set_at_star_n(int argc, char **argv)
 
         set_var_at(argv[i], i - 1);
 
-        string_concat(star, argv[i]);
+        star = string_concat(star, argv[i]);
         if (i < argc - 1)
-            string_concat(star, " ");
+            star = string_concat(star, " ");
     }
 
     add_var("*", string_get(star));

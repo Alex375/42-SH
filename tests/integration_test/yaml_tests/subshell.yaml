@@ -1,6 +1,8 @@
 - name: Basic subshell
   input: |
-    echo "current shell pid: $$"
-    (echo "subshell pid: $$"; exit 42; echo never executed)
+    echo "current shell pid: "
+    b=2
+    (echo $b; a=3; echo $a; exit 42; echo never executed)
     echo "subshell exited with status $?"
+    echo $b $a
   type: success

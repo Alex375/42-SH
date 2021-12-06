@@ -80,3 +80,11 @@
 - name: Echo empty -n
   input: echo -n
   type: success
+
+- name: Empty var
+  input: a=3; echo $a $b
+  type: success
+
+- name: Empty var 2
+  input: a=3; echo $b $a
+  type: success

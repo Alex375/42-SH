@@ -145,3 +145,11 @@
 - name: var poitional at and star
   arguments: test_var_positional_at_star.sh ya no
   type: success
+
+- name: var 16 char
+  input: a=thisisa16charvar
+  type: success
+
+- name: var 30 char
+  input: a=thisisa30charvaraaaaaaaaaaaaaa
+  type: success
