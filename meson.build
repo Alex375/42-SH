@@ -77,7 +77,7 @@ includes = [
     'src/xalloc/headers',
     'src/program_start/headers',
     'src/data_types/headers',
-    'src/builtins/headers'
+    'src/builtins/headers',
     'src/vars/headers'
 ]
 
