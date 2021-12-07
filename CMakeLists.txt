@@ -25,7 +25,7 @@ if (APPLE)
     target_link_libraries(42SH PRIVATE -fsanitize=address)
 else()
     add_executable(42SH ${SRC} src/main.c)
-    target_link_libraries(42SH PRIVATE -fsanitize=address)
+    target_link_libraries(42SH PUBLIC -fsanitize=address)
 endif()
 
 #Test executable
