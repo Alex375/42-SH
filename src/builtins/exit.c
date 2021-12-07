@@ -1,14 +1,13 @@
 #include <err.h>
 #include <stdlib.h>
 
-#include "xalloc.h"
-#include "vars.h"
 #include "sys/types.h"
 #include "unistd.h"
+#include "vars.h"
+#include "xalloc.h"
 
 int xexit(char **args)
 {
-
     char *end_ptr;
     if (args[1] == NULL)
         exit(0);

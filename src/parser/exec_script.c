@@ -5,10 +5,10 @@
 #include "eval_ast.h"
 #include "options.h"
 #include "read_script.h"
+#include "special_vars.h"
+#include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
-#include "vars.h"
-#include "special_vars.h"
 
 extern struct options *opt;
 
@@ -25,7 +25,7 @@ int exec_script(char *script, size_t size)
     {
         errno = 0;
         ast = parse_input();
-        if (opt && opt->print)  
+        if (opt && opt->print)
             ast_pretty_print(ast);
         if (errno != 0)
         {

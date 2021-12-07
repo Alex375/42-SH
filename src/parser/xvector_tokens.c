@@ -1,9 +1,8 @@
 
 
-#include "xalloc.h"
-#include "xstrdup.h"
-
+#include "ast_xalloc.h"
 #include "vector_tokens.h"
+#include "xstrdup.h"
 
 int is_part_word(enum token t)
 {
@@ -32,8 +31,8 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
         if (tok_vect->len >= tok_vect->cap - 1)
         {
             tok_vect->cap *= 2;
-            tok_vect->list = xrecalloc(tok_vect->list,
-                      tok_vect->cap * sizeof(struct token_info));
+            tok_vect->list = xrecalloc(
+                tok_vect->list, tok_vect->cap * sizeof(struct token_info));
         }
         pop_token();
 

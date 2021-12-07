@@ -45,7 +45,6 @@ int launch_program(int argc, char **argv)
         return 0;
     }
 
-
     if (opt->script == NULL && prog_index < argc)
     {
         opt->script = read_script(argv[prog_index]);

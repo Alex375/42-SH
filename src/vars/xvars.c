@@ -1,11 +1,11 @@
 
 
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdlib.h>
+
 #include "stdio.h"
 #include "vars.h"
-
 #include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
@@ -61,7 +61,7 @@ void set_var_at(char *value, int i)
 void set_var_int(char *name, long value)
 {
     char *str = xcalloc(16, sizeof(char));
-    sprintf(str,"%ld",value);
+    sprintf(str, "%ld", value);
     add_var(name, str);
     xfree(str);
 }
@@ -73,7 +73,7 @@ char *get_var(char *name, int *i_at)
         srand(time(NULL));
         int r = rand() % 32768;
         char *str = xcalloc(16, sizeof(char));
-        sprintf(str,"%d",r);
+        sprintf(str, "%d", r);
         return str;
     }
 

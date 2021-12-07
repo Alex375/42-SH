@@ -1,12 +1,12 @@
 #include "special_vars.h"
 
-#include "xalloc.h"
-#include "vars.h"
-#include "string.h"
-
 #include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
+#include <unistd.h>
+
+#include "string.h"
+#include "vars.h"
+#include "xalloc.h"
 
 void set_at_star_n(int argc, char **argv)
 {
@@ -14,7 +14,7 @@ void set_at_star_n(int argc, char **argv)
     for (int i = 1; i < argc; ++i)
     {
         char *str = xcalloc(16, sizeof(char));
-        sprintf(str,"%d",i);
+        sprintf(str, "%d", i);
         add_var(str, argv[i]);
         xfree(str);
 

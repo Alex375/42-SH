@@ -30,7 +30,7 @@ add_project_arguments(cflags, language: 'c')
 #Sources
 sources = [
 
-    'src/execution/execution.c',
+    'src/execution/xexecution.c',
     'src/execution/pipe.c',
     'src/execution/redir.c',
     'src/execution/subshell.c',
@@ -46,7 +46,7 @@ sources = [
     'src/parser/parser_shell_cmds.c',
     'src/parser/exec_script.c',
     'src/parser/parser.c',
-    'src/parser/vector_tokens.c',
+    'src/parser/xvector_tokens.c',
     'src/program_start/options.c',
     'src/program_start/read_script.c',
     'src/program_start/launch_program.c',
@@ -69,7 +69,7 @@ sources = [
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
     'src/lexer/lexer_fun.c',
-    'src/vars/vars.c'
+    'src/vars/xvars.c'
 ]
 
 includes = [

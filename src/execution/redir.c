@@ -73,7 +73,6 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
         return 0;
 
-
     default:
         err(127, "Unimplemented features");
     }

@@ -37,7 +37,8 @@ int is_token_seperator(enum token token)
     enum token sep[] = { T_AND,     T_OR,        T_NEWLINE,   T_SEMICOLON,
                          T_C_PRTH,  T_O_PRTH,    T_PIPE,      T_EOF,
                          T_REDIR_1, T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
-                         T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE, T_O_BRKT, T_C_BRKT };
+                         T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
+                         T_O_BRKT,  T_C_BRKT };
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
@@ -106,10 +107,10 @@ int check_special(struct string *accumulator, char next_char)
         return 0;
     }
 
-
     int token;
 
-    if (g_lexer_info.pos + 1 < g_lexer_info.script_size && accumulator->size >= 1)
+    if (g_lexer_info.pos + 1 < g_lexer_info.script_size
+        && accumulator->size >= 1)
     {
         accumulator = string_append(accumulator, next_char);
         token = separatorify(accumulator->data);
@@ -121,11 +122,12 @@ int check_special(struct string *accumulator, char next_char)
         accumulator = string_pop(accumulator, NULL);
     }
 
-    if (g_lexer_info.var_context == GENERAL_VAR && g_lexer_info.for_context == GENERAL_FOR)
+    if (g_lexer_info.var_context == GENERAL_VAR
+        && g_lexer_info.for_context == GENERAL_FOR)
     {
         if (fnmatch("*@([(])@([)])", accumulator->data, FNM_EXTMATCH) == 0)
         {
-            g_lexer_info.fun_context= IN_FUN_NAME;
+            g_lexer_info.fun_context = IN_FUN_NAME;
             return 1;
         }
     }

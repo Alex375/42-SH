@@ -45,8 +45,7 @@ static int err_redir()
     struct token_info t2 = look_forward_token(2);
     if ((is_chev(t0.type) && !is_part_word(t1.type))
         || (t0.type == T_IONUMBER
-            && ((!is_chev(t1.type))
-                || !is_part_word(t2.type))))
+            && ((!is_chev(t1.type)) || !is_part_word(t2.type))))
     {
         errno = ERROR_PARSING;
         return 1;

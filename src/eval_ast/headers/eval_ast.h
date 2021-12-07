@@ -2,8 +2,8 @@
 #define INC_42_SH_EVAL_AST_H
 
 #include "execution.h"
-#include "xparser.h"
 #include "vars.h"
+#include "xparser.h"
 
 /**
 ** @brief               Evaluate builded ast executing commands along the way
