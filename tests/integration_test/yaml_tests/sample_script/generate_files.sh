@@ -36,11 +36,3 @@ do
     fi
 done
 
-
-i=1
-while [ $number -ge $i ]
-do
-    name="${filename}-${i}.${extension}"
-    touch -- "$name"
-    i=$(($i+1))
-done
