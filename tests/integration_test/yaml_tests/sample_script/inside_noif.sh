@@ -1,5 +1,7 @@
-#!/bin/sh
+[ $# -ne 1 ] && echo "Sorry, expected 1 argument but $# were passed" && exit 1
 
-[ $# -ne $((1)) ] && echo "Sorry, expected 1 argument but $# were passed" && exit 1
-FILENAME=$1
-([ -f "$FILENAME" ] && cat "$FILENAME" && exit 0) || (echo "$FILENAME:" && printf "\tis not a valid file\n" && exit 2)
+[ -f "$1" ] && cat "$1" && exit 0
+
+echo "$1"
+echo "	is not a valid file"
+exit 2

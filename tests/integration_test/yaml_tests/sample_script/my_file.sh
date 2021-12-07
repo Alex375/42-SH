@@ -1,15 +1,12 @@
-#!/bin/sh
-
-while [ $# -ne $((0)) ]
+for arg in "$@"
 do
-    if [ -f "$1" ]
-    then 
-        echo "$1: file"
-    elif [ -d "$1" ]
+    if [ -f "$arg" ]
     then
-        echo "$1: directory"
-    else 
-        echo "$1: unknown"
+        echo $arg: file
+    elif [ -d "$arg" ]
+    then
+        echo $arg: directory
+    else
+        echo $arg: unknown
     fi
-    shift
 done
