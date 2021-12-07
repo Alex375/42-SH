@@ -719,7 +719,7 @@ Test(DOUBLE_QUOTE, MEDIUM)
 {
     char *script = "echo \"$i < && > $test\"";
     struct token_info expected[] = { { T_WORD, "echo", 1 },
-                                     { T_VAR_INQUOTE, "i", 1 },
+                                     { T_VAR_INQUOTE, "i", 0 },
                                      { T_WORD, " < && > ", 0 },
                                      { T_VAR_INQUOTE, "test", 0 } };
 
@@ -730,8 +730,8 @@ Test(DOUBLE_QUOTE, MEDIUM2)
 {
     char *script = "echo \"$i $test $test< && > $test\"";
     struct token_info expected[] = {
-        { T_WORD, "echo", 1 },    { T_VAR_INQUOTE, "i", 1 },
-        { T_WORD, " ", 0 },       { T_VAR_INQUOTE, "test", 1 },
+        { T_WORD, "echo", 1 },    { T_VAR_INQUOTE, "i", 0 },
+        { T_WORD, " ", 0 },       { T_VAR_INQUOTE, "test", 0 },
         { T_WORD, " ", 0 },       { T_VAR_INQUOTE, "test", 0, },
         { T_WORD, "< && > ", 0 }, { T_VAR_INQUOTE, "test", 0 }
     };
@@ -745,7 +745,7 @@ Test(DOUBLE_QUOTE, MEDIUM3)
     struct token_info expected[] = {
         { T_WORD, "echo", 1 },           { T_WORD, "Hello ", 0 },
         { T_VAR_INQUOTE, "world", 0 },   { T_WORD, ", if this is ", 0 },
-        { T_VAR_INQUOTE, "working", 1 }, { T_WORD, " then is good ! ", 0 }
+        { T_VAR_INQUOTE, "working", 0 }, { T_WORD, " then is good ! ", 0 }
     };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);

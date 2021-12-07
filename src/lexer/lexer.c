@@ -120,7 +120,8 @@ struct token_info tokenify_next(const char *script, size_t size)
 
     } while (look_ahead(script, size, accumulator));
 
-    res.is_space_after = isblank(script[g_lexer_info.pos]) || script[g_lexer_info.pos] == '\n';
+    if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT )
+        res.is_space_after = isblank(script[g_lexer_info.pos]) || script[g_lexer_info.pos] == '\n';
 
     return lex_accumulator(res, accumulator);
 }
