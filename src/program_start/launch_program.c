@@ -37,12 +37,22 @@ int launch_program(int argc, char **argv)
     opt = xcalloc(1, sizeof(struct options));
 
     int prog_index = preparseopt(argc, argv);
+    if (prog_index > argc)
+        prog_index = argc;
     char **options = dupplicate(prog_index, argv);
     get_option(opt, prog_index, options);
     if (opt->help)
     {
         print_usage();
         return 0;
+    }
+
+    if (opt->script != NULL)
+    {
+        opt->argv = argv + prog_index;
+        opt->argc = argc - prog_index;
+        if (opt->argc == 0)
+            opt->argc = 1;
     }
 
     if (opt->script == NULL && prog_index < argc)

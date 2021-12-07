@@ -46,3 +46,51 @@
   - arg1
   - arg    2
   type: success
+
+- name: c + args
+  arguments:
+    - -c
+    - echo $1 $2 $#
+    - a
+    - b
+  type: success
+
+- name: No arg c
+  arguments:
+    - -c
+  type: failed
+
+- name: C args setup
+  input: echo 'echo  $1 $2 $3 $#'> trash/test.txt
+  type: success
+
+- name: C args tearoff
+  arguments:
+    - trash/test.txt
+    - as
+    - de
+  type: success
+
+- name: C args tearoff
+  arguments:
+    - trash/test.txt
+  type: success
+
+
+- name: C args tearoff 2
+  arguments:
+    - -c
+    - 'echo  $1 $2 $3 $#'
+    - as
+    - de
+  type: success
+
+- name: C args teroff 3
+  arguments:
+    - -c
+    - 'echo  $1 $2 $3 $#'
+  type: success
+
+- name: C args teroff 3
+  input: 'echo $1 $2 $#'
+  type: success
