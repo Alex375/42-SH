@@ -20,7 +20,7 @@ int exec_script(char *script, size_t size)
 
     int res = 0;
 
-    lexer_start(script, size);
+    lexer_start(script, size, -1);
     while (errno != ERROR_EMPTY_EOF)
     {
         errno = 0;

@@ -34,12 +34,16 @@ enum token
     T_REDIR_2,
     T_REDIR_O_2,
     T_REDIR_PIPE,
+    T_D_PAREN,
+    T_BACKQUOTE,
     T_EOF,
     T_IONUMBER,
     T_VAR,
     T_VAR_INQUOTE,
     T_VAR_INIT,
     T_FUN_INIT,
+    T_COMMAND_SUB_START,
+    T_COMMAND_SUB_END,
     T_WORD,
     T_ERROR
 };

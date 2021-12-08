@@ -7,7 +7,7 @@
 
 void test_lexer(char *script, size_t size, struct token_info expected[])
 {
-    lexer_start(script, strlen(script));
+    lexer_start(script, strlen(script), -1);
     struct token_info actual_value;
     for (size_t i = 0; i < size; i++)
     {
