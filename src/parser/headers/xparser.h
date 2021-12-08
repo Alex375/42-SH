@@ -83,6 +83,15 @@ struct n_for
     struct ast *statement;
 };
 
+/**
+** @brief                   AST_FUNC ast member.
+*/
+struct n_func
+{
+    char *name;
+    struct ast *ast;
+};
+
 ////////////////
 
 /**
@@ -149,6 +158,20 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
 ** @param statement     ast inside the for
 */
 struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement);
+
+/*!
+** @brief               builds a n_func node
+** @param name          name of the function
+** @param statement     ast inside the function
+*/
+struct ast *build_func(struct ast *ast, char *name);
+
+/*!
+** @brief               builds a single node
+** @param ast           ast folowing
+** @param t             type of the node
+*/
+struct ast *build_single(struct ast *ast, enum AST_TYPE t);
 
 #include <stddef.h>
 
@@ -239,9 +262,17 @@ struct ast *parse_while_until_rule(enum token tokT);
 struct ast *parse_for_rule();
 
 /**
+** @brief               Parsing a funcdec rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_funcdec();
+
+/**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
 */
 struct ast *parse_compound();
+
+//////////////////////
 
 /**
 ** @brief               calling lexer while newline (cf sh_grammar.txt)

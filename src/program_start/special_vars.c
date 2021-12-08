@@ -8,8 +8,27 @@
 #include "vars.h"
 #include "xalloc.h"
 
+void set_special_vars(int argc, char **argv)
+{
+    set_at_star_n(argc, argv);
+
+    add_var("?", "0");
+
+    set_var_int("$", geteuid());
+
+    add_var("RANDOM", "0");
+
+    set_var_int("UID", getpid());
+
+    add_var("OLDPWD", getenv("OLDPWD"));
+
+    add_var("IFS", " \t\n");
+}
+
 void set_at_star_n(int argc, char **argv)
 {
+    set_var_int("#", argc - 1);
+
     struct string *star = string_create();
     for (int i = 1; i < argc; ++i)
     {
@@ -26,23 +45,4 @@ void set_at_star_n(int argc, char **argv)
     }
 
     add_var("*", string_get(star));
-}
-
-void set_special_vars(int argc, char **argv)
-{
-    add_var("?", "0");
-
-    set_var_int("$", geteuid());
-
-    set_at_star_n(argc, argv);
-
-    set_var_int("#", argc - 1);
-
-    add_var("RANDOM", "0");
-
-    set_var_int("UID", getpid());
-
-    add_var("OLDPWD", getenv("OLDPWD"));
-
-    add_var("IFS", " \t\n");
 }

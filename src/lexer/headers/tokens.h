@@ -27,6 +27,7 @@ enum token
     T_O_PRTH,
     T_C_PRTH,
     T_PIPE,
+    T_FUNCDEC,
     T_REDIR_1,
     T_REDIR_I_1,
     T_REDIR_A,

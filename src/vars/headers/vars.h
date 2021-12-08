@@ -2,6 +2,7 @@
 #define INC_42_SH_VARS_H
 
 #include "vector_tokens.h"
+#include "func.h"
 
 struct var
 {
@@ -16,6 +17,17 @@ struct vars_vect
     struct var *vars;
     char **at;
 };
+
+/**
+** @brief               the global variable
+*/
+struct context
+{
+    struct vars_vect *vars;
+    struct fc_vect *fcs;
+};
+
+struct context *init_context();
 
 /**
 ** @brief               alloc and inits the token vector
@@ -44,6 +56,16 @@ void set_var_int(char *name, long value);
 *                      i for accesing @ var
 */
 char *get_var(char *name, int *i_at);
+
+/**
+** @brief               free vars variable
+*/
+void free_vars();
+
+/**
+** @brief               free context variable
+*/
+void free_context();
 
 //////////////////
 

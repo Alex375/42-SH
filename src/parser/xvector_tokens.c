@@ -47,3 +47,25 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
 
     return added;
 }
+
+struct tok_vect *dup_token_vect(struct tok_vect *vect)
+{
+    struct tok_vect *res = xcalloc(1, sizeof(struct tok_vect));
+
+    res->cap = vect->cap;
+    res->len = vect->len;
+    res->list = xcalloc(res->cap, sizeof(struct token_info));
+
+    for (int i = 0; i < res->len; ++i)
+    {
+        res->list[i] = vect->list[i];
+    }
+
+    return res;
+}
+
+void free_token_vect(struct tok_vect *vect)
+{
+    xfree(vect->list);
+    xfree(vect);
+}

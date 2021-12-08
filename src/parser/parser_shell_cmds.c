@@ -22,11 +22,7 @@ static struct ast *O_PRTH()
     struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(
         errno == ERROR_PARSING || tok.type == T_EOF || tok.type != T_C_PRTH)
 
-        struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = AST_SUBSHELL;
-    res->t_ast = ast;
-
-    return res;
+        return build_single(ast, AST_SUBSHELL);
 }
 
 struct ast *parse_shell_command()

@@ -9,6 +9,7 @@
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
+#include "handle_ast.h"
 
 extern struct options *opt;
 
@@ -38,7 +39,11 @@ int exec_script(char *script, size_t size)
         }
         else if (ast)
             res = eval_ast(ast);
+
+        handle_rec(ast, H_FREE);
     }
     lexer_reset();
+
+    free_context();
     return res;
 }

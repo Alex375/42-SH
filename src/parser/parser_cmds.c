@@ -19,6 +19,11 @@ struct ast *parse_command()
         ast = parse_shell_command();
         parse_redirs(&redirs);
     }
+    else if (tok.type == T_FUNCDEC)
+    {
+        ast = parse_funcdec();
+        parse_redirs(&redirs);
+    }
     else
     {
         ast = parse_simple_command(&redirs);
@@ -157,4 +162,19 @@ struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
     }
 
     return res;
+}
+
+
+struct ast *parse_funcdec()
+{
+    struct token_info tok = POP_TOKEN
+
+    skip_newlines();
+
+    struct ast *ast = parse_shell_command();
+
+    if (errno)
+        return NULL;
+
+    return build_func(ast, tok.command);
 }
