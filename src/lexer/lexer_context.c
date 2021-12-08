@@ -55,7 +55,8 @@ int detect_context(char c)
     else if (c == '$' && g_lexer_info.for_context != VAR_FOR
              && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {
-        g_lexer_info.var_context = IN_VAR;
+        if (g_lexer_info.pos + 1 >= g_lexer_info.script_size || g_lexer_info.script[g_lexer_info.pos + 1] != '(')
+            g_lexer_info.var_context = IN_VAR;
     }
     else if (c == '"' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {

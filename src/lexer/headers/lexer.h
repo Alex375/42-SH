@@ -89,8 +89,8 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[28];
-    char *separator[18];
+    char *token_converter[30];
+    char *separator[20];
 };
 
 /**
@@ -146,7 +146,9 @@ int look_ahead_dquote(const char *script, size_t size, size_t acu_size);
 
 int look_ahead_squote(size_t size);
 
-void lexer_start(char *script, size_t size);
+struct token_info lex_sub(struct token_info res);
+
+void lexer_start(char *script, size_t size, long end);
 
 void lexer_reset();
 

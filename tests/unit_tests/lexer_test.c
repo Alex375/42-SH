@@ -7,7 +7,7 @@
 
 void test_lexer(char *script, size_t size, struct token_info expected[])
 {
-    lexer_start(script, strlen(script));
+    lexer_start(script, strlen(script), -1);
     struct token_info actual_value;
     for (size_t i = 0; i < size; i++)
     {
@@ -1159,10 +1159,21 @@ Test(TEST, EMPTY)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(COMMAND_SUB, easy)
+{
+    char *script = "$(echo test)";
+    struct token_info expected[] = {
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
 // int main()
 //{
-//    char *script = "echo \"/____\\  \\`'\\`\"";
-//    lexer_start(script, strlen(script));
+//    char *script = "i=$(echo test)";
+//    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)
 //        continue;
