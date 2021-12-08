@@ -6,6 +6,10 @@
       cat | tr a e
   type: success
 
+- name: Pipe no enter
+  input: "| cat"
+  type: failed
+
 - name: Multi pipe
   input: echo hallo | cat | tr a e | cat | tr l k | cat -e
   type: success
@@ -21,3 +25,7 @@
 - name: Pipe test exit code 3
   input: echo coucou | cat dzef
   type: failed
+
+- name: Pipe exit
+  input: exit 42 | echo $?
+  type: success

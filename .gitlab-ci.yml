@@ -3,6 +3,7 @@
 default:
   image: registry.cri.epita.fr/cri/infrastructure/nixpie/nixos-pie
   before_script:
+    - echo "Done register"
     - mkdir -p /tmp /var/tmp
     - meson setup -Ddoc=true builddir
 

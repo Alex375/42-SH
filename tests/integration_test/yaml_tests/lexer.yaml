@@ -1,0 +1,27 @@
+- name: Espace double quote
+  input: "echo \\\" not an error "
+  type: success
+
+- name: Error double quote
+  input: "echo \" a big error "
+  type: failed
+
+- name: Echo double quote with space
+  input: "echo \\\" it's made an error "
+  type: failed
+
+- name: Many escape with double quote
+  input: "e\"c\"h\"o\"\"\"\"\" haha"
+  type: success
+
+- name: Many escape with double quote failed
+  input: "e\"c\"h\"o\"\"\"\"     \""
+  type: failed
+
+- name: Weird for easy
+  input: "for in in in; do echo bonjour!; done"
+  type: success
+
+- name: Weird for
+  input: "for in in in in in in in in in in in in in in in in in in in in in in in in in; do\n  echo bonjour!\ndone"
+  type: success

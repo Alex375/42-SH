@@ -1,0 +1,172 @@
+
+- name: Useless variable declaration
+  input: "test=value; echo test!"
+  type: success
+
+- name: Basic variable use
+  input: "test=value; echo $test"
+  type: success
+
+- name: Basic variable use with bracket
+  input: "test=value; echo ${test}"
+  type: success
+
+- name: simple var
+  input: |
+    a=yee
+    echo $a
+  type: success
+
+- name: simple var quote
+  input: |
+    a="yee   no"
+    echo "$a"
+  type: success
+
+- name: double var no quote
+  input: |
+    a="yee   no"
+    b=$a
+    echo $b
+  type: success
+
+- name: double var
+  input: |
+    a="yee   no"
+    b=$a
+    echo "$b"
+  type: success
+
+- name: double var quoted inv
+  input: |
+    a="yee   no"
+    b="$a"
+    echo $b
+  type: success
+
+- name: double var quoted
+  input: |
+    a="yee   no"
+    b="$a"
+    echo "$b"
+  type: success
+
+- name: simple var dequote
+  input: |
+    a="yee   no"
+    echo $a
+  type: success
+
+- name: var NULL
+  input: |
+    a=
+    echo $a y
+  type: success
+
+- name: var of for
+  input: |
+    for b in 1 2   3; do
+    echo $b
+    done
+  type: success
+
+- name: var in for
+  input: |
+    a="1 2"
+    for b in $a; do
+    echo $b
+    done
+  type: success
+
+- name: var in for association 1
+  input: |
+    a="1 2"
+    for b in x$a   b  z"$a"; do
+    echo $b
+    done
+  type: success
+
+- name: var in for association 2
+  input: |
+    a="1 2"
+    for b in x$a   b  "$a"z; do
+    echo $b
+    done
+  type: success
+
+- name: var one word redir
+  input: |
+    a="tst oo"
+    echo 1 >$a
+    cat "tst oo"
+    rm "tst oo"
+  type: success
+
+- name: var IFS spliting
+  input: |
+    a="1 b2"
+    IFS=" b";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var IFS spliting 2
+  input: |
+    a="1bbb bbb bb2"
+    IFS="b";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var IFS spliting 3
+  input: |
+    a=" b  1b   bb bb  bb2  b"
+    IFS=" b ,";
+    for n in $a;do
+      echo $n
+    done
+  type: success
+
+- name: var oldpwd
+  input: |
+    echo $OLDPWD
+  type: success
+
+- name: var return value
+  input: |
+    echo a
+    echo $?
+    false
+    echo $?
+  type: success
+
+- name: var poitional at and star
+  arguments:
+    - test_var_positional_at_star.sh
+    - ya
+    - "no"
+  type: success
+
+- name: var 16 char
+  input: a=thisisa16charvar
+  type: success
+
+- name: var 30 char
+  input: a=thisisa30charvaraaaaaaaaaaaaaa
+  type: success
+
+- name: Var redir
+  input: |
+    a=trash/test.txt
+    echo 'echo coucou>&$1'> $a
+    cat trash/test.txt
+  type: success
+
+- name: Var redir arguments
+  arguments:
+    - trash/test.txt
+    - "2"
+  type: success
+

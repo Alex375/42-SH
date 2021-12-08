@@ -11,7 +11,8 @@
 
 extern struct options *opt;
 
-int exec_pipe(struct ast *left, struct ast *right) {
+int exec_pipe(struct ast *left, struct ast *right)
+{
     int fd[2];
     pipe(fd);
 

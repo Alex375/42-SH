@@ -5,8 +5,6 @@
 
 static int is_number(const char *str)
 {
-    if (strlen(str) != 1) // Check if the ionumber is < 10
-        return 0;
     int i = 0;
 
     while (str[i])
@@ -21,7 +19,7 @@ static int is_number(const char *str)
 
 int is_ionumber(struct token_info res, struct string *string)
 {
-    return res.type == T_WORD && is_number(string->data)
+    return res.type == T_WORD && is_number(string->data) && string->size == 1
         && g_lexer_info.pos < g_lexer_info.script_size
         && (g_lexer_info.script[g_lexer_info.pos] == '>'
             || g_lexer_info.script[g_lexer_info.pos] == '<');

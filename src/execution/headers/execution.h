@@ -6,6 +6,7 @@
 #define INC_42_SH_EXECUTION_H
 
 #include "execution.h"
+#include "vars.h"
 #include "xparser.h"
 
 /*!
@@ -14,7 +15,7 @@
  * @param args      Arguments string associated with the command
  * @return          Return the exit command of the executed command
  */
-int execute(char *cmd, char **args);
+int execute(char **args);
 
 /*!
  * @brief Creating a pipeline between to ast node and execute both nodes
@@ -47,5 +48,12 @@ struct redir_info
     int io_number;
     struct redir_info *next;
 };
+
+/*!
+ * @brief Execut a subshell command (fork)
+ * @param ast Ast to be executed in the subshell
+ * @return Return the exitcode of the subshell command.
+ */
+int subhsell(struct ast *ast);
 
 #endif // INC_42_SH_EXECUTION_H

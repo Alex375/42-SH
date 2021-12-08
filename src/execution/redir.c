@@ -1,10 +1,10 @@
+#define _POSIX_SOURCE
+
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 
 #include "eval_ast.h"
 #include "execution.h"
@@ -34,6 +34,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
     redirInfo->io_number = strtol(redir->ionumber, &end_ptr, 10);
     int temp;
     char *flag;
+    char **word = expand_vars_vect(redir->word);
     switch (redir->redir_type)
     {
     case T_REDIR_PIPE:
@@ -47,10 +48,10 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         flag = "a";
         break;
     case T_REDIR_O_2:
-        flag = "wr";
+        flag = "r";
         break;
     case T_REDIR_A:
-        temp = strtol(redir->word, &end_ptr, 10);
+        temp = strtol(word[0], &end_ptr, 10);
         if (*end_ptr != '\0' || temp >= 10)
         {
             fprintf(stderr, "%d Bad fd number", temp);
@@ -72,11 +73,11 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
         return 0;
 
-
     default:
         err(127, "Unimplemented features");
     }
-    redirInfo->file_fd = open_file(redir->word, flag);
+
+    redirInfo->file_fd = open_file(word[0], flag);
     redirInfo->temp_fd = dup(redirInfo->io_number);
     dup2(redirInfo->file_fd, redirInfo->io_number);
     fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);

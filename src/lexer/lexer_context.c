@@ -11,11 +11,16 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP)
+    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP
+        && g_lexer_info.soft_expansion != IN_DQUOTE)
     {
         return 1;
     }
     if (c == '"' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
+    {
+        return 1;
+    }
+    if (c == '`' && g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
     {
         return 1;
     }
@@ -39,7 +44,8 @@ int detect_context(char c)
         g_lexer_info.exp_context = IN_ESCAPE_EXP;
         g_lexer_info.last_exp_context = IN_ESCAPE_EXP;
     }
-    else if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP)
+    else if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP
+             && g_lexer_info.soft_expansion != IN_DQUOTE)
     {
         g_lexer_info.last_exp_context = IN_SQUOTE_EXP;
         g_lexer_info.exp_context = (g_lexer_info.exp_context == IN_SQUOTE_EXP)

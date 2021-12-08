@@ -5,29 +5,6 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-#define CHECK_SEG_ERROR(condition)                                             \
-    if (condition)                                                             \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define POP_TOKEN                                                              \
-    pop_token();                                                               \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define GET_TOKEN                                                              \
-    get_next_token();                                                          \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
 struct ast *parse_input()
 {
     struct token_info tok =

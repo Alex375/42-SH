@@ -14,6 +14,8 @@ void lexer_start(char *script, size_t size)
     {
         g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, token);
     }
+
+    return;
 }
 
 void lexer_reset()

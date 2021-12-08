@@ -2,6 +2,7 @@
 #define INC_42_SH_EVAL_AST_H
 
 #include "execution.h"
+#include "vars.h"
 #include "xparser.h"
 
 /**

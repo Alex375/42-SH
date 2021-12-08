@@ -30,7 +30,7 @@ class TestCase:
     type: str = field(default_factory=lambda: "")
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
-    arguments: str = field(default_factory=lambda: "")
+    arguments: List[str] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -76,30 +76,27 @@ def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
     if "stdout" in checks and expected.stdout != actual.stdout:
         res += f"Stdout differ \n{diff(expected.stdout, actual.stdout)}\n"
     if "stderr" in checks and expected.stderr != actual.stderr:
-        res += f"Stderr differ \n{diff(expected.stdout, actual.stderr)}\n"
+        res += f"Stderr differ \n{diff(expected.stderr, actual.stderr)}\n"
     if len(res) > 0:
         res = res[:-1]
     return res
 
 
-def run_shell(shell: str, stdin: str, arguments: str) -> sp.CompletedProcess:
-    progargs = []
-    if len(arguments) > 0:
-        progargs = arguments.split(' ')
-    return sp.run([shell] + progargs, input=stdin, capture_output=True, text=True)
+def run_shell(shell: str, stdin: str, arguments: List[str]) -> sp.CompletedProcess:
+    return sp.run([shell] + arguments, input=stdin, capture_output=True, text=True)
 
 
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
     if passed == 0:
         print(
-            f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'magenta')} | ",
+            f"{termcolor.colored(f'========[SUMMARY ran {passed + failed} tests ', 'magenta')} | ",
             end='')
     elif failed == 0:
         print(
-            f"{termcolor.colored(f'[========SUMMARY ran {passed + failed} tests ', 'green')} | ",
+            f"{termcolor.colored(f'========[SUMMARY ran {passed + failed} tests ', 'green')} | ",
             end='')
     else:
-        print(f"[========SUMMARY ran {passed + failed} tests ", end='')
+        print(f"========[SUMMARY ran {passed + failed} tests ", end='')
     if passed == 0:
         print(f"{termcolor.colored(f'passed {passed}', 'magenta')} | ", end='')
     else:
@@ -128,12 +125,12 @@ def print_summary(passed: int, failed: int, start_time: float, end_time: float):
 
     if passed == 0:
         print(
-            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'magenta')}")
+            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs]========', 'magenta')}")
     elif failed == 0:
         print(
-            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs ========]', 'green')}")
+            f"{termcolor.colored(f'in {round(end_time - start_time, 2)} secs]========', 'green')}")
     else:
-        print(f"in {round(end_time - start_time, 2)} secs ========]")
+        print(f"in {round(end_time - start_time, 2)} secs]========")
 
 
 def get_categories(category: str, reference: str) -> List[TestCategory]:
@@ -183,7 +180,7 @@ def build_binary(binary: Path, build_path: Path):
     print(termcolor.colored("Copying binary to test directory", 'blue'))
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser("Testsuite")
     parser.add_argument("--binary", required=False, type=Path, default="42SH")
     parser.add_argument("--category", required=False, type=str)
@@ -191,6 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--builddir", required=False, type=Path,
                         default="../../cmake-build-debug")
     parser.add_argument("--no_compile", required=False, action='store_true')
+    parser.add_argument("--clean", required=False, action='store_true')
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
@@ -206,6 +204,11 @@ if __name__ == "__main__":
 
     print(f"Test categori(es) : {categories}")
     print(f"Testing {binary_path}")
+
+    try:
+        os.mkdir("trash")
+    except FileExistsError:
+        pass
 
     test_types = {
         "success": "stdout stderr exitcode",
@@ -239,7 +242,7 @@ if __name__ == "__main__":
             except Exception as err:
                 failed += 1
                 if type(err) == TimeoutError and str(err) == "!!timeout!!":
-                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout")
+                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout\n")
                 elif type(err) == KeyError:
                     print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
                 else:
@@ -251,6 +254,18 @@ if __name__ == "__main__":
                     print(f"{OK_TAG} {categ.name} - {name}")
                 else:
                     failed += 1
-                    print(f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
+                    print(
+                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
     end_time = time.perf_counter()
     print_summary(passed, failed, start_time, end_time)
+
+    if args.clean:
+        try:
+            shutil.rmtree("trash")
+            os.remove(binary_path)
+        except Exception:
+            pass
+
+
+if __name__ == "__main__":
+    main()

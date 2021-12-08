@@ -1,9 +1,12 @@
 #include "options.h"
 
+#include <err.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "xalloc.h"
+#include "xparser.h"
 
 void print_usage(void)
 {
@@ -15,18 +18,7 @@ void print_usage(void)
            "information\n");
 }
 
-int get_scripts(int argc, char **argv, struct options *options)
-{
-    while (optind < argc)
-    {
-        options->scripts =
-            xrealloc(options->scripts, ++options->nb_script * sizeof(char *));
-        options->scripts[options->nb_script - 1] = argv[optind++];
-    }
-    return 0;
-}
-
-int get_option(struct options *options, int argc, char **argv)
+void get_option(struct options *options, int argc, char **argv)
 {
     struct option long_options[] = { { "commands", required_argument, 0, 'c' },
                                      { "pretty_print", no_argument, 0, 'p' },
@@ -43,9 +35,9 @@ int get_option(struct options *options, int argc, char **argv)
         switch (c)
         {
         case 'c':
-            options->commands = xrealloc(
-                options->commands, ++options->nb_command * sizeof(char *));
-            options->commands[options->nb_command - 1] = optarg;
+            options->argv = argv;
+            options->argc = 1;
+            options->script = optarg;
             break;
         case 'p':
             options->print = 1;
@@ -56,6 +48,9 @@ int get_option(struct options *options, int argc, char **argv)
         case 'v':
             options->verbose = 1;
             break;
+        case '?':
+            xfree_all();
+            err(2, "Illegal option");
         default:
             fprintf(stderr, "Wrong argument\n");
             print_usage();
@@ -64,5 +59,40 @@ int get_option(struct options *options, int argc, char **argv)
         }
     }
 
-    return get_scripts(argc, argv, options);
+    if (optind < argc)
+    {
+        xfree_all();
+        err(2, "Illegal option");
+    }
+}
+
+int preparseopt(int argc, char **argv)
+{
+    int i = 1;
+    while (i < argc)
+    {
+        if (argv[i][0] == '-' && strlen(argv[i]) > 1)
+        {
+            if (strcmp(argv[i], "-c") == 0)
+                return i + 2;
+            i++;
+            continue;
+        }
+        break;
+    }
+    return i;
+}
+
+char **dupplicate(int argc, char **argv)
+{
+    char **res = NULL;
+    int i = 0;
+    while (i < argc)
+    {
+        res = xrealloc(res, (i + 1) * sizeof(char *));
+        res[i] = xcalloc(strlen(argv[i]) + 1, sizeof(char));
+        strcpy(res[i], argv[i]);
+        i++;
+    }
+    return res;
 }

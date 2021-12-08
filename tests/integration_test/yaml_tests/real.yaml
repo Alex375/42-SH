@@ -1,0 +1,51 @@
+- name: Print 3
+  arguments:
+    - yaml_tests/sample_script/print_3.sh
+  type: success
+
+- name: Generate Files
+  arguments:
+    - yaml_tests/sample_script/generate_files.sh
+  type: success
+
+- name: File test
+  arguments:
+    - yaml_tests/sample_script/file.sh
+  type: success
+
+- name: File test 2
+  arguments:
+    - yaml_tests/sample_script/file.sh
+    - testsuite.py
+  type: success
+
+- name: File test 3
+  arguments:
+    - yaml_tests/sample_script/inside_noif.sh
+  type: success
+
+- name: File test 4
+  arguments:
+    - yaml_tests/sample_script/inside_noif.sh
+    - testsuite.py
+  type: success
+
+- name: Digit test
+  arguments:
+    - yaml_tests/sample_script/digit.sh
+  type: success
+
+- name: Digit test 2
+  arguments:
+    - "yaml_tests/sample_script/digit.sh"
+    - "20"
+    - "test"
+  type: success
+
+- name: My File
+  arguments:
+    - "yaml_tests/sample_script/my_file.sh"
+    - "42SH"
+    - "test"
+    - "testsuite.py"
+  type: success

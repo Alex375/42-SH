@@ -2,6 +2,7 @@
 #define INC_42_SH_XPARSER_H
 
 #include "lexer.h"
+#include "vector_tokens.h"
 
 /**
 ** @brief                   Describe the node type in ast.
@@ -16,7 +17,7 @@ enum AST_TYPE
     AST_CASE,
     AST_UNTIL,
     AST_PIPE,
-    AST_REDIR,
+    AST_SUBSHELL,
     AST_FUNC,
     AST_LIST,
     AST_NOT,
@@ -40,8 +41,7 @@ struct ast
 */
 struct n_s_cmd
 {
-    char *cmd;
-    char **cmd_arg;
+    struct tok_vect *cmd_arg;
     struct list_var_assign *vars;
 };
 
@@ -79,7 +79,7 @@ struct n_command
 struct n_for
 {
     char *name;
-    char **seq;
+    struct tok_vect *seq;
     struct ast *statement;
 };
 
@@ -91,7 +91,7 @@ struct n_for
 struct list_var_assign
 {
     char *name;
-    char *value;
+    struct tok_vect *value;
     struct list_var_assign *next;
 };
 
@@ -102,7 +102,7 @@ struct list_redir
 {
     char *ionumber;
     enum token redir_type;
-    char *word;
+    struct tok_vect *word;
     struct list_redir *next;
 };
 
@@ -132,8 +132,7 @@ struct ast *build_if(struct ast *condition, struct ast *true_c,
 ** @param cmd_arg       string list containing all the command arguments
 *                      separated by spaces.
 */
-struct ast *build_s_cmd(char *cmd, char **cmd_arg,
-                        struct list_var_assign *vars);
+struct ast *build_s_cmd(struct tok_vect *cmd_arg, struct list_var_assign *vars);
 
 /**
 ** @brief               builds a n_command node
@@ -149,7 +148,7 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
 *                      take it's values
 ** @param statement     ast inside the for
 */
-struct ast *build_for(char *name, char **seq, struct ast *statement);
+struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement);
 
 #include <stddef.h>
 
@@ -170,13 +169,6 @@ int exec_script(char *script, size_t size);
 ** @param ast           Ast to be printed
 */
 void ast_pretty_print(struct ast *ast);
-
-/**
-** @brief               start the parsing of a script
-** @param script        string containing block
-** @param size          len of script parameter
-*/
-struct ast *start_parse(char *script, size_t size);
 
 /**
 ** @brief               Parsing an input (cf sh_grammar.txt)
@@ -276,5 +268,28 @@ void add_to_redir_list(struct list_redir **redirs,
 */
 void add_to_var_assign_list(struct list_var_assign **vars,
                             struct list_var_assign *new_var);
+
+#define CHECK_SEG_ERROR(condition)                                             \
+    if (condition)                                                             \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define POP_TOKEN                                                              \
+    pop_token();                                                               \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define GET_TOKEN                                                              \
+    get_next_token();                                                          \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
 
 #endif // INC_42_SH_XPARSER_H

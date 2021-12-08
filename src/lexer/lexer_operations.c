@@ -2,7 +2,7 @@
 
 struct token_info look_forward_token(int i)
 {
-    struct token_info EOF = { T_EOF, NULL };
+    struct token_info EOF = { T_EOF, NULL, 1 };
     int new_pos = g_lexer_info.array_pos + i;
     if (g_lexer_info.token_list == NULL || new_pos < 0
         || g_lexer_info.array_pos + i >= g_lexer_info.token_list->size)
@@ -15,7 +15,7 @@ struct token_info look_forward_token(int i)
 
 struct token_info get_next_token(void)
 {
-    struct token_info EOF = { T_EOF, NULL };
+    struct token_info EOF = { T_EOF, NULL, 1 };
 
     if (g_lexer_info.token_list == NULL
         || g_lexer_info.array_pos >= g_lexer_info.token_list->size)
@@ -28,7 +28,7 @@ struct token_info get_next_token(void)
 
 struct token_info pop_token(void)
 {
-    struct token_info EOF = { T_EOF, NULL };
+    struct token_info EOF = { T_EOF, NULL, 1 };
 
     if (g_lexer_info.token_list == NULL
         || g_lexer_info.array_pos >= g_lexer_info.token_list->size)
