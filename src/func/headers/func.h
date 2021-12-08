@@ -27,7 +27,7 @@ void add_fc(char *name, struct ast *ast);
 /**
 ** @brief               gets the ast of func named name
 */
-struct ast *get_fc(char *name);
+int get_fc(char *name, struct ast **ast);
 
 /**
 ** @brief               free the fcs struct

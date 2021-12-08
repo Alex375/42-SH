@@ -1,0 +1,8 @@
+
+- name: simple fc
+  input: |
+    foo()
+    { echo foooooo ;}
+    foo
+  type: success
+

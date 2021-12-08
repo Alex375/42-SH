@@ -1,20 +1,11 @@
-#include "vars.h"
 #include "func.h"
+#include "handle_ast.h"
+#include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
-#include "handle_ast.h"
 
 extern struct context *context;
-
-struct context *init_context()
-{
-    context = xcalloc(1, sizeof(struct context));
-    context->vars = init_vars_vect();
-    context->fcs = init_func_vect();
-
-    return context;
-}
 
 struct vars_vect *init_vars_vect()
 {
@@ -27,24 +18,33 @@ struct vars_vect *init_vars_vect()
     return res;
 }
 
-void free_vars()
+struct context *init_context()
 {
-    for (int i = 0; i < context->vars->len; ++i)
+    context = xcalloc(1, sizeof(struct context));
+    context->vars = init_vars_vect();
+    context->fcs = init_func_vect();
+
+    return context;
+}
+
+void free_vars(struct vars_vect *vars)
+{
+    for (int i = 0; i < vars->len; ++i)
     {
-        xfree(context->vars->vars[i].name);
-        xfree(context->vars->vars[i].value);
+        xfree(vars->vars[i].name);
+        xfree(vars->vars[i].value);
     }
 
-    xfree(context->vars->vars);
+    xfree(vars->vars);
 
-    free_char_star_star(context->vars->at);
+    free_char_star_star(vars->at);
 
-    xfree(context->vars);
+    xfree(vars);
 }
 
 void free_context()
 {
-    free_vars();
+    free_vars(context->vars);
     free_fcs();
 
     xfree(context);

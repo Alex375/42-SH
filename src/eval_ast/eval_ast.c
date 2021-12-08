@@ -19,6 +19,7 @@ int eval_ast(struct ast *ast)
     struct n_if *if_ast;
     struct n_command *cmd;
     struct n_for *for_ast;
+    struct n_func *func;
 
     int res = 0;
 
@@ -74,6 +75,8 @@ int eval_ast(struct ast *ast)
     case AST_SUBSHELL:
         RETURN(subhsell(ast))
     case AST_FUNC:
+        func = ast->t_ast;
+        add_fc(func->name, func->ast);
         RETURN(0)
     case AST_LIST:
         b_ast = ast->t_ast;

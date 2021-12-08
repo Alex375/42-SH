@@ -23,8 +23,9 @@ void add_var(char *name, char *value)
 
     if (pos != context->vars->len)
     {
-        xfree(context->vars->vars[pos].value);
+        char *previous = context->vars->vars[pos].value;
         context->vars->vars[pos].value = xstrdup(value);
+        xfree(previous);
 
         return;
     }
@@ -45,7 +46,8 @@ void add_var(char *name, char *value)
 void set_var_at(char *value, int i)
 {
     context->vars->at = xrecalloc(context->vars->at, (i + 2) * sizeof(char *));
-    context->vars->at[i] = xstrdup(value);
+    if (value)
+        context->vars->at[i] = xstrdup(value);
 }
 
 void set_var_int(char *name, long value)

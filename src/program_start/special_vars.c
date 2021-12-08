@@ -10,7 +10,7 @@
 
 void set_special_vars(int argc, char **argv)
 {
-    set_at_star_n(argc, argv);
+    set_arg_related_vars(argc, argv);
 
     add_var("?", "0");
 
@@ -25,8 +25,10 @@ void set_special_vars(int argc, char **argv)
     add_var("IFS", " \t\n");
 }
 
-void set_at_star_n(int argc, char **argv)
+void set_arg_related_vars(int argc, char **argv)
 {
+    set_vars_argc(argc);
+
     set_var_int("#", argc - 1);
 
     struct string *star = string_create();

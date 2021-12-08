@@ -30,8 +30,9 @@ void add_fc(char *name, struct ast *ast)
 
     if (pos != context->fcs->len)
     {
-        handle_rec(context->fcs->fcs[pos].ast, H_FREE);
+        struct ast *previous = context->fcs->fcs[pos].ast;
         context->fcs->fcs[pos].ast = handle_rec(ast, H_DUP);
+        handle_rec(previous, H_FREE);
 
         return;
     }
@@ -48,7 +49,7 @@ void add_fc(char *name, struct ast *ast)
     context->fcs->len++;
 }
 
-struct ast *get_fc(char *name)
+int get_fc(char *name, struct ast **ast)
 {
     int pos = 0;
     for (; pos < context->fcs->len; ++pos)
@@ -58,9 +59,11 @@ struct ast *get_fc(char *name)
     }
 
     if (pos != context->fcs->len)
-        return context->fcs->fcs[pos].ast;
+        *ast = context->fcs->fcs[pos].ast;
     else
-        return NULL;
+        return 0;
+
+    return 1;
 }
 
 void free_fcs()
