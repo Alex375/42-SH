@@ -19,7 +19,7 @@ struct ast *parse_command()
         ast = parse_shell_command();
         parse_redirs(&redirs);
     }
-    else if (tok.type == T_FUNCDEC)
+    else if (tok.type == T_FUN_INIT)
     {
         ast = parse_funcdec();
         parse_redirs(&redirs);
