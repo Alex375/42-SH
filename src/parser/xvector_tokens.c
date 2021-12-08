@@ -66,6 +66,8 @@ struct tok_vect *dup_token_vect(struct tok_vect *vect)
 
 void free_token_vect(struct tok_vect *vect)
 {
+    if (!vect)
+        return;
     xfree(vect->list);
     xfree(vect);
 }

@@ -6,11 +6,9 @@
 
 #include "stdio.h"
 #include "vars.h"
-#include "func.h"
 #include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
-#include "handle_ast.h"
 
 extern struct context *context;
 
@@ -34,7 +32,8 @@ void add_var(char *name, char *value)
     if (context->vars->len >= context->vars->cap - 1)
     {
         context->vars->cap *= 2;
-        context->vars->vars = xrecalloc(context->vars->vars, context->vars->cap * sizeof(struct var));
+        context->vars->vars = xrecalloc(
+            context->vars->vars, context->vars->cap * sizeof(struct var));
     }
 
     context->vars->vars[context->vars->len].name = xstrdup(name);

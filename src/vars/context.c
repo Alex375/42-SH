@@ -1,10 +1,3 @@
-
-
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include "stdio.h"
 #include "vars.h"
 #include "func.h"
 #include "xalloc.h"
