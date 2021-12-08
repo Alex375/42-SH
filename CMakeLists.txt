@@ -17,7 +17,7 @@ include_directories(src/builtins/headers)
 include_directories(src/vars/headers)
 
 
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c)
+file(GLOB SRC src/vars/*.c src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c)
 add_executable(test_cd ${SRC})
 
 if (APPLE)

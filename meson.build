@@ -39,6 +39,8 @@ sources = [
     'src/builtins/builtins_dispatch.c',
     'src/builtins/echo.c',
     'src/builtins/exit.c',
+    'src/builtins/unset.c',
+    'src/builtins/cd.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',

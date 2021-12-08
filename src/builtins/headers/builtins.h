@@ -21,6 +21,12 @@ int xexit(char **args);
 int cd(char **args);
 
 /*!
+ * @brief Replicate the unset function
+ * @param args Array of string containing arguments of unset
+ */
+int unset(char **args);
+
+/*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
  * get index)
  * @param index
