@@ -44,6 +44,14 @@ struct vars_vect *init_vars_vect();
 void add_var(char *name, char *value);
 
 /**
+** @brief               add a variable to variable vars givven as arg
+*/
+void add_var_var(struct vars_vect *vars, char *name, char *value);
+
+
+void push_pop_arg(struct vars_vect *var, int pop);
+
+/**
 ** @brief               add a part of @ variable to the global variable vars
 */
 void set_var_at(char *value, int i);
@@ -74,7 +82,7 @@ char *get_var(char *name, int *i_at);
 /**
 ** @brief               saves the arguments related vars in a vect
 */
-struct vars_vect *save_arg_var();
+void save_arg_var();
 
 /**
 ** @brief               free vars variable

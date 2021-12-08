@@ -48,6 +48,8 @@ void set_var_at(char *value, int i)
     context->vars->at = xrecalloc(context->vars->at, (i + 2) * sizeof(char *));
     if (value)
         context->vars->at[i] = xstrdup(value);
+    else
+        context->vars->at[i] = NULL;
 }
 
 void set_var_int(char *name, long value)

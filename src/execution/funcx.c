@@ -10,26 +10,30 @@
 
 int exec_func(char **args, struct ast *fc_ast)
 {
-    struct vars_vect *save = save_arg_var();
+    struct vars_vect *save = init_vars_vect();
+    push_pop_arg(save, 0);
     int argc = 0;
     while (args[argc])
         argc++;
 
     set_arg_related_vars(argc, args);
 
+    for (int i = get_vars_argc(); i <= save->argc; ++i)
+    {
+        set_var_at(NULL, i - 1);
+
+        char *str = xcalloc(16, sizeof(char));
+        sprintf(str, "%d", i);
+        add_var(str, "");
+        xfree(str);
+    }
+
     int res = eval_ast(fc_ast);
 
-    for (int i = 0; i < save->len; ++i)
+    push_pop_arg(save, 1);
+    for (int i = save->argc; i <= get_vars_argc(); ++i)
     {
-        add_var(save->vars[i].name, save->vars[i].value);
-    }
-    for (int i = 0; i < save->argc - 1; ++i)
-    {
-        set_var_at(save->at[i], i);
-    }
-    for (int i = save->argc; i < get_vars_argc(); ++i)
-    {
-        set_var_at(NULL, i);
+        set_var_at(NULL, i - 1);
 
         char *str = xcalloc(16, sizeof(char));
         sprintf(str, "%d", i);
