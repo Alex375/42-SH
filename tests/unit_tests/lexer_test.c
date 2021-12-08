@@ -1170,11 +1170,11 @@ Test(COMMAND_SUB, easy)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
- int main()
-{
-    char *script = "$(echo test)";
-    lexer_start(script, strlen(script), -1);
-    struct token_info tk;
-    while ((tk = pop_token()).type != T_EOF)
-        continue;
-}
+// int main()
+//{
+//    char *script = "i=$(echo test)";
+//    lexer_start(script, strlen(script), -1);
+//    struct token_info tk;
+//    while ((tk = pop_token()).type != T_EOF)
+//        continue;
+//}

@@ -146,6 +146,8 @@ int look_ahead_dquote(const char *script, size_t size, size_t acu_size);
 
 int look_ahead_squote(size_t size);
 
+struct token_info lex_sub(struct token_info res);
+
 void lexer_start(char *script, size_t size, long end);
 
 void lexer_reset();

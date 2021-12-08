@@ -17,7 +17,7 @@ void lexer_start(char *script, size_t size, long end)
     while ((token = tokenify_next(script, size)).type != T_EOF)
     {
         g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, token);
-        if (end != -1 && (size_t) end >= g_lexer_info.pos)
+        if (end != -1 && g_lexer_info.pos  >= (size_t) end)
         {
             return;
         }

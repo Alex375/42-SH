@@ -4,7 +4,7 @@ static long find_end_sub(const char *script, size_t size)
 {
     int nb_paren = 1;
 
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = g_lexer_info.pos; i < size; i++)
     {
         if (script[i] == ')')
             nb_paren--;
@@ -49,6 +49,7 @@ void revert_context(struct lexer_info copy)
 
 struct token_info lex_sub(struct token_info res)
 {
+    res.type = T_COMMAND_SUB_START;
     g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, res);
     res.type = T_COMMAND_SUB_END;
     res.command = NULL;
@@ -66,6 +67,7 @@ struct token_info lex_sub(struct token_info res)
     lexer_start(g_lexer_info.script, g_lexer_info.script_size, end_sub);
 
     revert_context(copy);
+    g_lexer_info.pos++;
 
     return res;
 }
