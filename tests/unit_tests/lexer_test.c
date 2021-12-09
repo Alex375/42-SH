@@ -1254,6 +1254,24 @@ Test(COMMAND_SUB, medium4)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(COMMAND_SUB, recursive)
+{
+    char *script = "i=$(i=$(i=$(i=$(echo \"test\"); echo \"$i\"); echo \"$i\"); echo \"$i\")";
+    struct token_info expected[] = {
+        { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
+        { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
+        { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
+        { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
+        { T_WORD, "echo", 1 },{ T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
 Test(COMMAND_SUB, medium5)
 {
     char *script = "echo `i=1; echo \"$i\"` $pute";
@@ -1293,7 +1311,7 @@ Test(FOR, DO_HARD)
 
 // int main()
 //{
-//    char *script = "for a do echo test; done";
+//    char *script = "for i in $(echo pute) 2 3; do\n    test=$(ls -la)\ndone";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

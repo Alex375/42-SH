@@ -45,17 +45,19 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
-    if (res.type == T_D_PAREN || res.type == T_BACKQUOTE)
+
+
+    if (g_lexer_info.for_context != GENERAL_FOR)
+    {
+        res = lex_for(res, string);
+    }
+    else if (res.type == T_D_PAREN || res.type == T_BACKQUOTE)
     {
         res = lex_sub(res);
     }
     else if (g_lexer_info.var_context == IN_VAR_NAME)
     {
         res = lex_varname(res, string);
-    }
-    else if (g_lexer_info.for_context != GENERAL_FOR)
-    {
-        res = lex_for(res, string);
     }
     else if (g_lexer_info.var_context != GENERAL_VAR
              && g_lexer_info.last_exp_context != IN_SQUOTE_EXP)
