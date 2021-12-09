@@ -49,6 +49,28 @@ void add_fc(char *name, struct ast *ast)
     context->fcs->len++;
 }
 
+void destroy_fc(char *name)
+{
+    int pos = 0;
+    for (; pos < context->fcs->len; ++pos)
+    {
+        if (!strcmp(context->fcs->fcs[pos].name, name))
+            break;
+    }
+
+    if (pos != context->fcs->len)
+    {
+        struct ast *previous = context->fcs->fcs[pos].ast;
+        for (int i = pos; i < context->fcs->len - 1; ++i)
+        {
+            context->fcs->fcs[i] = context->fcs->fcs[i + 1];
+        }
+        handle_rec(previous, H_FREE);
+
+        context->fcs->len--;
+    }
+}
+
 int get_fc(char *name, struct ast **ast)
 {
     int pos = 0;
