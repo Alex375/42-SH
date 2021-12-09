@@ -1309,14 +1309,36 @@ Test(FOR, DO_HARD)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(VAR, NO_SEPA)
+{
+    char *script = "a=1 b=2; echo $a$b";
+    struct token_info expected[] = {
+        { T_VAR_INIT, "a", 0 },    { T_WORD, "1", 1 },    { T_VAR_INIT, "b", 0 },    { T_WORD, "2", 0 },
+        { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR, "a", 0 }, { T_VAR, "b", 0 },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(VAR, NO_SEPA2)
+{
+    char *script = "a= echo $a$b";
+    struct token_info expected[] = {
+        { T_VAR_INIT, "a", 1 }, { T_WORD, "echo", 1 }, { T_VAR, "a", 0 }, { T_VAR, "b", 0 },
+        };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
 // int main()
 //{
-//    char *script = "for i in $(echo pute) 2 3; do\n    test=$(ls -la)\ndone";
+//    char *script = "''''";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)
 //    {
 //        continue;
 //    }
-//
+//    lexer_reset();
 //}

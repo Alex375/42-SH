@@ -20,6 +20,11 @@ struct token_info lex_command(struct token_info res, struct string *string)
     {
         if (g_lexer_info.redir_context == GENERAL_REDIR)
             g_lexer_info.word_context = IN_COMMAND;
+        if (g_lexer_info.var_context == IN_VAR_INIT)
+        {
+            g_lexer_info.var_context = GENERAL_VAR;
+            g_lexer_info.word_context = GENERAL;
+        }
         res.type = T_WORD;
         res.command = string_get(string);
     }

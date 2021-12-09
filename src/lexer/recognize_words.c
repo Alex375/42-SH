@@ -108,6 +108,15 @@ int check_special(struct string *accumulator, char next_char)
         }
     }
 
+    if (g_lexer_info.last_exp_context == IN_ESCAPE_EXP)
+    {
+        if (fnmatch("$", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.exp_context = GENERAL_EXP_HARD;
+            return 1;
+        }
+    }
+
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD
         || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
         || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
