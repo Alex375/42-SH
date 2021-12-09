@@ -67,6 +67,8 @@ sources = [
     'src/lexer/lexer_var.c',
     'src/lexer/recognize_words.c',
     'src/lexer/lexer_command.c',
+    'src/lexer/lexer_command_sub.c',
+    'src/lexer/lexer_fun.c',
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
     'src/lexer/lexer_fun.c',
