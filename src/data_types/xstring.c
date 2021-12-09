@@ -69,7 +69,7 @@ struct string *string_pop(struct string *string, char *pop)
     return string;
 }
 
-void *string_get(struct string *string)
+char *string_get(struct string *string)
 {
     char *res = string->data;
     xfree(string);
