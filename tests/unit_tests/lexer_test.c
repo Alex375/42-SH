@@ -1,5 +1,6 @@
 #include <criterion/criterion.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "lexer.h"
 
@@ -1129,7 +1130,7 @@ Test(FUNCTION, ERROR)
     char *script = "() { echo bonjour }";
     struct token_info expected[] = {
         { T_O_PRTH, NULL, 0 }, { T_C_PRTH, NULL, 1 },    { T_O_BRKT, NULL, 1 },
-        { T_WORD, "echo", 1 }, { T_WORD, "bonjour", 1 }, { T_C_BRKT, NULL, 0 },
+        { T_WORD, "echo", 1 }, { T_WORD, "bonjour", 1 }, { T_WORD, "}", 0 },
     };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -1170,11 +1171,121 @@ Test(COMMAND_SUB, easy)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(COMMAND_SUB, easy3)
+{
+    char *script = "`echo test`";
+    struct token_info expected[] = {
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, easy2)
+{
+    char *script = "i=$(echo test)";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, easy5)
+{
+    char *script = "i=`echo test`";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, medium)
+{
+    char *script = "i=\"$(echo test)\"";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, medium2)
+{
+    char *script = "i=\"$(echo test)\"test2";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }, { T_WORD, "test2", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, medium3)
+{
+    char *script = "i=$(echo test)test2";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, ")", 0 }, { T_WORD, "test2", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, medium4)
+{
+    char *script = "i=$(echo test)\"test2  toto\"";
+    struct token_info expected[] = {
+        {T_VAR_INIT, "i", 0},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_WORD, "echo", 1 }, { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 }, { T_WORD, "test2  toto", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(COMMAND_SUB, medium5)
+{
+    char *script = "echo `i=1; echo \"$i\"` $pute";
+    struct token_info expected[] = {
+        { T_WORD, "echo", 1},
+        { T_COMMAND_SUB_START, NULL, 0 },  { T_VAR_INIT, "i", 0 }, { T_WORD, "1", 0 }, { T_SEMICOLON, NULL, 1 },
+        { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 }, { T_COMMAND_SUB_END, NULL, 1 }, { T_VAR, "pute", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+Test(FUNCTION, ECHO)
+{
+    char *script = "echo {";
+    struct token_info expected[] = {
+        { T_WORD, "echo", 1},
+        { T_WORD, "{", 0 },
+    };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
+
 // int main()
 //{
-//    char *script = "i=$(echo test)";
+//    char *script = "foo() { echo bonjour }";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)
+//    {
 //        continue;
+//    }
+//
 //}

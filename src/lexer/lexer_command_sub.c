@@ -1,16 +1,25 @@
 #include "lexer.h"
+#include <ctype.h>
 
-static long find_end_sub(const char *script, size_t size)
+static long find_end_sub(const char *script, size_t size, enum token init_type)
 {
-    int nb_paren = 1;
+    char start = '(';
+    char end = ')';
+    if (init_type == T_BACKQUOTE)
+    {
+        start = '`';
+        end = '`';
+    }
+
+    int nb = 1;
 
     for (size_t i = g_lexer_info.pos; i < size; i++)
     {
-        if (script[i] == ')')
-            nb_paren--;
-        else if (script[i] == '(')
-            nb_paren++;
-        if (nb_paren == 0)
+        if (script[i] == end)
+            nb--;
+        else if (script[i] == start)
+            nb++;
+        if (nb == 0)
             return i;
     }
 
@@ -49,13 +58,14 @@ void revert_context(struct lexer_info copy)
 
 struct token_info lex_sub(struct token_info res)
 {
+    enum token initial_type = res.type;
     res.type = T_COMMAND_SUB_START;
     g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, res);
     res.type = T_COMMAND_SUB_END;
     res.command = NULL;
 
     struct lexer_info copy = new_context();
-    long end_sub = find_end_sub(g_lexer_info.script, g_lexer_info.script_size);
+    long end_sub = find_end_sub(g_lexer_info.script, g_lexer_info.script_size, initial_type);
 
     if (end_sub == -1)
     {
@@ -68,6 +78,17 @@ struct token_info lex_sub(struct token_info res)
 
     revert_context(copy);
     g_lexer_info.pos++;
+    if (g_lexer_info.script[g_lexer_info.pos] == '"')
+    {
+        g_lexer_info.last_soft = IN_DQUOTE;
+        g_lexer_info.soft_expansion = (g_lexer_info.soft_expansion == IN_DQUOTE)
+            ? GENERAL_EXP_SOFT
+            : IN_DQUOTE;
+        g_lexer_info.pos++;
+    }
+
+    res.is_space_after = isblank(g_lexer_info.script[g_lexer_info.pos])
+        || g_lexer_info.script[g_lexer_info.pos] == '\n';
 
     return res;
 }

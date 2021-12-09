@@ -20,9 +20,9 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '`' && g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
+    if (c == '`')
     {
-        return 1;
+        return 0;
     }
     if ((c == '{' || c == '}') && g_lexer_info.var_context == IN_VAR)
     {
@@ -68,6 +68,11 @@ int detect_context(char c)
     else if (g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         g_lexer_info.exp_context = GENERAL_EXP_HARD;
+    }
+    else if (c == '}' && g_lexer_info.fun_context == IN_FUN)
+    {
+        g_lexer_info.word_context = GENERAL;
+        return 1;
     }
     return 0;
 }

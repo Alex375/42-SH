@@ -49,3 +49,8 @@
     - "test"
     - "testsuite.py"
   type: success
+
+- name: Ascci house
+  arguments:
+    - "yaml_tests/sample_script/ascii_house.sh"
+  type: success

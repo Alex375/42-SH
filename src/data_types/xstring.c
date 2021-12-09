@@ -12,6 +12,8 @@ struct string *string_create()
 
 struct string *string_append(struct string *string, char c)
 {
+    if (string == NULL)
+        return NULL;
     if (string->size == string->capacity)
     {
         string->capacity = (string->capacity) * 2 + 1;

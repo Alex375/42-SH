@@ -11,11 +11,19 @@ int look_ahead_keywords(const char *script, size_t size)
 
     if (script[i] == '$' && i > 0 && script[i - 1] == '$')
     {
+        string_free(accumulator);
         return 1;
     }
     if (script[i] == '$' && i > 0)
     {
+        string_free(accumulator);
         return 0;
+    }
+
+    if (script[i] == '}' && g_lexer_info.fun_context == IN_FUN)
+    {
+        string_free(accumulator);
+        return 1;
     }
 
     if (g_lexer_info.var_context == IN_VAR && i > 0 && script[i - 1] != '$'
@@ -68,6 +76,13 @@ struct token_info lex_keywords(struct token_info res, struct string *string)
     {
         g_lexer_info.redir_context = IN_REDIR;
     }
+    else if (res.type == T_C_BRKT)
+    {
+
+        g_lexer_info.fun_context = GENERAL_FUN;
+    }
+
+
     string_free(string);
     return res;
 }

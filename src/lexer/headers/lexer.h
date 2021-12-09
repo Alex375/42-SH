@@ -56,7 +56,8 @@ enum redir_context
 enum fun_context
 {
     GENERAL_FUN,
-    IN_FUN_NAME
+    IN_FUN_NAME,
+    IN_FUN
 };
 
 /**
