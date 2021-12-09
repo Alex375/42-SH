@@ -42,6 +42,7 @@ sources = [
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',
+    'src/parser/builds2.c',
     'src/parser/tools_parse.c',
     'src/parser/parser_shell_cmds.c',
     'src/parser/exec_script.c',

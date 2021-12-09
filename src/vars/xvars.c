@@ -10,52 +10,46 @@
 #include "xparser.h"
 #include "xstrdup.h"
 
-extern struct vars_vect *vars;
-
-struct vars_vect *init_vars_vect()
-{
-    struct vars_vect *res = xcalloc(1, sizeof(struct vars_vect));
-
-    res->cap = 8;
-    res->vars = xcalloc(res->cap, sizeof(struct var));
-    res->at = xcalloc(1, sizeof(char *));
-
-    return res;
-}
+extern struct context *context;
 
 void add_var(char *name, char *value)
 {
     int pos = 0;
-    for (; pos < vars->len; ++pos)
+    for (; pos < context->vars->len; ++pos)
     {
-        if (!strcmp(vars->vars[pos].name, name))
+        if (!strcmp(context->vars->vars[pos].name, name))
             break;
     }
 
-    if (pos != vars->len)
+    if (pos != context->vars->len)
     {
-        xfree(vars->vars[pos].value);
-        vars->vars[pos].value = xstrdup(value);
+        char *previous = context->vars->vars[pos].value;
+        context->vars->vars[pos].value = xstrdup(value);
+        xfree(previous);
 
         return;
     }
 
-    if (vars->len >= vars->cap - 1)
+    if (context->vars->len >= context->vars->cap - 1)
     {
-        vars->cap *= 2;
-        vars->vars = xrecalloc(vars->vars, vars->cap * sizeof(struct var));
+        context->vars->cap *= 2;
+        context->vars->vars = xrecalloc(
+            context->vars->vars, context->vars->cap * sizeof(struct var));
     }
 
-    vars->vars[vars->len].name = xstrdup(name);
-    vars->vars[vars->len].value = xstrdup(value);
+    context->vars->vars[context->vars->len].name = xstrdup(name);
+    context->vars->vars[context->vars->len].value = xstrdup(value);
 
-    vars->len++;
+    context->vars->len++;
 }
 
 void set_var_at(char *value, int i)
 {
-    vars->at = xrecalloc(vars->at, (i + 2) * sizeof(char *));
-    vars->at[i] = xstrdup(value);
+    context->vars->at = xrecalloc(context->vars->at, (i + 2) * sizeof(char *));
+    if (value)
+        context->vars->at[i] = xstrdup(value);
+    else
+        context->vars->at[i] = NULL;
 }
 
 void set_var_int(char *name, long value)
@@ -79,27 +73,27 @@ char *get_var(char *name, int *i_at)
 
     if (name && !strcmp("@", name))
     {
-        if (!vars->at[*i_at])
+        if (!context->vars->at[*i_at])
         {
             *i_at = 0;
             return "";
         }
         int old = *i_at;
         (*i_at)++;
-        if (!vars->at[*i_at])
+        if (!context->vars->at[*i_at])
             *i_at = 0;
-        return vars->at[old];
+        return context->vars->at[old];
     }
 
     int pos = 0;
-    for (; pos < vars->len; ++pos)
+    for (; pos < context->vars->len; ++pos)
     {
-        if (!strcmp(vars->vars[pos].name, name))
+        if (!strcmp(context->vars->vars[pos].name, name))
             break;
     }
 
-    if (pos != vars->len)
-        return vars->vars[pos].value;
+    if (pos != context->vars->len)
+        return context->vars->vars[pos].value;
     else
         return "";
 }

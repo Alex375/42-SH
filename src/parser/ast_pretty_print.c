@@ -57,6 +57,7 @@ void pp_rec(struct ast *ast, int prof)
     struct n_if *if_ast;
     struct n_command *cmd_ast;
     struct n_for *for_ast;
+    struct n_func *func;
 
     switch (ast->type)
     {
@@ -139,7 +140,10 @@ void pp_rec(struct ast *ast, int prof)
         pp_rec(ast->t_ast, prof + 1);
         break;
     case AST_FUNC:
-        break;
+        func = ast->t_ast;
+        tab(prof);
+        printf("FUNCDEC %s\n", func->name);
+        pp_rec(func->ast, prof + 1);
     case AST_LIST:
         binary_ast = ast->t_ast;
         tab(prof);

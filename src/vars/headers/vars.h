@@ -2,6 +2,7 @@
 #define INC_42_SH_VARS_H
 
 #include "vector_tokens.h"
+#include "func.h"
 
 struct var
 {
@@ -15,10 +16,25 @@ struct vars_vect
     int cap;
     struct var *vars;
     char **at;
+    int argc;
 };
 
 /**
-** @brief               alloc and inits the token vector
+** @brief               the global variable
+*/
+struct context
+{
+    struct vars_vect *vars;
+    struct fc_vect *fcs;
+};
+
+/**
+** @brief               inits context global var
+*/
+struct context *init_context();
+
+/**
+** @brief               inits vars global var
 */
 struct vars_vect *init_vars_vect();
 
@@ -28,15 +44,33 @@ struct vars_vect *init_vars_vect();
 void add_var(char *name, char *value);
 
 /**
+** @brief               add a variable to variable vars givven as arg
+*/
+void add_var_var(struct vars_vect *vars, char *name, char *value);
+
+
+void push_pop_arg(struct vars_vect *var, int pop);
+
+/**
 ** @brief               add a part of @ variable to the global variable vars
 */
 void set_var_at(char *value, int i);
 
 /**
 ** @brief               add a variable to the global variable vars casting the
-*                      int to a char
+*                       int to a char
 */
 void set_var_int(char *name, long value);
+
+/**
+** @brief               setter for argc
+*/
+void set_vars_argc(int argc);
+
+/**
+** @brief               getter for argc
+*/
+int get_vars_argc();
 
 /**
 ** @brief               gets value of a variable in the global variable vars
@@ -44,6 +78,21 @@ void set_var_int(char *name, long value);
 *                      i for accesing @ var
 */
 char *get_var(char *name, int *i_at);
+
+/**
+** @brief               saves the arguments related vars in a vect
+*/
+void save_arg_var();
+
+/**
+** @brief               free vars variable
+*/
+void free_vars(struct vars_vect *vars);
+
+/**
+** @brief               free context variable
+*/
+void free_context();
 
 //////////////////
 

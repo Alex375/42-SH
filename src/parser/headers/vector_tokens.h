@@ -28,4 +28,14 @@ struct tok_vect *init_tok_vect();
 */
 int add_word_vect(struct tok_vect *tok_vect, int quote_word);
 
+/**
+** @brief              duplicate the vector structure
+*/
+struct tok_vect *dup_token_vect(struct tok_vect *vect);
+
+/**
+** @brief               free the vect structure
+*/
+void free_token_vect(struct tok_vect *vect);
+
 #endif // INC_42_SH_VECTOR_TOKENS_H

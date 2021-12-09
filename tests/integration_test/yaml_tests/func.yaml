@@ -1,0 +1,36 @@
+
+- name: simple fc
+  input: |
+    foo()
+    { echo foooooo ;}
+    foo
+  type: success
+
+
+- name: simple fc nested
+  input: |
+    foo() {
+      bar() {
+      echo foobar
+      }
+    }
+      foo
+      bar
+  type: success
+
+- name: simple fc vars
+  input: |
+    a=3;
+    foo()
+    { a=2; echo $a;}
+    echo $a
+    foo
+    echo $a
+  type: success
+
+- name: script vars arg
+  arguments:
+    - yaml_tests/sample_script/fc.sh
+    - nooo
+    - "waaaa yyyy"
+  type: success

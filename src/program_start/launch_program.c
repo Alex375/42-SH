@@ -10,7 +10,7 @@
 #include "vars.h"
 
 struct options *opt = NULL;
-struct vars_vect *vars = NULL;
+struct context *context = NULL;
 
 char *read_stdin(void)
 {
@@ -32,7 +32,7 @@ char *read_stdin(void)
 
 int launch_program(int argc, char **argv)
 {
-    vars = init_vars_vect();
+    context = init_context();
 
     opt = xcalloc(1, sizeof(struct options));
 
