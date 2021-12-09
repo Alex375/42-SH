@@ -45,15 +45,21 @@ static struct token_info lex_accumulator(struct token_info res,
     res.type = tokenify(string->data);
     context_update(res);
 
-    if (g_lexer_info.var_context == IN_VAR_NAME)
-    {
-        res = lex_varname(res, string);
-    }
-    else if (g_lexer_info.for_context != GENERAL_FOR)
+
+
+    if (g_lexer_info.for_context != GENERAL_FOR)
     {
         res = lex_for(res, string);
     }
-    else if (g_lexer_info.var_context != GENERAL_VAR
+    else if (res.type == T_D_PAREN || res.type == T_BACKQUOTE)
+    {
+        res = lex_sub(res);
+    }
+    else if (g_lexer_info.var_context == IN_VAR_NAME)
+    {
+        res = lex_varname(res, string);
+    }
+    else if (g_lexer_info.var_context != GENERAL_VAR && g_lexer_info.var_context != IN_VAR_INIT
              && g_lexer_info.last_exp_context != IN_SQUOTE_EXP)
     {
         res = lex_var(res, string);
@@ -109,6 +115,15 @@ struct token_info tokenify_next(const char *script, size_t size)
     struct string *accumulator = string_create();
     do
     {
+        if (script[g_lexer_info.pos] == '\0' || g_lexer_info.pos >= size)
+        {
+            res.type = T_EOF;
+            if (g_lexer_info.soft_expansion == IN_DQUOTE)
+            {
+                g_lexer_info.soft_expansion = GENERAL_EXP_SOFT;
+                res.type = T_ERROR;
+            }
+        }
         if (!skip_character(script[g_lexer_info.pos]))
             accumulator = string_append(accumulator, script[g_lexer_info.pos]);
 

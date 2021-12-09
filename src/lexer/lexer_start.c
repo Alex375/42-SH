@@ -1,21 +1,27 @@
 #include "lexer.h"
 
-void lexer_start(char *script, size_t size)
+void lexer_start(char *script, size_t size, long end)
 {
-    if (g_lexer_info.token_list != NULL)
-        return;
+    if (end == -1)
+    {
+        if (g_lexer_info.token_list != NULL)
+            return;
 
-    g_lexer_info.script = script;
-    g_lexer_info.script_size = size;
-    g_lexer_info.token_list = tkvec_create();
+        g_lexer_info.script = script;
+        g_lexer_info.script_size = size;
+        g_lexer_info.token_list = tkvec_create();
+
+    }
 
     struct token_info token;
     while ((token = tokenify_next(script, size)).type != T_EOF)
     {
         g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, token);
+        if (end != -1 && g_lexer_info.pos  >= (size_t) end)
+        {
+            return;
+        }
     }
-
-    return;
 }
 
 void lexer_reset()

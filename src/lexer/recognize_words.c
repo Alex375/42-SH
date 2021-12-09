@@ -4,13 +4,13 @@
 #include "lexer.h"
 
 struct words_converter converter = {
-    28,
+    30,
     18,
     { "if",   "then", "elif", "else", "fi", "while", "until", "for", "in", "do",
       "done", "!",    "||",   "&&",   "\n", ";",     "{",     "}",   "(",  ")",
-      "|",    ">",    "<",    ">&",   "<&", ">>",    "<>",    ">|" },
+      "|",    ">",    "<",    ">&",   "<&", ">>",    "<>",    ">|", "`", "$("  },
     { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&",
-      ">>", "<>", ">|", "{", "}" }
+      ">>", "<>", ">|",  "`", "$(" }
 };
 
 int separatorify(const char *token_str)
@@ -38,7 +38,7 @@ int is_token_seperator(enum token token)
                          T_C_PRTH,  T_O_PRTH,    T_PIPE,      T_EOF,
                          T_REDIR_1, T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
                          T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
-                         T_O_BRKT,  T_C_BRKT };
+                         T_BACKQUOTE, T_D_PAREN };
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
@@ -82,10 +82,18 @@ int check_special(struct string *accumulator, char next_char)
         && g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         char next[2] = { next_char, 0 };
-        if (fnmatch("[$\\\\\"`]", next, FNM_EXTMATCH) == 0)
+        if (fnmatch("@([$\\\\\"`]|$()", next, FNM_EXTMATCH) == 0)
         {
             accumulator->size--;
             accumulator->data[accumulator->size] = '\0';
+        }
+    }
+
+    if (g_lexer_info.soft_expansion == IN_DQUOTE)
+    {
+        if (fnmatch("@(`|$()", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            return 1;
         }
     }
 
@@ -96,6 +104,15 @@ int check_special(struct string *accumulator, char next_char)
         if (fnmatch("+([a-zA-Z0-9_])=", accumulator->data, FNM_EXTMATCH) == 0)
         {
             g_lexer_info.var_context = IN_VAR_NAME;
+            return 1;
+        }
+    }
+
+    if (g_lexer_info.last_exp_context == IN_ESCAPE_EXP)
+    {
+        if (fnmatch("$", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.exp_context = GENERAL_EXP_HARD;
             return 1;
         }
     }

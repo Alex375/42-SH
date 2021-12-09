@@ -76,6 +76,7 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
             string_concat(res, tok_vect->list[*i].command);
         else
         {
+            int old_at = *nb_at;
             char *val = get_var(tok_vect->list[*i].command, nb_at);
             if ((!val || !val[0])
                 && ((tok_vect->list[*i].type == T_VAR_INQUOTE
@@ -100,8 +101,7 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
                     (*nb_strtok)++;
                     if (my_strsep(xstrdup(val), get_var("IFS", 0), *nb_strtok))
                     {
-                        if (*nb_at)
-                            (*nb_at)--;
+                        *nb_at = old_at;
                         break;
                     }
                 }

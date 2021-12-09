@@ -9,6 +9,8 @@
 #include "execution.h"
 #include "options.h"
 #include "xalloc.h"
+#include "eval_ast.h"
+#include "special_vars.h"
 
 extern struct options *opt;
 
@@ -26,6 +28,11 @@ int execute(char **args)
     {
         fprintf(stdout, "Executing command -> %s\nWith args1 -> %s\n", args[0],
                 args[1]);
+    }
+    struct ast *fc_ast;
+    if (get_fc(args[0], &fc_ast) == 1)
+    {
+        return exec_func(args, fc_ast);
     }
     int index;
     if ((index = get_builins_index(args[0])) != -1)

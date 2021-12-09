@@ -29,3 +29,11 @@
 - name: Pipe exit
   input: exit 42 | echo $?
   type: success
+
+- name: Bad triple pipe
+  input: echo coucou | fwe
+  type: failed
+
+- name: Bad triple pipe
+  input: echo coucou ||| cat
+  type: failed
