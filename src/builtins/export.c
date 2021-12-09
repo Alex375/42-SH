@@ -4,7 +4,7 @@
 #include "ast_xalloc.h"
 #include "vars.h"
 
-int unset(char **args)
+int export(char **args)
 {
     int i = 1;
     int f = 0;

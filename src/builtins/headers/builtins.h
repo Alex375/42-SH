@@ -27,6 +27,21 @@ int cd(char **args);
 int unset(char **args);
 
 /*!
+ * @brief Replicate the break function
+ * @param args Array of string containing arguments of break
+ * @return Return the args of break + 255
+ */
+int xbreak(char **args);
+
+/*!
+ * @brief Replicate the continue function
+ * @param args Array of string containing arguments of continue
+ * @return Return the negative of args of continue
+ */
+int xcontinue(char **args);
+
+
+/*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
  * get index)
  * @param index

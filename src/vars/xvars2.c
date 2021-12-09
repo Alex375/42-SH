@@ -1,12 +1,11 @@
 
-#include "func.h"
+#include <stdio.h>
+
+#include "ast_xalloc.h"
 #include "handle_ast.h"
 #include "vars.h"
-#include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
-
-#include <stdio.h>
 
 extern struct context *context;
 
@@ -54,7 +53,7 @@ void add_var_var(struct vars_vect *vars, char *name, char *value)
     context->vars = vars;
     add_var(name, value);
 
-    context->vars =save;
+    context->vars = save;
 }
 
 void set_vars_argc(int argc)

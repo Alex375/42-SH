@@ -17,3 +17,52 @@
 - name: Unset void
   input: 'a=w; echo a; unset; echo $a'
   type: success
+
+- name: Unset bad option
+  input: |
+    a=3
+    echo $a
+    unset -d a
+  type: failed
+
+- name: Unset bad var
+  input: |
+    a=3
+    echo $a
+    unset 1d a
+    echo $a
+  type: failed
+
+- name: Unset func
+  input: |
+    foo() { echo foo; }
+    foo
+    unset foo
+    foo
+    unset -v foo
+    foo
+    unset -f foo
+    foo
+  type: failed
+
+- name: Unset var
+  input: |
+    foo() { echo foo; }
+    foo=3
+    foo
+    echo $foo
+    unset foo
+    foo
+    unset -v foo
+    foo
+    unset -f foo
+    foo
+  type: failed
+
+- name: Unset fun
+  input: |
+    foo() { echo foo; }
+    foo
+    unset -f foo
+    foo
+  type: failed
