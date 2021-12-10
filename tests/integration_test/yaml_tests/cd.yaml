@@ -89,6 +89,6 @@
     echo Exit code $?
     env -i pwd
     echo $PWD
-  type: success
+  type: failed
 
 
