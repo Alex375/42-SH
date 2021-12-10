@@ -49,7 +49,6 @@ int dot(char **args);
  */
 int exec_builtin(int index, char **args);
 
-
 /*!
  * @brief Return the exit
  * @param function function name to be executed

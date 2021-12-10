@@ -3,13 +3,13 @@
 #include <stddef.h>
 
 #include "eval_ast.h"
+#include "handle_ast.h"
 #include "options.h"
 #include "read_script.h"
 #include "special_vars.h"
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
-#include "handle_ast.h"
 
 extern struct options *opt;
 

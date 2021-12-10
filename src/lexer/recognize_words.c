@@ -3,15 +3,17 @@
 
 #include "lexer.h"
 
-struct words_converter converter = {
-    30,
-    18,
-    { "if",   "then", "elif", "else", "fi", "while", "until", "for", "in", "do",
-      "done", "!",    "||",   "&&",   "\n", ";",     "{",     "}",   "(",  ")",
-      "|",    ">",    "<",    ">&",   "<&", ">>",    "<>",    ">|", "`", "$("  },
-    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&",
-      ">>", "<>", ">|",  "`", "$(" }
-};
+struct words_converter converter = { 30,
+                                     18,
+                                     { "if",    "then",  "elif", "else", "fi",
+                                       "while", "until", "for",  "in",   "do",
+                                       "done",  "!",     "||",   "&&",   "\n",
+                                       ";",     "{",     "}",    "(",    ")",
+                                       "|",     ">",     "<",    ">&",   "<&",
+                                       ">>",    "<>",    ">|",   "`",    "$(" },
+                                     { "||", "&&", "\n", ";", "(", ")", "|",
+                                       " ", "\0", ">", "<", ">&", "<&", ">>",
+                                       "<>", ">|", "`", "$(" } };
 
 int separatorify(const char *token_str)
 {
@@ -34,10 +36,10 @@ int separatorify(const char *token_str)
 
 int is_token_seperator(enum token token)
 {
-    enum token sep[] = { T_AND,     T_OR,        T_NEWLINE,   T_SEMICOLON,
-                         T_C_PRTH,  T_O_PRTH,    T_PIPE,      T_EOF,
-                         T_REDIR_1, T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
-                         T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
+    enum token sep[] = { T_AND,       T_OR,        T_NEWLINE,   T_SEMICOLON,
+                         T_C_PRTH,    T_O_PRTH,    T_PIPE,      T_EOF,
+                         T_REDIR_1,   T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
+                         T_REDIR_A,   T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
                          T_BACKQUOTE, T_D_PAREN };
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 

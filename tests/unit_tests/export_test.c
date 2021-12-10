@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "builtins.h"
 
 int main()
@@ -8,7 +9,7 @@ int main()
     char *arg1 = "test=";
     char *arg2 = "test2=marche";
     char *arg3 = "test3=       a";
-    char **args = calloc(5, sizeof(char*));
+    char **args = calloc(5, sizeof(char *));
     args[0] = arg0;
     args[1] = arg1;
     args[2] = arg2;
