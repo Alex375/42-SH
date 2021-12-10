@@ -27,20 +27,6 @@ int cd(char **args);
 int unset(char **args);
 
 /*!
- * @brief Replicate the break function
- * @param args Array of string containing arguments of break
- * @return Return the args of break + 255
- */
-int xbreak(char **args);
-
-/*!
- * @brief Replicate the continue function
- * @param args Array of string containing arguments of continue
- * @return Return the negative of args of continue
- */
-int xcontinue(char **args);
-
-/*!
  * @brief Replicate the export function
  * @param args Array of string containing arguments of continue
  * @return Return always 0
