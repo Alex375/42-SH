@@ -56,12 +56,6 @@
 
 - name: TDB 1
   input: |
-    cd $(echo './')
-    ls
-  type: success
-
-- name: TDB 2
-  input: |
     cd `echo './'`
     ls
   type: success
@@ -89,6 +83,6 @@
     echo Exit code $?
     env -i pwd
     echo $PWD
-  type: success
+  type: failed
 
 
