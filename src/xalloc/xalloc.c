@@ -104,9 +104,9 @@ void *xrealloc(void *data, size_t new_size)
 
 void *xrecalloc(void *data, size_t new_size)
 {
-    size_t old_size = get_header(data)->allocation_size;
     data = xrealloc(data, new_size);
 
+    size_t old_size = get_header(data)->allocation_size;
     char *start_data_addr = data;
     if (old_size < new_size)
         memset(start_data_addr + old_size, 0, new_size - old_size);

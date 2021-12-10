@@ -1,15 +1,13 @@
 - name: simple dot
   input: |
     cd .
-    ls
+    env -i pwd
   type: success
-
-- name: Simple
 
 - name: double dot
   input: |
     cd ..
-    ls
+    env -i pwd
   type: success
 
 - name: no args (goto HOME)
@@ -61,9 +59,7 @@
   type: success
 
 - name: Failed
-  input: |
-    cd efw
-    ls
+  input: cd efw; ls
   type: failed
 
 - name: Complexe
@@ -72,7 +68,6 @@
     cd .././../$dir/.
     ls
     env -i pwd
-    echo $PWD
     pwd
   type: success
 

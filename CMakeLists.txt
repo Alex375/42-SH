@@ -43,7 +43,4 @@ add_executable(echo_main ${SRC} tests/unit_tests/echo_tests/echo_main.c)
 add_executable(export_test ${SRC} tests/unit_tests/export_test.c)
 target_link_libraries(export_test PRIVATE -fsanitize=address)
 
-add_executable(dot_test ${SRC} tests/unit_tests/dot_test.c)
-target_link_libraries(export_test PRIVATE -fsanitize=address)
-
 

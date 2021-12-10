@@ -62,6 +62,7 @@ int dot(char **args);
  * @return Return the exit code of the executed command
  */
 int exec_builtin(int index, char **args);
+int pwd(char **args);
 
 
 /*!
