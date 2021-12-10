@@ -234,7 +234,7 @@ def main() -> int:
                     check = testcase.checks
                 else:
                     check = test_types[testcase.type]
-                with timeout(1):
+                with timeout(120):
                     dash_proc = run_shell(categ.reference, stdin, testcase.arguments)
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_repport = perform_checks(dash_proc, sh_proc,

@@ -18,7 +18,7 @@ char *read_script(char *filename)
     size_t r = 0;
     while ((r = fread(res + i, 1, BUFFER_SIZE, f)))
     {
-        i += r;
+        i += r + 1;
         res = xrealloc(res, i + 1);
     }
     res[i] = '\0';
