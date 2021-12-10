@@ -44,7 +44,7 @@ int exec_script(char *script, size_t size, int set_var)
         handle_rec(ast, H_FREE);
     }
     lexer_reset();
-
-    free_context();
+    if (set_var)
+        free_context();
     return res;
 }
