@@ -10,7 +10,7 @@ int get_builins_index(char *function)
 {
     if (function == NULL)
         return -1;
-    char *builints[5] = { "echo", "exit", "cd", "unset", "dot" };
+    char *builints[5] = { "echo", "exit", "cd", "unset", "." };
     for (int i = 0; i < 5; i++)
     {
         if (strcmp(builints[i], function) == 0)
