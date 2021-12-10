@@ -16,7 +16,7 @@ int exec_pipe(struct ast *left, struct ast *right)
     int fd[2];
     pipe(fd);
 
-    int res = 0;
+    int res;
     pid_t pid1 = fork();
 
     if (pid1 == -1)

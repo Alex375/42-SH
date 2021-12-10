@@ -50,3 +50,9 @@ int contain_slash(char *str)
 //
 //    return 0;
 //}
+
+int dot(char **args)
+{
+    //TODO: Implement
+    return 0;
+}

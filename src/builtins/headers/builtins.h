@@ -47,6 +47,12 @@ int xcontinue(char **args);
  */
 int export(char **args);
 
+/*!
+ * @brief Replicate the dot function
+ * @param args Array of string containing arguments of dot
+ * @return Return always exit code of dot
+ */
+int dot(char **args);
 
 /*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
