@@ -180,7 +180,7 @@ def build_binary(binary: Path, build_path: Path):
     print(termcolor.colored("Copying binary to test directory", 'blue'))
 
 
-def main():
+def main() -> int:
     parser = ArgumentParser("Testsuite")
     parser.add_argument("--binary", required=False, type=Path, default="42SH")
     parser.add_argument("--category", required=False, type=str)
@@ -265,7 +265,8 @@ def main():
             os.remove(binary_path)
         except Exception:
             pass
+    return int(failed != 0)
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())
