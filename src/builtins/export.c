@@ -1,52 +1,42 @@
 #include <err.h>
-#include <ctype.h>
+#include <string.h>
+#include "xstrdup.h"
+#include <stdlib.h>
+#if __APPLE__
+#    include "xfnmatch.h"
+#else
+#    define _GNU_SOURCE
+#    include <fnmatch.h>
+#endif
 
-#include "ast_xalloc.h"
-#include "vars.h"
 
 int export(char **args)
 {
     int i = 1;
-    int f = 0;
-    while (args[i] && args[i][0] == '-' && args[i][1])
+    while (args[i] && args[i][0])
     {
-        int j = 1;
-        while (args[i][j] == 'v' || args[i][j] == 'f')
-        {
-            f = args[i][j++] == 'f';
-        }
-        if (args[i][j])
-        {
-            xfree_all();
-            err(2, "unset: illegal option");
-        }
+        if (fnmatch("+([a-zA-Z0-9_])=*", args[i], FNM_EXTMATCH) != 0)
+            errx(1, "export: '%s': not a valid identifier", args[i]);
+
+        char *copy = xstrdup(args[i]);
+        char* pos_equal = strchr(copy, '=');
+        if (pos_equal == NULL)
+            errx(1, "export: '%s': not a valid identifier", args[i]);
+
+
+        *pos_equal = '\0';
+        char *var_name = copy;
+        char *var_value = "";
+
+        if (*(pos_equal + 1) != '\0')
+            var_value = pos_equal + 1;
+
+        if (setenv(var_name, var_value, 1) == -1)
+            errx(1, "export: the maximum has been reached");
+
         i++;
     }
-    while (args[i])
-    {
-        if (args[i][0] == '\0')
-        {
-            i++;
-            continue;
-        }
-        if (isalpha(args[i][0]) || args[i][0] == '_')
-        {
-            if (f)
-            {
-                destroy_fc(args[i]);
-            }
-            else
-            {
-                add_var(args[i], "");
-                unsetenv(args[i]);
-            }
-        }
-        else
-        {
-            xfree_all();
-            err(2, "Unset: Bad variable name");
-        }
-        i++;
-    }
+
     return 0;
 }
+

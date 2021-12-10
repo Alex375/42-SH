@@ -40,6 +40,13 @@ int xbreak(char **args);
  */
 int xcontinue(char **args);
 
+/*!
+ * @brief Replicate the export function
+ * @param args Array of string containing arguments of continue
+ * @return Return always 0
+ */
+int export(char **args);
+
 
 /*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
@@ -49,6 +56,7 @@ int xcontinue(char **args);
  * @return Return the exit code of the executed command
  */
 int exec_builtin(int index, char **args);
+
 
 /*!
  * @brief Return the exit
