@@ -70,7 +70,7 @@ int launch_program(int argc, char **argv)
     }
     if (opt->verbose)
         printf("Executing command \n\'%s\'\n", opt->script);
-    int res = exec_script(opt->script, strlen(opt->script));
+    int res = exec_script(opt->script, strlen(opt->script), 1);
     xfree_all();
     return res;
 }

@@ -42,7 +42,7 @@ int dot(char **args)
             if(access(file_env, F_OK) == 0)
             {
                 char *script = read_script(file_env);
-                return exec_script(script, strlen(file));
+                return exec_script(script, strlen(file), 0);
             }
         }
     }
@@ -53,5 +53,5 @@ int dot(char **args)
     }
 
     char *script = read_script(file);
-    return exec_script(script, strlen(file));;
+    return exec_script(script, strlen(file), 0);
 }

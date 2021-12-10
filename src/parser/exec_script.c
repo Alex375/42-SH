@@ -13,9 +13,10 @@
 
 extern struct options *opt;
 
-int exec_script(char *script, size_t size)
+int exec_script(char *script, size_t size, int set_var)
 {
-    set_special_vars(opt->argc, opt->argv);
+    if (set_var)
+        set_special_vars(opt->argc, opt->argv);
     struct ast *ast;
     errno = 0;
 
