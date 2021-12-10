@@ -10,10 +10,13 @@
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
+#include "ast_info.h"
 
 extern struct options *opt;
 
+struct ast_info *ast_info = NULL;
 int exec_script(char *script, size_t size, int set_var)
+
 {
     if (set_var)
         set_special_vars(opt->argc, opt->argv);
@@ -39,7 +42,14 @@ int exec_script(char *script, size_t size, int set_var)
             break;
         }
         else if (ast)
+        {
+            ast_info = xcalloc(1, sizeof(struct ast_info));
+            ast_info->type = A_NOTHING;
+
             res = eval_ast(ast);
+
+            xfree(ast_info);
+        }
 
         handle_rec(ast, H_FREE);
     }

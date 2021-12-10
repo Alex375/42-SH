@@ -2,12 +2,32 @@
 
 #include <err.h>
 
+#include "ast_info.h"
 #include "execution.h"
 
 #define RETURN(val)                                                            \
     res = val;                                                                 \
     set_var_int("?", res);                                                     \
     return res;
+
+#define EVAL_AST(val)                                                          \
+    res = eval_ast(val);                                                       \
+    set_var_int("?", res);                                                     \
+    if (is_breaking())                                                         \
+        return res;
+
+#define EVAL_AST_IN_LOOP(val)         \
+    inc_depth();\
+    res = eval_ast(val);                                                       \
+    set_var_int("?", res);                                                     \
+    enum ast_info_type t;                                                      \
+    if ((t = b_c_is_done()) != A_NOTHING)                                      \
+    {                                                                          \
+        if (t == A_BREAK)                                                      \
+            break;                                                             \
+        else                                                                   \
+            continue;                                                          \
+    }
 
 int eval_ast(struct ast *ast)
 {
@@ -44,17 +64,29 @@ int eval_ast(struct ast *ast)
         RETURN(res)
     case AST_IF:
         if_ast = ast->t_ast;
-        if (eval_ast(if_ast->condition) == 0)
-            res = eval_ast(if_ast->true_c);
+        EVAL_AST(if_ast->condition)
+        if (res == 0)
+        {
+            EVAL_AST(if_ast->true_c)
+        }
         else
-            res = eval_ast(if_ast->false_c);
+        {
+            EVAL_AST(if_ast->false_c)
+        }
         RETURN(res)
     case AST_WHILE:
     case AST_UNTIL:
         b_ast = ast->t_ast;
+
+        if (ast->type == AST_UNTIL)
+        {
+            EVAL_AST_IN_LOOP()
+        }
         while ((ast->type == AST_UNTIL && eval_ast(b_ast->left))
                || (ast->type == AST_WHILE && eval_ast(b_ast->left) == 0))
-            res = eval_ast(b_ast->right);
+        {
+            EVAL_AST_IN_LOOP(b_ast->right)
+        }
 
         RETURN(res)
     case AST_FOR:
@@ -63,7 +95,7 @@ int eval_ast(struct ast *ast)
         for (int i = 0; seq[i]; ++i)
         {
             add_var(for_ast->name, seq[i]);
-            res = eval_ast(for_ast->statement);
+            EVAL_AST(for_ast->statement);
         }
 
         RETURN(res)
