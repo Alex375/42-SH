@@ -25,9 +25,14 @@ void set_b_c(int code, enum ast_info_type type)
 enum ast_info_type b_c_is_done()
 {
     ast_info->depth--;
+
     if (ast_info->code)
         ast_info->code--;
-    if (ast_info->type != A_NOTHING && (ast_info->depth == 0 || ast_info->code == 0))
+
+    if (ast_info->type == A_NOTHING)
+        return A_NOTHING;
+
+    if ((ast_info->depth == 0 || ast_info->code == 0))
     {
         ast_info->code = 0;
         enum ast_info_type t = ast_info->type;
@@ -35,7 +40,7 @@ enum ast_info_type b_c_is_done()
         return t;
     }
 
-    return A_NOTHING;
+    return A_BREAK;
 }
 
 enum ast_info_type is_breaking()
