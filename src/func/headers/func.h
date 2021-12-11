@@ -25,6 +25,11 @@ struct fc_vect *init_func_vect();
 void add_fc(char *name, struct ast *ast);
 
 /**
+** @brief               remove from fcs the function named name if it exists
+*/
+void destroy_fc(char *name);
+
+/**
 ** @brief               gets the ast of func named name
 */
 int get_fc(char *name, struct ast **ast);
@@ -33,6 +38,5 @@ int get_fc(char *name, struct ast **ast);
 ** @brief               free the fcs struct
 */
 void free_fcs();
-
 
 #endif // INC_42_SH_FUNC_H

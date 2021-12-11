@@ -1,7 +1,7 @@
+#include "ast_xalloc.h"
 #include "func.h"
 #include "handle_ast.h"
 #include "vars.h"
-#include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
 

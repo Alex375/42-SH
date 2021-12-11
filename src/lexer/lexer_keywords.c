@@ -33,7 +33,8 @@ int look_ahead_keywords(const char *script, size_t size)
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {
-        if (g_lexer_info.var_context == GENERAL_VAR || g_lexer_info.var_context == IN_VAR_INIT)
+        if (g_lexer_info.var_context == GENERAL_VAR
+            || g_lexer_info.var_context == IN_VAR_INIT)
         {
             if ((script[i] == '(' && i + 1 < size && script[i + 1] == ')')
                 || (script[i] == ')' && i > 0 && script[i - 1] == '('))
@@ -55,7 +56,8 @@ int look_ahead_keywords(const char *script, size_t size)
     accumulator = string_append(accumulator, script[i]);
     if (separatorify(accumulator->data) != -1)
     {
-        if (g_lexer_info.var_context == GENERAL_VAR || g_lexer_info.var_context == IN_VAR_INIT)
+        if (g_lexer_info.var_context == GENERAL_VAR
+            || g_lexer_info.var_context == IN_VAR_INIT)
         {
             string_free(accumulator);
             return 0;
@@ -78,12 +80,8 @@ struct token_info lex_keywords(struct token_info res, struct string *string)
     }
     else if (res.type == T_C_BRKT)
     {
-
         g_lexer_info.fun_context = GENERAL_FUN;
     }
-
-
-
 
     string_free(string);
     return res;

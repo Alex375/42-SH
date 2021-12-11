@@ -3,19 +3,23 @@
 #include <stddef.h>
 
 #include "eval_ast.h"
+#include "handle_ast.h"
 #include "options.h"
 #include "read_script.h"
 #include "special_vars.h"
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
-#include "handle_ast.h"
+#include "ast_info.h"
 
 extern struct options *opt;
 
-int exec_script(char *script, size_t size)
+struct ast_info *ast_info = NULL;
+int exec_script(char *script, size_t size, int set_var)
+
 {
-    set_special_vars(opt->argc, opt->argv);
+    if (set_var)
+        set_special_vars(opt->argc, opt->argv);
     struct ast *ast;
     errno = 0;
 
@@ -38,12 +42,19 @@ int exec_script(char *script, size_t size)
             break;
         }
         else if (ast)
+        {
+            ast_info = xcalloc(1, sizeof(struct ast_info));
+            ast_info->type = A_NOTHING;
+
             res = eval_ast(ast);
+
+            xfree(ast_info);
+        }
 
         handle_rec(ast, H_FREE);
     }
     lexer_reset();
-
-    free_context();
+    if (set_var)
+        free_context();
     return res;
 }

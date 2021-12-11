@@ -17,9 +17,10 @@ include_directories(src/builtins/headers)
 include_directories(src/vars/headers)
 include_directories(src/func/headers)
 include_directories(src/handle_ast/headers)
+include_directories(src/ast_info/headers)
 
 
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c src/vars/*.c src/func/*.c src/handle_ast/*.c)
+file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c src/vars/*.c src/func/*.c src/handle_ast/*.c src/ast_info/*.c)
 
 if (APPLE)
     include_directories(src/xfnmatch)
@@ -39,5 +40,11 @@ add_executable(echo_test ${SRC} tests/unit_tests/echo_tests/echo_tests.c)
 target_link_libraries(echo_test PUBLIC -lcriterion)
 
 add_executable(echo_main ${SRC} tests/unit_tests/echo_tests/echo_main.c)
+
+add_executable(export_test ${SRC} tests/unit_tests/export_test.c)
+target_link_libraries(export_test PRIVATE -fsanitize=address)
+
+add_executable(dot_test ${SRC} tests/unit_tests/dot_test.c)
+target_link_libraries(export_test PRIVATE -fsanitize=address)
 
 

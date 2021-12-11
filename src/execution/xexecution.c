@@ -6,11 +6,11 @@
 #include <unistd.h>
 
 #include "builtins.h"
+#include "eval_ast.h"
 #include "execution.h"
 #include "options.h"
-#include "xalloc.h"
-#include "eval_ast.h"
 #include "special_vars.h"
+#include "xalloc.h"
 
 extern struct options *opt;
 

@@ -33,12 +33,17 @@ sources = [
     'src/execution/xexecution.c',
     'src/execution/pipe.c',
     'src/execution/redir.c',
+    'src/execution/funcx.c',
     'src/execution/subshell.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
     'src/builtins/builtins_dispatch.c',
     'src/builtins/echo.c',
     'src/builtins/exit.c',
+    'src/builtins/unset.c',
+    'src/builtins/cd.c',
+    'src/builtins/dot.c',
+    'src/builtins/export.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',
@@ -72,7 +77,11 @@ sources = [
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
     'src/lexer/lexer_fun.c',
-    'src/vars/xvars.c'
+    'src/vars/xvars.c',
+    'src/vars/xvars2.c',
+    'src/vars/context.c',
+    'src/handle_ast/handle_ast.c',
+    'src/func/func.c'
 ]
 
 includes = [
@@ -85,7 +94,9 @@ includes = [
     'src/program_start/headers',
     'src/data_types/headers',
     'src/builtins/headers',
-    'src/vars/headers'
+    'src/vars/headers',
+    'src/func/headers',
+    'src/handle_ast/headers'
 ]
 
 #42SH binary

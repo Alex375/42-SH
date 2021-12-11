@@ -1,11 +1,12 @@
 #include "func.h"
+
 #include <string.h>
 
+#include "handle_ast.h"
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
 #include "xstrdup.h"
-#include "handle_ast.h"
 
 extern struct context *context;
 
@@ -40,13 +41,36 @@ void add_fc(char *name, struct ast *ast)
     if (context->fcs->len >= context->fcs->cap - 1)
     {
         context->fcs->cap *= 2;
-        context->fcs->fcs = xrecalloc(context->fcs->fcs, context->fcs->cap * sizeof(struct fc));
+        context->fcs->fcs =
+            xrecalloc(context->fcs->fcs, context->fcs->cap * sizeof(struct fc));
     }
 
     context->fcs->fcs[context->fcs->len].name = xstrdup(name);
     context->fcs->fcs[context->fcs->len].ast = handle_rec(ast, H_DUP);
 
     context->fcs->len++;
+}
+
+void destroy_fc(char *name)
+{
+    int pos = 0;
+    for (; pos < context->fcs->len; ++pos)
+    {
+        if (!strcmp(context->fcs->fcs[pos].name, name))
+            break;
+    }
+
+    if (pos != context->fcs->len)
+    {
+        struct ast *previous = context->fcs->fcs[pos].ast;
+        for (int i = pos; i < context->fcs->len - 1; ++i)
+        {
+            context->fcs->fcs[i] = context->fcs->fcs[i + 1];
+        }
+        handle_rec(previous, H_FREE);
+
+        context->fcs->len--;
+    }
 }
 
 int get_fc(char *name, struct ast **ast)
@@ -78,4 +102,3 @@ void free_fcs()
 
     xfree(context->fcs);
 }
-

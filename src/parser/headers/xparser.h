@@ -183,9 +183,10 @@ struct ast *build_single(struct ast *ast, enum AST_TYPE t);
 *                      (crash if a parsing error is found)
 ** @param script        string containing block
 ** @param size          len of script parameter
+** @param set_var       If true will set vars
 ** @return              Return le exit code of the last executed command
 */
-int exec_script(char *script, size_t size);
+int exec_script(char *script, size_t size, int set_var);
 
 /**
 ** @brief               printing the ast obtain from a script

@@ -1,0 +1,88 @@
+- name: simple dot
+  input: |
+    cd .
+    ls
+  type: success
+
+- name: Simple
+
+- name: double dot
+  input: |
+    cd ..
+    ls
+  type: success
+
+- name: no args (goto HOME)
+  input: |
+    cd
+    env -i pwd
+  type: success
+
+- name: lot of simple dot
+  input: |
+    cd ./././././././././././././././././././
+    env -i pwd
+  type: success
+
+- name: back & come again
+  input: |
+    cd ../integration_test
+    env -i pwd
+  type: success
+
+- name: absolute
+  input: |
+    cd /
+    env -i pwd
+  type: success
+
+- name: absolute set pwd
+  input: |
+    cd /
+    echo $PWD
+  type: success
+
+- name: hard one
+  input: |
+    cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
+    env -i pwd
+  type: success
+
+- name: hard one set pwd
+  input: |
+    cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
+    echo $PWD
+  type: success
+
+- name: TDB 1
+  input: |
+    cd `echo './'`
+    ls
+  type: success
+
+- name: Failed
+  input: |
+    cd efw
+    ls
+  type: failed
+
+- name: Complexe
+  input: |
+    dir=src
+    cd .././../$dir/.
+    ls
+    env -i pwd
+    echo $PWD
+    pwd
+  type: success
+
+- name: Failed complex
+  input: |
+    dir=srcs
+    cd ../../tests/$dir/
+    echo Exit code $?
+    env -i pwd
+    echo $PWD
+  type: failed
+
+

@@ -1,8 +1,8 @@
 #ifndef INC_42_SH_VARS_H
 #define INC_42_SH_VARS_H
 
-#include "vector_tokens.h"
 #include "func.h"
+#include "vector_tokens.h"
 
 struct var
 {
@@ -47,7 +47,6 @@ void add_var(char *name, char *value);
 ** @brief               add a variable to variable vars givven as arg
 */
 void add_var_var(struct vars_vect *vars, char *name, char *value);
-
 
 void push_pop_arg(struct vars_vect *var, int pop);
 
