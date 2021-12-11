@@ -1,9 +1,10 @@
-#include <criterion/criterion.h>
+
 #include <stdio.h>
 #include <string.h>
-
 #include "lexer.h"
+/*
 
+#include <criterion/criterion.h>
 #define EXPECTED_SIZE(array) (sizeof((array)) / sizeof(struct token_info))
 
 void test_lexer(char *script, size_t size, struct token_info expected[])
@@ -1328,17 +1329,17 @@ Test(VAR, NO_SEPA2)
         };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
+}*/
+
+
+ int main()
+{
+    char *script = "i=$(i=$(i=$(i=$(echo \"test\"); echo \"$i\"); echo \"$i\"); echo \"$i\")";
+    lexer_start(script, strlen(script), -1);
+    struct token_info tk;
+    while ((tk = pop_token()).type != T_EOF)
+    {
+        continue;
+    }
+    lexer_reset();
 }
-
-
-// int main()
-//{
-//    char *script = "''''";
-//    lexer_start(script, strlen(script), -1);
-//    struct token_info tk;
-//    while ((tk = pop_token()).type != T_EOF)
-//    {
-//        continue;
-//    }
-//    lexer_reset();
-//}
