@@ -144,6 +144,7 @@ void pp_rec(struct ast *ast, int prof)
         tab(prof);
         printf("FUNCDEC %s\n", func->name);
         pp_rec(func->ast, prof + 1);
+        break;
     case AST_LIST:
         binary_ast = ast->t_ast;
         tab(prof);

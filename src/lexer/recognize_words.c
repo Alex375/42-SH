@@ -91,7 +91,11 @@ int check_special(struct string *accumulator, char next_char)
 
     if (g_lexer_info.soft_expansion == IN_DQUOTE)
     {
-        if (fnmatch("@(`|$()", accumulator->data, FNM_EXTMATCH) == 0)
+        if (fnmatch("`", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            return 1;
+        }
+        else if (fnmatch("$(", accumulator->data, FNM_EXTMATCH) == 0)
         {
             return 1;
         }
