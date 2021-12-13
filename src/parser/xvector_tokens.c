@@ -45,6 +45,10 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
             return 1;
     }
 
+    if (added)
+    {
+        tok_vect->list[tok_vect->len - 1].is_space_after = 1;
+    }
     return added;
 }
 

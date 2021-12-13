@@ -1,6 +1,6 @@
 - name: simple
   input: |
-    case z in 1 | z) echo inn ;;
+    case z in 1|z) echo inn ;;
     $a) echo oon ;; esac
   type: success
 
