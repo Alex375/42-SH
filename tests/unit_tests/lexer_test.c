@@ -1174,10 +1174,10 @@ Test(COMMAND_SUB, easy)
 Test(COMMAND_SUB, easy3)
 {
     char *script = "`echo test`";
-    struct token_info expected[] = { { T_COMMAND_SUB_START, NULL, 0 },
+    struct token_info expected[] = { { T_BACKQUOTE, NULL, 0 },
                                      { T_WORD, "echo", 1 },
                                      { T_WORD, "test", 0 },
-                                     { T_COMMAND_SUB_END, ")", 0 } };
+                                     { T_BACKQUOTE, ")", 0 } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1198,10 +1198,10 @@ Test(COMMAND_SUB, easy5)
 {
     char *script = "i=`echo test`";
     struct token_info expected[] = { { T_VAR_INIT, "i", 0 },
-                                     { T_COMMAND_SUB_START, NULL, 0 },
+                                     { T_BACKQUOTE, NULL, 0 },
                                      { T_WORD, "echo", 1 },
                                      { T_WORD, "test", 0 },
-                                     { T_COMMAND_SUB_END, ")", 0 } };
+                                     { T_BACKQUOTE, ")", 0 } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1280,10 +1280,10 @@ Test(COMMAND_SUB, medium5)
 {
     char *script = "echo `i=1; echo \"$i\"` $pute";
     struct token_info expected[] = {
-        { T_WORD, "echo", 1 },     { T_COMMAND_SUB_START, NULL, 0 },
+        { T_WORD, "echo", 1 },     { T_BACKQUOTE, NULL, 0 },
         { T_VAR_INIT, "i", 0 },    { T_WORD, "1", 0 },
         { T_SEMICOLON, NULL, 1 },  { T_WORD, "echo", 1 },
-        { T_VAR_INQUOTE, "i", 0 }, { T_COMMAND_SUB_END, NULL, 1 },
+        { T_VAR_INQUOTE, "i", 0 }, { T_BACKQUOTE, NULL, 1 },
         { T_VAR, "pute", 0 },
     };
 
