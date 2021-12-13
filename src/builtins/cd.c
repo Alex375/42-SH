@@ -193,18 +193,18 @@ int cd(char **args)
         path = xstrdup(args[1]); // on recup le path passe en arg
 
 
-    int code_cd = chdir(fpath);
+    int code_cd = chdir(path);
     if (code_cd == -1)
     {
         fprintf(stderr, "%s: No such file or directory\n", path);
         return 2;
     }
 
-    printf("before PWD : %s\n", getenv("PWD"));
+    //printf("before PWD : %s\n", getenv("PWD"));
     set_Envar(path);
 
-    printf("PWD : %s\n", getenv("PWD"));
-    printf("OLDPWD : %s\n", getenv("OLDPWD"));
+    //printf("PWD : %s\n", getenv("PWD"));
+    //printf("OLDPWD : %s\n", getenv("OLDPWD"));
 
     return 0;
 }
