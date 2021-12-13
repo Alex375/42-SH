@@ -31,6 +31,7 @@ struct lexer_info new_context()
 {
     struct lexer_info copy = g_lexer_info;
 
+    g_lexer_info.case_context = GENERAL_CASE;
     g_lexer_info.fun_context = GENERAL_FUN;
     g_lexer_info.exp_context = GENERAL_EXP_HARD;
     g_lexer_info.soft_expansion = GENERAL_EXP_SOFT;
@@ -46,6 +47,7 @@ struct lexer_info new_context()
 
 void revert_context(struct lexer_info copy)
 {
+    g_lexer_info.case_context = copy.case_context;
     g_lexer_info.fun_context = copy.fun_context;
     g_lexer_info.exp_context = copy.exp_context;
     g_lexer_info.soft_expansion = copy.soft_expansion;

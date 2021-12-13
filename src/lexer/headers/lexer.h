@@ -99,8 +99,8 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[32];
-    char *separator[20];
+    char *token_converter[33];
+    char *separator[19];
 };
 
 /**
@@ -161,6 +161,19 @@ struct token_info lex_sub(struct token_info res);
 void lexer_start(char *script, size_t size, long end);
 
 void lexer_reset();
+
+/**
+** @brief                   Save the current state of the lexer
+** @return                  Return the saved state (lexer_info)
+*/
+struct lexer_info save_lexer();
+
+/**
+** @brief                   Revert the state of the lexer from a copy
+** @param copy              The copied state of the lexer
+*/
+
+void revert_lexer(struct lexer_info copy);
 
 /**
 ** @brief                   Token-ify the next element of a script without
