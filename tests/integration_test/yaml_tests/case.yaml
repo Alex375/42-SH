@@ -1,0 +1,16 @@
+- name: simple
+  input: |
+    case z in 1 | z) echo inn ;;
+    $a) echo oon ;; esac
+  type: success
+
+- name: simple no good case
+  input: |
+    case n in z|1) echo inn ;;
+    zaazz) echo oon ;; esac
+  type: success
+
+- name: empty
+  input: |
+    case n in esac ; echo a
+  type: success

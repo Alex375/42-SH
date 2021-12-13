@@ -16,6 +16,7 @@ int eval_ast(struct ast *ast)
     struct n_command *cmd;
     struct n_for *for_ast;
     struct n_func *func;
+    struct n_case *case_ast;
 
     enum ast_info_type t;
     int continued = 0;
@@ -81,7 +82,8 @@ int eval_ast(struct ast *ast)
 
         RETURN(res)
     case AST_CASE:
-        RETURN(0)
+        case_ast = ast->t_ast;
+        RETURN(treat_case(case_ast))
     case AST_PIPE:
         b_ast = ast->t_ast;
         RETURN(exec_pipe(b_ast->left, b_ast->right))

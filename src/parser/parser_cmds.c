@@ -14,7 +14,7 @@ struct ast *parse_command()
 
         if (tok.type == T_IF || tok.type == T_O_PRTH || tok.type == T_O_BRKT
             || tok.type == T_FOR || tok.type == T_WHILE
-            || tok.type == T_UNTIL) // T_CASE
+            || tok.type == T_UNTIL || tok.type == T_CASE)
     {
         ast = parse_shell_command();
         parse_redirs(&redirs);

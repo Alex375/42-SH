@@ -84,6 +84,15 @@ struct n_for
 };
 
 /**
+** @brief                   AST_CASE ast member.
+*/
+struct n_case
+{
+    struct tok_vect *pattern;
+    struct list_case_item *case_items;
+};
+
+/**
 ** @brief                   AST_FUNC ast member.
 */
 struct n_func
@@ -113,6 +122,16 @@ struct list_redir
     enum token redir_type;
     struct tok_vect *word;
     struct list_redir *next;
+};
+
+/**
+** @brief                   chained list of case items.
+*/
+struct list_case_item
+{
+    struct tok_vect *seq;
+    struct ast *statement;
+    struct list_case_item *next;
 };
 
 ///////////////
@@ -172,6 +191,14 @@ struct ast *build_func(struct ast *ast, char *name);
 ** @param t             type of the node
 */
 struct ast *build_single(struct ast *ast, enum AST_TYPE t);
+
+/*!
+** @brief               builds a case node
+** @param pattern       pattern to match
+** @param case_items    list of case items
+*/
+struct ast *build_case(struct tok_vect *pattern,
+                       struct list_case_item *case_items);
 
 #include <stddef.h>
 
@@ -261,6 +288,24 @@ struct ast *parse_while_until_rule(enum token tokT);
 **                      (cf sh_grammar.txt)
 */
 struct ast *parse_for_rule();
+
+/**
+** @brief               Parsing a case rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_case_rule();
+
+/**
+** @brief               Parsing a case clause
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_clause();
+
+/**
+** @brief               Parsing a case item
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_item();
 
 /**
 ** @brief               Parsing a funcdec rule

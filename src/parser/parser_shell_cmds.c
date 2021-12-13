@@ -44,7 +44,8 @@ struct ast *parse_shell_command()
     case T_WHILE:
     case T_UNTIL:
         return parse_while_until_rule(tok.type);
-        // T_CASE
+    case T_CASE:
+        return parse_case_rule();
 
     default:
         errno = ERROR_PARSING;

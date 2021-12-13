@@ -64,4 +64,11 @@ int subhsell(struct ast *ast);
  */
 int exec_func(char **args, struct ast *fc_ast);
 
+/*!
+ * @brief           Execute a case rule
+ * @param n_case    the node to treat
+ * @return          Return the exit command of the executed command
+ */
+int treat_case(struct n_case *case_ast);
+
 #endif // INC_42_SH_EXECUTION_H

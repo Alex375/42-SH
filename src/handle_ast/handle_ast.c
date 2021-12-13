@@ -31,6 +31,17 @@ static void free_list_redir(struct list_redir *redir)
     xfree(redir);
 }
 
+static void free_list_case_item(struct list_case_item *items)
+{
+    if (!items)
+        return;
+
+    free_list_case_item(items->next);
+
+    free_token_vect(items->seq);
+    handle_rec(items->statement, H_FREE);
+}
+
 static struct list_var_assign *dup_list_assign(struct list_var_assign *assign)
 {
     if (!assign)
@@ -59,6 +70,22 @@ static struct list_redir *dup_list_redir(struct list_redir *redir)
     res->ionumber = xstrdup(redir->ionumber);
 
     res->word = dup_token_vect(redir->word);
+
+    return res;
+}
+
+static struct list_case_item *dup_list_case_item(struct list_case_item *items)
+{
+    if (!items)
+        return NULL;
+
+    struct list_case_item *res = xcalloc(1, sizeof(struct list_case_item));
+
+    res->next = dup_list_case_item(items->next);
+
+    res->seq = dup_token_vect(items->seq);
+
+    res->statement = handle_rec(items->statement, H_DUP);
 
     return res;
 }
@@ -109,6 +136,7 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
     struct n_command *cmd_ast;
     struct n_for *for_ast;
     struct n_func *func;
+    struct n_case *case_ast;
 
     switch (ast->type)
     {
@@ -215,11 +243,23 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
             return build_cmd(handle_rec(cmd_ast->ast, h),
                              dup_list_redir(cmd_ast->redirs));
         }
+    case AST_CASE:
+        case_ast = ast->t_ast;
+        if (h == H_FREE)
+        {
+            free_token_vect(case_ast->pattern);
+            free_list_case_item(case_ast->case_items);
+            xfree(case_ast);
+            return NULL;
+        }
+        else
+        {
+            return build_case(dup_token_vect(case_ast->pattern),
+                              dup_list_case_item(case_ast->case_items));
+        }
     case AST_BRACKET:
         break;
     case AST_PARENTH:
-        break;
-    case AST_CASE:
         break;
     }
 

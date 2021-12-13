@@ -23,3 +23,16 @@ struct ast *build_single(struct ast *ast, enum AST_TYPE t)
 
     return res;
 }
+
+struct ast *build_case(struct tok_vect *pattern, struct list_case_item *case_items)
+{
+    struct n_case *n_case = xcalloc(1, sizeof(struct n_case));
+    n_case->pattern = pattern;
+    n_case->case_items = case_items;
+
+    struct ast *res = xcalloc(1, sizeof(struct ast));
+    res->type = AST_CASE;
+    res->t_ast = n_case;
+
+    return res;
+}
