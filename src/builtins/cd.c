@@ -5,6 +5,7 @@
 #include <xstrdup.h>
 
 #include "xalloc.h"
+#include "vars.h"
 #include "xstring.h"
 
 /*
@@ -122,6 +123,7 @@ void set_Envar(char *path)
     if (strcmp(path, getenv("HOME")) == 0)
     {
         setenv("OLDPWD", old, 1);
+        add_var("OLDPWD", old);
         setenv("PWD", getenv("HOME"), 1);
         return;
     }
@@ -155,6 +157,7 @@ void set_Envar(char *path)
     value_PWD = string_append(value_PWD, '\0');
 
     setenv("OLDPWD", old, 1);
+    add_var("OLDPWD", old);
     setenv("PWD", value_PWD->data, 1);
 }
 
@@ -171,6 +174,7 @@ int comeback(void)
     char *tmp = xstrdup(getenv("PWD"));
     setenv("PWD", oldpwd, 1);
     setenv("OLDPWD", tmp, 1);
+    add_var("OLDPWD", tmp);
     return 0;
 }
 
