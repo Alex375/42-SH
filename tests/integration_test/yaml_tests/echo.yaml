@@ -84,3 +84,7 @@
 - name: Empty var 2
   input: a=3; echo $b $a
   type: success
+
+- name: Lot backslash
+  input: echo -e \\\\\\
+  type: success

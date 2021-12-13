@@ -861,7 +861,6 @@ Test(QUOTE, DOUBLE_QUOTE_MISSING)
 {
     char *script = "echo \"test";
     struct token_info expected[] = { { T_WORD, "echo", 1 },
-                                     { T_WORD, "test", 0 },
                                      { T_ERROR, NULL, 0 } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
@@ -1455,7 +1454,7 @@ Test(CASE, MEDIUM_VAR_IF)
 
 // int main()
 //{
-//    char *script = "case case in\ncase)\n   if true; then echo pute; fi;;\n*)\n   echo nothing\nesac";
+//    char *script = "echo \"dwe";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

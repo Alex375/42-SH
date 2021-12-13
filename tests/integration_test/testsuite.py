@@ -281,13 +281,14 @@ def main() -> int:
     test_results: List[TestResult] = []
     for categ in categories:
 
+        print(f"{termcolor.colored(f'-----Testing {categ.name}-----', 'blue')}")
+
         with open(f"{categ.file}", "r") as file:
             testsuite = []
             if categ.file.endswith(".yaml"):
                 testsuite = [TestCase(**testcase) for testcase in
                              list(yaml.safe_load(file))]
         for testcase in testsuite:
-            print(dict(testcase))
             stdin = testcase.input
             for key, value in test_types.items():
                 if key == testcase.type:
