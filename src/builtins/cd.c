@@ -26,14 +26,14 @@ static struct string **set_arr_PWD(void)
     char *token = strtok(PWD, "/");
     while (token != NULL)
     {
-        arr_PWD = xrealloc(arr_PWD, ++size * sizeof(struct string *));
-        arr_PWD[size - 1] = string_create();
-        arr_PWD[size - 1] = string_concat(arr_PWD[size - 1], token);
+        arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
+        arr_PWD[size] = string_create();
+        arr_PWD[size] = string_concat(arr_PWD[size], token);
         token = strtok(NULL, "/");
+        size++;
     }
 
-    arr_PWD = xrealloc(arr_PWD, (size + 1) * sizeof(struct string *));
-    arr_PWD[size] = NULL;
+    arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
     return arr_PWD;
 }
 
@@ -85,6 +85,8 @@ static struct string **arr_append(struct string **arr, char *data)
     arr = xrealloc(arr, (size_arr + 1) * sizeof(struct string *));
     arr[size_arr] = string_create();
     arr[size_arr] = string_concat(arr[size_arr], data);
+    arr[size_arr + 1] = NULL;
+
     return arr;
 }
 
@@ -104,9 +106,12 @@ static struct string **arr_pop(struct string **arr)
     for (int i = 0; arr[i] != NULL; i++)
         size_arr++;
 
+    if (size_arr == 0)
+        return arr;
+
     string_free(arr[size_arr - 1]);
     arr[size_arr - 1] = NULL;
-    arr = xrealloc(arr, --size_arr * sizeof(struct string *));
+    //arr = xrealloc(arr, --size_arr * sizeof(struct string *));
     return arr;
 }
 
@@ -175,6 +180,7 @@ int comeback(void)
     setenv("PWD", oldpwd, 1);
     setenv("OLDPWD", tmp, 1);
     add_var("OLDPWD", tmp);
+    printf("%s\n", getenv("PWD"));
     return 0;
 }
 
@@ -190,6 +196,7 @@ int cd(char **args)
     else if (strcmp(args[1], "-") == 0)
     {
         int oui = comeback();
+
         return oui;
     }
 
@@ -205,6 +212,7 @@ int cd(char **args)
     }
 
     //printf("before PWD : %s\n", getenv("PWD"));
+    //printf("before OLDPWD : %s\n", getenv("OLDPWD"));
     set_Envar(path);
 
     //printf("PWD : %s\n", getenv("PWD"));

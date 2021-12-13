@@ -95,9 +95,11 @@
 
 - name: Minus
   input: |
+    pwd
+    cd ../
+    pwd
     cd -
-    env -i pwd
-    echo $OLDPWD
+    pwd
   type: success
 
 

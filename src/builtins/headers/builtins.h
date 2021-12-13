@@ -55,6 +55,14 @@ int xbreak(char **args);
 int xcontinue(char **args);
 
 /*!
+ * @brief Replicate the pwd function
+ * @param args Array of string containing arguments of dot
+ * @return Return always 0
+ */
+int pwd(char **args);
+
+
+/*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
  * get index)
  * @param index
