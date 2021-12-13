@@ -34,6 +34,20 @@ class TestCase:
 
 
 @dataclass
+class TestResult:
+    passed: bool
+    testcase: TestCase
+    stdout: str
+    stderr: str
+    exitcode: int
+    refstdout: str
+    refstderr: str
+    refexitcode: int
+    category: str
+    exception: Exception = None
+
+
+@dataclass
 class TestCategory:
     name: str
     reference: str
@@ -66,24 +80,67 @@ def diff(expected: str, actual: str) -> str:
                      tofile='actual'))
 
 
-def perform_checks(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
-                   checks):
+def get_testres(expected: sp.CompletedProcess, actual: sp.CompletedProcess,
+                testcase: TestCase, category: str) -> TestResult:
+    testres = TestResult(
+        passed=True,
+        testcase=testcase,
+        stdout=actual.stdout,
+        stderr=actual.stderr,
+        exitcode=actual.returncode,
+        refstdout=expected.stdout,
+        refstderr=expected.stderr,
+        refexitcode=expected.returncode,
+        category=category
+    )
+    if "err_msg" in testres.testcase.checks and testres.stderr == "":
+        testres.passed = False
+    if "exitcode" in testres.testcase.checks and testres.refexitcode != testres.exitcode:
+        testres.passed = False
+    if "stdout" in testres.testcase.checks and testres.stdout != testres.refstdout:
+        testres.passed = False
+    if "stderr" in testres.testcase.checks and testres.stderr != testres.refstderr:
+        testres.passed = False
+    if testres.exception is not None:
+        testres.passed = False
+    return testres
+
+
+def format_test(testres: TestResult) -> str:
     res = ""
-    if "err_msg" in checks and actual.stderr == "":
+
+    if testres.passed:
+        res += f"{OK_TAG} {testres.category} - {testres.testcase.name}"
+        return res
+    if testres.exception is not None:
+        if type(testres.exception) == TimeoutError and str(testres.exception) == "!!timeout!!":
+            res += f"{KO_TAG} {testres.category} - {testres.testcase.name}\nTest timedout\n"
+        elif type(testres.exception) == KeyError:
+            res += f"{KO_TAG} {testres.category} - {testres.testcase.name}\nWrong test type"
+        else:
+            res += f"{KO_TAG} {testres.category} - {testres.testcase.name}\nWith:\nArguments : '{testres.testcase.arguments}'\nInput '{testres.testcase.input}'\n{testres.exception}\n"
+        return res
+    else:
+        res += f"{KO_TAG} {testres.category} - {testres.testcase.name}\nWith:\nArguments: '{testres.testcase.arguments}'\nInput: '{testres.testcase.input}'\n"
+
+    if "err_msg" in testres.testcase.checks and testres.stderr == "":
         res += "Something was expected on stderr\n"
-    if "exitcode" in checks and expected.returncode != actual.returncode:
-        res += f"Exited with {actual.returncode} expected {expected.returncode}\n"
-    if "stdout" in checks and expected.stdout != actual.stdout:
-        res += f"Stdout differ \n{diff(expected.stdout, actual.stdout)}\n"
-    if "stderr" in checks and expected.stderr != actual.stderr:
-        res += f"Stderr differ \n{diff(expected.stderr, actual.stderr)}\n"
+    if "exitcode" in testres.testcase.checks and testres.refexitcode != testres.exitcode:
+        res += f"Exited with {testres.exitcode} expected {testres.refexitcode}\n"
+    if "stdout" in testres.testcase.checks and testres.stdout != testres.refstdout:
+        res += f"Stdout differ \n{diff(testres.refstdout, testres.stdout)}\n"
+    if "stderr" in testres.testcase.checks and testres.stderr != testres.refstderr:
+        res += f"Stderr differ \n{diff(testres.refstderr, testres.stderr)}\n"
     if len(res) > 0:
         res = res[:-1]
+
     return res
 
 
-def run_shell(shell: str, stdin: str, arguments: List[str]) -> sp.CompletedProcess:
-    return sp.run([shell] + arguments, input=stdin, capture_output=True, text=True)
+def run_shell(shell: str, stdin: str,
+              arguments: List[str]) -> sp.CompletedProcess:
+    return sp.run([shell] + arguments, input=stdin, capture_output=True,
+                  text=True)
 
 
 def print_summary(passed: int, failed: int, start_time: float, end_time: float):
@@ -169,7 +226,8 @@ def copy_binary(build_path: Path, binary: Path):
             raise FileNotFoundError(
                 f"Tried to copy file but {binary.absolute()} not found")
     else:
-        print(f"{termcolor.colored(f'Could found binary at {build_path}/{binary}', 'red')}")
+        print(
+            f"{termcolor.colored(f'Could found binary at {build_path}/{binary}', 'red')}")
 
 
 def build_binary(binary: Path, build_path: Path):
@@ -195,6 +253,11 @@ def main() -> int:
     ref = args.reference
     build_dir = args.builddir
     no_compile = args.no_compile
+    try:
+        os.system(f"cat yaml_tests/sample_script/.hidden")
+    except Exception:
+        pass
+
     if not no_compile:
         build_binary(args.binary, build_dir)
 
@@ -202,7 +265,8 @@ def main() -> int:
 
     categories: List[TestCategory] = get_categories(args.category, ref)
 
-    print(f"Test categori(es) : {categories}")
+    for c in categories:
+        print(f"{c}")
     print(f"Testing {binary_path}")
 
     try:
@@ -211,15 +275,18 @@ def main() -> int:
         pass
 
     test_types = {
-        "success": "stdout stderr exitcode",
-        "failed": "stdout err_msg exitcode",
-        "noerrcheck": "exitcode stdout"
+        "success": ["stdout", "stderr", "exitcode"],
+        "failed": ["stdout", "err_msg", "exitcode"],
+        "noerrcheck": ["exitcode", "stdout"]
     }
 
     passed = 0
     failed = 0
     start_time = time.perf_counter()
+    test_results: List[TestResult] = []
     for categ in categories:
+
+        print(f"{termcolor.colored(f'-----Testing {categ.name}-----', 'blue')}")
 
         with open(f"{categ.file}", "r") as file:
             testsuite = []
@@ -228,35 +295,38 @@ def main() -> int:
                              list(yaml.safe_load(file))]
         for testcase in testsuite:
             stdin = testcase.input
-            name = testcase.name
+            for key, value in test_types.items():
+                if key == testcase.type:
+                    testcase.checks = value
             try:
-                if testcase.type == "":
-                    check = testcase.checks
-                else:
-                    check = test_types[testcase.type]
-                with timeout(120):
-                    dash_proc = run_shell(categ.reference, stdin, testcase.arguments)
+                with timeout(1):
+                    dash_proc = run_shell(categ.reference, stdin,
+                                          testcase.arguments)
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
-                    test_repport = perform_checks(dash_proc, sh_proc,
-                                                  check)
+                    test_result = get_testres(dash_proc, sh_proc, testcase, categ.name)
+                    test_results.append(test_result)
+                    print(format_test(test_result))
             except Exception as err:
-                failed += 1
-                if type(err) == TimeoutError and str(err) == "!!timeout!!":
-                    print(f"{KO_TAG} {categ.name} - {name}\nTest timedout\n")
-                elif type(err) == KeyError:
-                    print(f"{KO_TAG} {categ.name} - {name}\nWrong test type")
-                else:
-                    print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments : '{testcase.arguments}'\nInput '{stdin}'\n{err}\n")
-            else:
-                if len(test_repport) == 0:
-                    passed += 1
-                    print(f"{OK_TAG} {categ.name} - {name}")
-                else:
-                    failed += 1
-                    print(
-                        f"{KO_TAG} {categ.name} - {name}\nWith:\nArguments: '{testcase.arguments}'\nInput: '{stdin}'\n{test_repport}\n")
+                test_result = TestResult(
+                    False,
+                    testcase,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    categ.name,
+                    err
+                )
+                test_results.append(test_result)
+                print(format_test(test_result))
     end_time = time.perf_counter()
+    for test in test_results:
+        if test.passed:
+            passed += 1
+        else:
+            failed += 1
     print_summary(passed, failed, start_time, end_time)
 
     if args.clean:

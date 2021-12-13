@@ -3,14 +3,14 @@
 
 #include "lexer.h"
 
-struct words_converter converter = { 30,
+struct words_converter converter = { 32,
                                      18,
                                      { "if",    "then",  "elif", "else", "fi",
                                        "while", "until", "for",  "in",   "do",
                                        "done",  "!",     "||",   "&&",   "\n",
                                        ";",     "{",     "}",    "(",    ")",
                                        "|",     ">",     "<",    ">&",   "<&",
-                                       ">>",    "<>",    ">|",   "`",    "$(" },
+                                       ">>",    "<>",    ">|",   "`",    "$(", "case", "esac" },
                                      { "||", "&&", "\n", ";", "(", ")", "|",
                                        " ", "\0", ">", "<", ">&", "<&", ">>",
                                        "<>", ">|", "`", "$(" } };

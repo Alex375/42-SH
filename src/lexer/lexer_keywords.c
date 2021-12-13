@@ -82,7 +82,35 @@ struct token_info lex_keywords(struct token_info res, struct string *string)
     {
         g_lexer_info.fun_context = GENERAL_FUN;
     }
+    else if (g_lexer_info.case_context == IN_CASE)
+    {
+        if (res.type == T_C_PRTH)
+        {
+            g_lexer_info.word_context = GENERAL;
+            g_lexer_info.case_context = IN_CASE_COMMAND;
+        }
+        else if (res.type == T_CASE || res.type == T_IN || is_token_seperator(res.type))
+        {
+            g_lexer_info.word_context = IN_COMMAND;
+        }
+    }
+    else if (res.type == T_CASE)
+    {
+        g_lexer_info.case_context = IN_CASE;
+        g_lexer_info.word_context = IN_COMMAND;
+    }
+    if (res.type == T_SEMICOLON
+     && g_lexer_info.token_list->size > 0
+     && g_lexer_info.token_list
+             ->data[g_lexer_info.token_list->size - 1]
+             .type
+         == T_SEMICOLON && g_lexer_info.case_context == IN_CASE_COMMAND)
+    {
+        g_lexer_info.case_context = IN_CASE;
+    }
 
-    string_free(string);
+    if (string != NULL)
+        string_free(string);
+
     return res;
 }
