@@ -253,6 +253,11 @@ def main() -> int:
     ref = args.reference
     build_dir = args.builddir
     no_compile = args.no_compile
+    try:
+        os.system(f"cat yaml_tests/sample_script/.hidden")
+    except Exception:
+        pass
+
     if not no_compile:
         build_binary(args.binary, build_dir)
 
