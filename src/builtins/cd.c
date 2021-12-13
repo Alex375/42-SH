@@ -43,6 +43,7 @@ static struct string **set_arr_PWD(void)
  *
  * EXEMPLE :
  *  -> `cd /home/afs/ING1/42SH`
+ *  -> path = "/home/afs/ING1/42SH"
  *  -> arr_PATH = [["HOME"], ["AFS"], ["ING1"], ["42SH"]]
  */
 static struct string **set_arr_PATH(char *path)
@@ -113,8 +114,14 @@ static struct string **arr_pop(struct string **arr)
  */
 void set_Envar(char *path)
 {
+    char *old = xstrdup(getenv("PWD"));
+
+    if (path[0] == '/') // si le path commence par un slash alors on reset $PWD
+        setenv("PWD", "", 1);
+
     if (strcmp(path, getenv("HOME")) == 0)
     {
+        setenv("OLDPWD", old, 1);
         setenv("PWD", getenv("HOME"), 1);
         return;
     }
@@ -144,8 +151,27 @@ void set_Envar(char *path)
         value_PWD = string_append(value_PWD, '/');
         value_PWD = string_concat(value_PWD, arr_PWD[i]->data);
     }
+
     value_PWD = string_append(value_PWD, '\0');
+
+    setenv("OLDPWD", old, 1);
     setenv("PWD", value_PWD->data, 1);
+}
+
+int comeback(void)
+{
+    char *oldpwd;
+    if ((oldpwd = getenv("OLDPWD")) == NULL)
+    {
+        fprintf(stderr, "Cannot obtain $OLDPWD");
+        return 2;
+    }
+
+    chdir(oldpwd);
+    char *tmp = xstrdup(getenv("PWD"));
+    setenv("PWD", oldpwd, 1);
+    setenv("OLDPWD", tmp, 1);
+    return 0;
 }
 
 int cd(char **args)
@@ -157,20 +183,28 @@ int cd(char **args)
         else
             path = xstrdup(getenv("HOME"));
 
+    else if (strcmp(args[1], "-") == 0)
+    {
+        int oui = comeback();
+        return oui;
+    }
+
     else
         path = xstrdup(args[1]); // on recup le path passe en arg
 
-    char *fpath = xstrdup(path);
 
-    int code_cd = chdir(fpath);
+    int code_cd = chdir(path);
     if (code_cd == -1)
     {
         fprintf(stderr, "%s: No such file or directory\n", path);
-        // printf("bite : %s\n", getenv("PWD"));
         return 2;
     }
 
+    printf("before PWD : %s\n", getenv("PWD"));
     set_Envar(path);
+
+    printf("PWD : %s\n", getenv("PWD"));
+    printf("OLDPWD : %s\n", getenv("OLDPWD"));
 
     return 0;
 }

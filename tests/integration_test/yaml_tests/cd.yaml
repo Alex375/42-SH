@@ -2,54 +2,65 @@
   input: |
     cd .
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: double dot
   input: |
     cd ..
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: no args (goto HOME)
   input: |
     cd
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: lot of simple dot
   input: |
     cd ./././././././././././././././././././
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: back & come again
   input: |
     cd ../integration_test
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: absolute
   input: |
     cd /
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: absolute set pwd
   input: |
     cd /
-    echo $PWD
+    env -i pwd
+    env -i oldpwd
+    pwd
   type: success
 
 - name: hard one
   input: |
     cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
     env -i pwd
+    env -i oldpwd
   type: success
 
 - name: hard one set pwd
   input: |
     cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
-    echo $PWD
+    env -i pwd
+    env -i oldpwd
+    pwd
   type: success
 
 - name: TDB 1
@@ -68,6 +79,7 @@
     cd .././../$dir/.
     ls
     env -i pwd
+    env -i oldpwd
     pwd
   type: success
 
@@ -77,7 +89,15 @@
     cd ../../tests/$dir/
     echo Exit code $?
     env -i pwd
-    echo $PWD
+    env -i oldpwd
+    pwd
   type: failed
+
+- name: Minus
+  input: |
+    cd -
+    env -i pwd
+    env -i oldpwd
+  type: success
 
 
