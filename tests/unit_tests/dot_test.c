@@ -1,8 +1,9 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "builtins.h"
 
-//int main()
+// int main()
 //{
 //    char *arg0 = ".";
 //    char *arg1 = "/home/lucas/test.sh";

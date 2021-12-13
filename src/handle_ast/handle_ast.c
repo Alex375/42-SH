@@ -212,7 +212,8 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
         }
         else
         {
-            return build_cmd(handle_rec(cmd_ast->ast, h), dup_list_redir(cmd_ast->redirs));
+            return build_cmd(handle_rec(cmd_ast->ast, h),
+                             dup_list_redir(cmd_ast->redirs));
         }
     case AST_BRACKET:
         break;

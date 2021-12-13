@@ -193,7 +193,7 @@ int cd(char **args)
         path = xstrdup(args[1]); // on recup le path passe en arg
 
 
-    int code_cd = chdir(path);
+    int code_cd = chdir(fpath);
     if (code_cd == -1)
     {
         fprintf(stderr, "%s: No such file or directory\n", path);

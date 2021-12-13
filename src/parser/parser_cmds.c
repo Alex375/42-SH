@@ -164,7 +164,6 @@ struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
     return res;
 }
 
-
 struct ast *parse_funcdec()
 {
     struct token_info tok = POP_TOKEN

@@ -39,5 +39,4 @@ int get_fc(char *name, struct ast **ast);
 */
 void free_fcs();
 
-
 #endif // INC_42_SH_FUNC_H

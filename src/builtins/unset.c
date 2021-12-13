@@ -1,5 +1,7 @@
-#include <err.h>
+#define _POSIX_C_SOURCE 200112L
+
 #include <ctype.h>
+#include <err.h>
 
 #include "ast_xalloc.h"
 #include "vars.h"

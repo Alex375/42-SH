@@ -1,10 +1,10 @@
+#include <err.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <err.h>
 
+#include "eval_ast.h"
 #include "xalloc.h"
 #include "xparser.h"
-#include "eval_ast.h"
 
 int get_stdout(struct ast *ast, char **stdout_r)
 {

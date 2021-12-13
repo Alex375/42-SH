@@ -1,5 +1,6 @@
-#include "lexer.h"
 #include <ctype.h>
+
+#include "lexer.h"
 
 static long find_end_sub(const char *script, size_t size, enum token init_type)
 {
@@ -65,7 +66,8 @@ struct token_info lex_sub(struct token_info res)
     res.command = NULL;
 
     struct lexer_info copy = new_context();
-    long end_sub = find_end_sub(g_lexer_info.script, g_lexer_info.script_size, initial_type);
+    long end_sub = find_end_sub(g_lexer_info.script, g_lexer_info.script_size,
+                                initial_type);
 
     if (end_sub == -1)
     {

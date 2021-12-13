@@ -1,9 +1,10 @@
-#include <criterion/criterion.h>
+
 #include <stdio.h>
 #include <string.h>
-
 #include "lexer.h"
+/*
 
+#include <criterion/criterion.h>
 #define EXPECTED_SIZE(array) (sizeof((array)) / sizeof(struct token_info))
 
 void test_lexer(char *script, size_t size, struct token_info expected[])
@@ -1256,18 +1257,22 @@ Test(COMMAND_SUB, medium4)
 
 Test(COMMAND_SUB, recursive)
 {
-    char *script = "i=$(i=$(i=$(i=$(echo \"test\"); echo \"$i\"); echo \"$i\"); echo \"$i\")";
+    char *script = "i=$(i=$(i=$(i=$(echo \"test\"); echo \"$i\"); echo "
+                   "\"$i\"); echo \"$i\")";
     struct token_info expected[] = {
         { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
         { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
         { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
         { T_VAR_INIT, "i", 0 },         { T_COMMAND_SUB_START, NULL, 0 },
-        { T_WORD, "echo", 1 },{ T_WORD, "test", 0 },
-        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
-        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
-        { T_COMMAND_SUB_END, NULL, 0 },         { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR_INQUOTE, "i", 0 },
+        { T_WORD, "echo", 1 },          { T_WORD, "test", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 }, { T_SEMICOLON, NULL, 1 },
+        { T_WORD, "echo", 1 },          { T_VAR_INQUOTE, "i", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 }, { T_SEMICOLON, NULL, 1 },
+        { T_WORD, "echo", 1 },          { T_VAR_INQUOTE, "i", 0 },
+        { T_COMMAND_SUB_END, NULL, 0 }, { T_SEMICOLON, NULL, 1 },
+        { T_WORD, "echo", 1 },          { T_VAR_INQUOTE, "i", 0 },
         { T_COMMAND_SUB_END, NULL, 0 },
-        };
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1313,9 +1318,11 @@ Test(VAR, NO_SEPA)
 {
     char *script = "a=1 b=2; echo $a$b";
     struct token_info expected[] = {
-        { T_VAR_INIT, "a", 0 },    { T_WORD, "1", 1 },    { T_VAR_INIT, "b", 0 },    { T_WORD, "2", 0 },
-        { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 }, { T_VAR, "a", 0 }, { T_VAR, "b", 0 },
-        };
+        { T_VAR_INIT, "a", 0 },   { T_WORD, "1", 1 },
+        { T_VAR_INIT, "b", 0 },   { T_WORD, "2", 0 },
+        { T_SEMICOLON, NULL, 1 }, { T_WORD, "echo", 1 },
+        { T_VAR, "a", 0 },        { T_VAR, "b", 0 },
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1324,12 +1331,14 @@ Test(VAR, NO_SEPA2)
 {
     char *script = "a= echo $a$b";
     struct token_info expected[] = {
-        { T_VAR_INIT, "a", 1 }, { T_WORD, "echo", 1 }, { T_VAR, "a", 0 }, { T_VAR, "b", 0 },
-        };
+        { T_VAR_INIT, "a", 1 },
+        { T_WORD, "echo", 1 },
+        { T_VAR, "a", 0 },
+        { T_VAR, "b", 0 },
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
-}
-
+}*/
 
 // int main()
 //{

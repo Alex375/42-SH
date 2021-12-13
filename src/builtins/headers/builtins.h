@@ -27,20 +27,6 @@ int cd(char **args);
 int unset(char **args);
 
 /*!
- * @brief Replicate the break function
- * @param args Array of string containing arguments of break
- * @return Return the args of break + 255
- */
-int xbreak(char **args);
-
-/*!
- * @brief Replicate the continue function
- * @param args Array of string containing arguments of continue
- * @return Return the negative of args of continue
- */
-int xcontinue(char **args);
-
-/*!
  * @brief Replicate the export function
  * @param args Array of string containing arguments of continue
  * @return Return always 0
@@ -55,6 +41,20 @@ int export(char **args);
 int dot(char **args);
 
 /*!
+ * @brief Replicate the break function
+ * @param args Array of string containing arguments of dot
+ * @return Return always 0
+ */
+int xbreak(char **args);
+
+/*!
+ * @brief Replicate the continue function
+ * @param args Array of string containing arguments of dot
+ * @return Return always 0
+ */
+int xcontinue(char **args);
+
+/*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
  * get index)
  * @param index
@@ -63,7 +63,6 @@ int dot(char **args);
  */
 int exec_builtin(int index, char **args);
 int pwd(char **args);
-
 
 /*!
  * @brief Return the exit
