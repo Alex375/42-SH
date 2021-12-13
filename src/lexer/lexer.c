@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 struct lexer_info g_lexer_info = { NULL,
+                                   GENERAL_CASE,
                                    GENERAL_FUN,
                                    GENERAL_REDIR,
                                    GENERAL_EXP_SOFT,
@@ -86,6 +87,7 @@ static struct token_info lex_accumulator(struct token_info res,
         g_lexer_info.last_soft = GENERAL_EXP_SOFT;
     if (res.type == T_WORD)
         g_lexer_info.redir_context = GENERAL_REDIR;
+
     return res;
 }
 

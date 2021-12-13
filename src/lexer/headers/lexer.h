@@ -61,6 +61,13 @@ enum fun_context
     IN_FUN
 };
 
+enum case_context
+{
+    GENERAL_CASE,
+    IN_CASE,
+    IN_CASE_COMMAND,
+};
+
 /**
 ** @brief                   Global info for the lexer
 ** @param nb_token          The number of token in the token converter.
@@ -72,6 +79,7 @@ enum fun_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum case_context case_context;
     enum fun_context fun_context;
     enum redir_context redir_context;
     enum soft_expansion last_soft;
@@ -91,7 +99,7 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[30];
+    char *token_converter[32];
     char *separator[20];
 };
 

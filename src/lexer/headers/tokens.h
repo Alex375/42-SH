@@ -36,6 +36,8 @@ enum token
     T_REDIR_PIPE,
     T_BACKQUOTE,
     T_D_PAREN,
+    T_CASE,
+    T_ESAC,
     T_EOF,
     T_IONUMBER,
     T_VAR,
