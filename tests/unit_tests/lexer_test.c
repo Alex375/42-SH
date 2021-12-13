@@ -1352,8 +1352,7 @@ Test(CASE, EASY)
         { T_NEWLINE, NULL, 1 },
         { T_WORD, "echo", 1 },
         { T_WORD, "test", 0 },
-        { T_SEMICOLON, NULL, 0 },
-        { T_SEMICOLON, NULL, 1 },
+        { T_DOUBLE_SCOLON, NULL, 1 },
         { T_NEWLINE, NULL, 0 },
         { T_ESAC, NULL, 0 },
     };
@@ -1374,8 +1373,7 @@ Test(CASE, MEDIUM)
         { T_NEWLINE, NULL, 1 },
         { T_WORD, "echo", 1 },
         { T_WORD, "test", 0 },
-        { T_SEMICOLON, NULL, 0 },
-        { T_SEMICOLON, NULL, 1 },
+        { T_DOUBLE_SCOLON, NULL, 1 },
         { T_NEWLINE, NULL, 0 },
         { T_WORD, "*", 0 },
         { T_C_PRTH, NULL, 1 },
@@ -1391,7 +1389,7 @@ Test(CASE, MEDIUM)
 
 Test(CASE, MEDIUM_VAR)
 {
-    char *script = "case $case in\n$case)\n   echo $var;;\n*)\n   echo nothing\nesac";
+    char *script = "case $case in\n$case)\n   echo $var;;\n*)\n   echo nothing;;\nesac";
     struct token_info expected[] = {
         { T_CASE, NULL, 1 },
         { T_VAR, "case", 1 },
@@ -1402,14 +1400,14 @@ Test(CASE, MEDIUM_VAR)
         { T_NEWLINE, NULL, 1 },
         { T_WORD, "echo", 1 },
         { T_VAR, "var", 0 },
-        { T_SEMICOLON, NULL, 0 },
-        { T_SEMICOLON, NULL, 1 },
+        { T_DOUBLE_SCOLON, NULL, 1 },
         { T_NEWLINE, NULL, 0 },
         { T_WORD, "*", 0 },
         { T_C_PRTH, NULL, 1 },
         { T_NEWLINE, NULL, 1 },
         { T_WORD, "echo", 1 },
-        { T_WORD, "nothing", 1 },
+        { T_WORD, "nothing", 0 },
+        { T_DOUBLE_SCOLON, NULL, 1 },
         { T_NEWLINE, NULL, 0 },
         { T_ESAC, NULL, 0 },
     };
@@ -1436,8 +1434,7 @@ Test(CASE, MEDIUM_VAR_IF)
         { T_VAR, "var", 0 },
         { T_SEMICOLON, NULL, 1 },
         { T_FI, NULL, 0 },
-        { T_SEMICOLON, NULL, 0 },
-        { T_SEMICOLON, NULL, 1 },
+        { T_DOUBLE_SCOLON, NULL, 1 },
         { T_NEWLINE, NULL, 0 },
         { T_WORD, "*", 0 },
         { T_C_PRTH, NULL, 1 },
@@ -1454,7 +1451,7 @@ Test(CASE, MEDIUM_VAR_IF)
 
 // int main()
 //{
-//    char *script = "echo \"dwe";
+//    char *script = "case test in\ntest)\n   echo test;;\nesac";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

@@ -38,6 +38,7 @@ enum token
     T_D_PAREN,
     T_CASE,
     T_ESAC,
+    T_DOUBLE_SCOLON,
     T_EOF,
     T_IONUMBER,
     T_VAR,
