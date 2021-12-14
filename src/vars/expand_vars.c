@@ -4,6 +4,9 @@
 #include "xalloc.h"
 #include "xstrdup.h"
 #include "xstring.h"
+#include "execution.h"
+
+static char *acc = NULL;
 
 static int is_in(const char *arr, char c)
 {
@@ -57,6 +60,8 @@ static char *my_strsep(char *copy, char *ifs, int nb_strtok)
         }
     }
 
+    xfree(copy);
+
     return w;
 }
 
@@ -77,7 +82,18 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
         else
         {
             int old_at = *nb_at;
-            char *val = get_var(tok_vect->list[*i].command, nb_at);
+
+            char *val;
+            if (tok_vect->list[*i].type == T_COMMAND_SUB_START)
+            {
+                if (!acc)
+                    get_stdout(tok_vect->cmd_sub_list[*i], &acc);
+
+                val = acc;
+            }
+            else
+                val = get_var(tok_vect->list[*i].command, nb_at);
+
             if ((!val || !val[0])
                 && ((tok_vect->list[*i].type == T_VAR_INQUOTE
                      && tok_vect->list[*i].command
@@ -106,6 +122,7 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
                     }
                 }
                 (*nb_strtok) = 0;
+                acc = NULL;
             }
         }
     } while (!*nb_at && ++(*i) < tok_vect->len

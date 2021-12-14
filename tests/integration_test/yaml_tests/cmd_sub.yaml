@@ -1,0 +1,4 @@
+- name: simple
+  input: |
+    $(echo ls)
+  type: success

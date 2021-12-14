@@ -8,6 +8,7 @@ struct tok_vect
     int len;
     int cap;
     struct token_info *list;
+    struct ast **cmd_sub_list;
 };
 
 /**

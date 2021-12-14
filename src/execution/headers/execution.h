@@ -13,7 +13,7 @@
  * @brief Execute a command including builtins
  * @param cmd       Command string to be executed
  * @param args      Arguments string associated with the command
- * @return          Return the exit command of the executed command
+ * @return          Return the exit code of the executed command
  */
 int execute(char **args);
 
@@ -60,15 +60,23 @@ int subhsell(struct ast *ast);
  * @brief           Execute a command including a previously define function
  * @param args      Arguments string associated with the command
  * @param fc_ast    ast to execute;
- * @return          Return the exit command of the executed command
+ * @return          Return the exit code of the executed command
  */
 int exec_func(char **args, struct ast *fc_ast);
 
 /*!
  * @brief           Execute a case rule
  * @param n_case    the node to treat
- * @return          Return the exit command of the executed command
+ * @return          Return the exit code of the executed command
  */
 int treat_case(struct n_case *case_ast);
+
+/*!
+ * @brief           Execute commands and gets the stdout
+ * @param ast       ast to execute
+ * @param stdout_r  pointer to the string of stdout content
+ * @return          Return the exit code of the executed command
+ */
+int get_stdout(struct ast *ast, char **stdout_r);
 
 #endif // INC_42_SH_EXECUTION_H

@@ -37,3 +37,9 @@
 - name: Bad triple pipe
   input: echo coucou ||| cat
   type: failed
+
+- name: forked pipe
+  input: |
+    a=6 | echo
+    echo $a
+  type: success

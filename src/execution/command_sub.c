@@ -24,20 +24,27 @@ int get_stdout(struct ast *ast, char **stdout_r)
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
         res = eval_ast(ast);
+        close(fd[1]);
         exit(res);
     }
     else
     {
         close(fd[1]);
+        int wstatus;
+        if (waitpid(pid, &wstatus, 0) == -1)
+            return 2;
+        res = WEXITSTATUS(wstatus);
         char *buff = xcalloc(2049, 1);
         int r = 0;
         int total = 0;
-        while ((r = read(2048, buff + total, fd[0])) > 0)
+        while ((r = read(fd[0], buff + total, 2048)) > 0)
         {
             total += r;
             buff = xrecalloc(buff, total + 2049);
         }
+        close(fd[0]);
         *stdout_r = buff;
     }
-    return res;
+
+    RETURN(res);
 }
