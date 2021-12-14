@@ -1,10 +1,11 @@
+#include <stdio.h>
 #include <string.h>
 
+#include "execution.h"
 #include "vars.h"
 #include "xalloc.h"
 #include "xstrdup.h"
 #include "xstring.h"
-#include "execution.h"
 
 static char *acc = NULL;
 
@@ -59,8 +60,6 @@ static char *my_strsep(char *copy, char *ifs, int nb_strtok)
             copy++;
         }
     }
-
-    xfree(copy);
 
     return w;
 }

@@ -1,17 +1,19 @@
 #include <err.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <wait.h>
 
 #include "eval_ast.h"
 #include "xalloc.h"
 #include "xparser.h"
+#include "xstrdup.h"
 
 int get_stdout(struct ast *ast, char **stdout_r)
 {
     int fd[2];
     pipe(fd);
 
-    int res = 0;
+    int res;
     pid_t pid = fork();
 
     if (pid == -1)
@@ -24,7 +26,6 @@ int get_stdout(struct ast *ast, char **stdout_r)
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
         res = eval_ast(ast);
-        close(fd[1]);
         exit(res);
     }
     else
@@ -35,7 +36,7 @@ int get_stdout(struct ast *ast, char **stdout_r)
             return 2;
         res = WEXITSTATUS(wstatus);
         char *buff = xcalloc(2049, 1);
-        int r = 0;
+        int r;
         int total = 0;
         while ((r = read(fd[0], buff + total, 2048)) > 0)
         {
@@ -43,7 +44,8 @@ int get_stdout(struct ast *ast, char **stdout_r)
             buff = xrecalloc(buff, total + 2049);
         }
         close(fd[0]);
-        *stdout_r = buff;
+        *stdout_r = xstrdup(buff);
+        xfree(buff);
     }
 
     RETURN(res);
