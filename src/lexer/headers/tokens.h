@@ -47,6 +47,8 @@ enum token
     T_FUN_INIT,
     T_COMMAND_SUB_START,
     T_COMMAND_SUB_END,
+    T_COMMAND_SUB_START_Q,
+    T_BACKQUOTE_Q,
     T_WORD,
     T_ERROR
 };

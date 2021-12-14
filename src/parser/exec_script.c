@@ -16,10 +16,13 @@ extern struct options *opt;
 
 struct ast_info *ast_info = NULL;
 int exec_script(char *script, size_t size, int set_var)
-
 {
+    struct lexer_info save;
+
     if (set_var)
         set_special_vars(opt->argc, opt->argv);
+    else
+        save = save_lexer();
     struct ast *ast;
     errno = 0;
 
@@ -48,13 +51,20 @@ int exec_script(char *script, size_t size, int set_var)
 
             res = eval_ast(ast);
 
-            xfree(ast_info);
+            //TODO SAVE AST
+            //xfree(ast_info);
         }
 
         handle_rec(ast, H_FREE);
     }
     lexer_reset();
-    if (set_var)
-        free_context();
+    //TODO SAVE AST
+    //TODO SAVE AST
+    //TODO SAVE AST
+    //TODO SAVE AST
+    //TODO SAVE AST
+    //free_context();
+    if (!set_var)
+        revert_lexer(save);
     return res;
 }

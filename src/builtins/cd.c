@@ -140,9 +140,7 @@ void set_Envar(char *path)
     for (int i = 0; arr_PATH[i] != NULL; i++)
     {
         if (strcmp(arr_PATH[i]->data, "..") == 0)
-        {
             arr_PWD = arr_pop(arr_PWD);
-        }
 
         else if (strcmp(arr_PATH[i]->data, ".") == 0)
             continue;
@@ -196,11 +194,7 @@ int cd(char **args)
             path = xstrdup(getenv("HOME"));
 
     else if (strcmp(args[1], "-") == 0)
-    {
-        int oui = comeback();
-
-        return oui;
-    }
+        return comeback();
 
     else
         path = xstrdup(args[1]); // on recup le path passe en arg

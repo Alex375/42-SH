@@ -64,6 +64,15 @@ struct token_info lex_sub(struct token_info res)
     enum token initial_type = res.type;
     if (res.type != T_BACKQUOTE)
         res.type = T_COMMAND_SUB_START;
+
+    if (g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
+    {
+        if (res.type == T_COMMAND_SUB_START)
+            res.type = T_COMMAND_SUB_START_Q;
+        else if (res.type == T_BACKQUOTE_Q)
+            res.type = T_BACKQUOTE_Q;
+    }
+
     g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, res);
     if (res.type != T_BACKQUOTE)
         res.type = T_COMMAND_SUB_END;

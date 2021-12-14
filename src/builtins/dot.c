@@ -1,11 +1,11 @@
 #include <err.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "read_script.h"
 #include "xparser.h"
+#include "xalloc.h"
 
 int contain_slash(char *str)
 {
@@ -14,7 +14,7 @@ int contain_slash(char *str)
 
 char *create_path(char *path, char *file)
 {
-    char *res = calloc(strlen(path) + strlen(file) + 2, sizeof(char));
+    char *res = xcalloc(strlen(path) + strlen(file) + 2, sizeof(char));
     if (path[strlen(path) - 1] == '/')
     {
         sprintf(res, "%s%s", path, file);
@@ -32,11 +32,12 @@ int dot(char **args)
         return 0;
 
     char *file = args[1];
-    if (!contain_slash(file))
+    int contain_s = contain_slash(file);
+    if (!contain_s)
     {
-        char *folder = NULL;
+        char *folder = strtok(getenv("PATH"), ":");
         char *file_env = NULL;
-        while ((folder = strtok(getenv("PATH"), ":")) != NULL)
+        while (folder != NULL)
         {
             file_env = create_path(folder, file);
             if (access(file_env, F_OK) == 0)
@@ -44,12 +45,14 @@ int dot(char **args)
                 char *script = read_script(file_env);
                 return exec_script(script, strlen(file), 0);
             }
+            folder = strtok(NULL, ":");
         }
     }
 
     if (access(file, F_OK) != 0)
     {
-        errx(2, "export: the maximum has been reached");
+        int error_code = contain_s ? 127 : 2;
+        errx(error_code, "Can't open %s", file);
     }
 
     char *script = read_script(file);
