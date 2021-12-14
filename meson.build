@@ -36,6 +36,7 @@ sources = [
     'src/execution/funcx.c',
     'src/execution/command_sub.c',
     'src/execution/subshell.c',
+    'src/execution/case.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
     'src/builtins/builtins_dispatch.c',
@@ -45,6 +46,7 @@ sources = [
     'src/builtins/cd.c',
     'src/builtins/dot.c',
     'src/builtins/export.c',
+    'src/builtins/pwd.c',
     'src/builtins/break_continue.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
@@ -53,6 +55,7 @@ sources = [
     'src/parser/tools_parse.c',
     'src/parser/parser_shell_cmds.c',
     'src/parser/exec_script.c',
+    'src/parser/parse_case.c',
     'src/parser/parser.c',
     'src/parser/xvector_tokens.c',
     'src/program_start/options.c',
@@ -83,7 +86,8 @@ sources = [
     'src/vars/xvars2.c',
     'src/vars/context.c',
     'src/handle_ast/handle_ast.c',
-    'src/func/func.c'
+    'src/func/func.c',
+    'src/ast_info/ast_info.c'
 ]
 
 includes = [

@@ -81,13 +81,13 @@ static struct string **set_arr_PATH(char *path)
 static struct string **arr_append(struct string **arr, char *data)
 {
     int size_arr = 0;
-    for (int i = 0; arr[i] != NULL; i++)
+    while (arr[size_arr])
         size_arr++;
 
     arr = xrealloc(arr, (size_arr + 1) * sizeof(struct string *));
-    arr[size_arr] = string_create();
-    arr[size_arr] = string_concat(arr[size_arr], data);
-    arr[size_arr + 1] = NULL;
+    arr[size_arr - 1] = string_create();
+    arr[size_arr - 1] = string_concat(arr[size_arr], data);
+    arr[size_arr] = NULL;
 
     return arr;
 }
