@@ -62,6 +62,8 @@ void set_var_int(char *name, long value)
 
 char *get_var(char *name, int *i_at)
 {
+    if (!name)
+        return xcalloc(1, 1);
     if (name && !strcmp("RANDOM", name))
     {
         srand(time(NULL));
