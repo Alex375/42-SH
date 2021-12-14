@@ -64,6 +64,8 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
             return 2;
         }
         redirInfo->temp_fd = dup(redirInfo->io_number);
+        if (redirInfo->temp_fd == -1)
+            errx(2, "Failed to dup");
 
         if (redirInfo->temp_fd == -1 || dup2(temp, redirInfo->io_number) == -1)
         {
@@ -79,7 +81,8 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
 
     redirInfo->file_fd = open_file(word[0], flag);
     redirInfo->temp_fd = dup(redirInfo->io_number);
-    dup2(redirInfo->file_fd, redirInfo->io_number);
+    if (dup2(redirInfo->file_fd, redirInfo->io_number) == -1)
+        errx(2, "Failed dup2");
     fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
     return 0;
 }
@@ -88,7 +91,8 @@ void unapply_redir(struct redir_info *redirInfo)
 {
     if (redirInfo->temp_fd != -1)
     {
-        dup2(redirInfo->temp_fd, redirInfo->io_number);
+        if (dup2(redirInfo->temp_fd, redirInfo->io_number) == -1)
+            errx(2, "Failed to dup2");
         close(redirInfo->temp_fd);
     }
     if (redirInfo->file_fd != -1)
