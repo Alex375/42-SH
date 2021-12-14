@@ -11,7 +11,8 @@
 int get_stdout(struct ast *ast, char **stdout_r)
 {
     int fd[2];
-    pipe(fd);
+    if (pipe(fd) == -1)
+        errx(2, "Failed to pipe");
 
     int res;
     pid_t pid = fork();
@@ -23,7 +24,8 @@ int get_stdout(struct ast *ast, char **stdout_r)
     }
     if (pid == 0)
     {
-        dup2(fd[1], STDOUT_FILENO);
+        if (dup2(fd[1], STDOUT_FILENO) == -1)
+            errx(2, "Failed to dup2");
         close(fd[0]);
         res = eval_ast(ast);
         exit(res);
