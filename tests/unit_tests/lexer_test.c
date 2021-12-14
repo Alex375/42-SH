@@ -1210,7 +1210,7 @@ Test(COMMAND_SUB, medium)
 {
     char *script = "i=\"$(echo test)\"";
     struct token_info expected[] = { { T_VAR_INIT, "i", 0 },
-                                     { T_COMMAND_SUB_START, NULL, 0 },
+                                     { T_COMMAND_SUB_START_Q, NULL, 0 },
                                      { T_WORD, "echo", 1 },
                                      { T_WORD, "test", 0 },
                                      { T_COMMAND_SUB_END, ")", 0 } };
@@ -1222,7 +1222,7 @@ Test(COMMAND_SUB, medium2)
 {
     char *script = "i=\"$(echo test)\"test2";
     struct token_info expected[] = {
-        { T_VAR_INIT, "i", 0 },        { T_COMMAND_SUB_START, NULL, 0 },
+        { T_VAR_INIT, "i", 0 },        { T_COMMAND_SUB_START_Q, NULL, 0 },
         { T_WORD, "echo", 1 },         { T_WORD, "test", 0 },
         { T_COMMAND_SUB_END, ")", 0 }, { T_WORD, "test2", 0 },
     };

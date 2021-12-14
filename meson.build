@@ -34,6 +34,7 @@ sources = [
     'src/execution/pipe.c',
     'src/execution/redir.c',
     'src/execution/funcx.c',
+    'src/execution/command_sub.c',
     'src/execution/subshell.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
@@ -44,6 +45,7 @@ sources = [
     'src/builtins/cd.c',
     'src/builtins/dot.c',
     'src/builtins/export.c',
+    'src/builtins/break_continue.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',
@@ -96,7 +98,8 @@ includes = [
     'src/builtins/headers',
     'src/vars/headers',
     'src/func/headers',
-    'src/handle_ast/headers'
+    'src/handle_ast/headers',
+    'src/ast_info/headers'
 ]
 
 #42SH binary
