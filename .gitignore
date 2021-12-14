@@ -24,3 +24,4 @@ launch.json
 cmake-build-debug/
 
 debug.sh
+venv
