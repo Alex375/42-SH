@@ -1,5 +1,3 @@
-#define _POSIX_C_SOURCE 200112L
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +5,7 @@
 #include <xstrdup.h>
 
 #include "xalloc.h"
+#include "vars.h"
 #include "xstring.h"
 
 /*
@@ -27,14 +26,14 @@ static struct string **set_arr_PWD(void)
     char *token = strtok(PWD, "/");
     while (token != NULL)
     {
-        arr_PWD = xrealloc(arr_PWD, ++size * sizeof(struct string *));
-        arr_PWD[size - 1] = string_create();
-        arr_PWD[size - 1] = string_concat(arr_PWD[size - 1], token);
+        arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
+        arr_PWD[size] = string_create();
+        arr_PWD[size] = string_concat(arr_PWD[size], token);
         token = strtok(NULL, "/");
+        size++;
     }
 
-    arr_PWD = xrealloc(arr_PWD, (size + 1) * sizeof(struct string *));
-    arr_PWD[size] = NULL;
+    arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
     return arr_PWD;
 }
 
@@ -45,6 +44,7 @@ static struct string **set_arr_PWD(void)
  *
  * EXEMPLE :
  *  -> `cd /home/afs/ING1/42SH`
+ *  -> path = "/home/afs/ING1/42SH"
  *  -> arr_PATH = [["HOME"], ["AFS"], ["ING1"], ["42SH"]]
  */
 static struct string **set_arr_PATH(char *path)
@@ -85,6 +85,8 @@ static struct string **arr_append(struct string **arr, char *data)
     arr = xrealloc(arr, (size_arr + 1) * sizeof(struct string *));
     arr[size_arr] = string_create();
     arr[size_arr] = string_concat(arr[size_arr], data);
+    arr[size_arr + 1] = NULL;
+
     return arr;
 }
 
@@ -104,9 +106,12 @@ static struct string **arr_pop(struct string **arr)
     for (int i = 0; arr[i] != NULL; i++)
         size_arr++;
 
+    if (size_arr == 0)
+        return arr;
+
     string_free(arr[size_arr - 1]);
     arr[size_arr - 1] = NULL;
-    arr = xrealloc(arr, --size_arr * sizeof(struct string *));
+    //arr = xrealloc(arr, --size_arr * sizeof(struct string *));
     return arr;
 }
 
@@ -115,8 +120,15 @@ static struct string **arr_pop(struct string **arr)
  */
 void set_Envar(char *path)
 {
+    char *old = xstrdup(getenv("PWD"));
+
+    if (path[0] == '/') // si le path commence par un slash alors on reset $PWD
+        setenv("PWD", "", 1);
+
     if (strcmp(path, getenv("HOME")) == 0)
     {
+        setenv("OLDPWD", old, 1);
+        add_var("OLDPWD", old);
         setenv("PWD", getenv("HOME"), 1);
         return;
     }
@@ -146,8 +158,30 @@ void set_Envar(char *path)
         value_PWD = string_append(value_PWD, '/');
         value_PWD = string_concat(value_PWD, arr_PWD[i]->data);
     }
+
     value_PWD = string_append(value_PWD, '\0');
+
+    setenv("OLDPWD", old, 1);
+    add_var("OLDPWD", old);
     setenv("PWD", value_PWD->data, 1);
+}
+
+int comeback(void)
+{
+    char *oldpwd;
+    if ((oldpwd = getenv("OLDPWD")) == NULL)
+    {
+        fprintf(stderr, "Cannot obtain $OLDPWD");
+        return 2;
+    }
+
+    chdir(oldpwd);
+    char *tmp = xstrdup(getenv("PWD"));
+    setenv("PWD", oldpwd, 1);
+    setenv("OLDPWD", tmp, 1);
+    add_var("OLDPWD", tmp);
+    printf("%s\n", getenv("PWD"));
+    return 0;
 }
 
 int cd(char **args)
@@ -159,20 +193,30 @@ int cd(char **args)
         else
             path = xstrdup(getenv("HOME"));
 
+    else if (strcmp(args[1], "-") == 0)
+    {
+        int oui = comeback();
+
+        return oui;
+    }
+
     else
         path = xstrdup(args[1]); // on recup le path passe en arg
 
-    char *fpath = xstrdup(path);
 
-    int code_cd = chdir(fpath);
+    int code_cd = chdir(path);
     if (code_cd == -1)
     {
         fprintf(stderr, "%s: No such file or directory\n", path);
-        // printf("bite : %s\n", getenv("PWD"));
         return 2;
     }
 
+    //printf("before PWD : %s\n", getenv("PWD"));
+    //printf("before OLDPWD : %s\n", getenv("OLDPWD"));
     set_Envar(path);
+
+    //printf("PWD : %s\n", getenv("PWD"));
+    //printf("OLDPWD : %s\n", getenv("OLDPWD"));
 
     return 0;
 }
