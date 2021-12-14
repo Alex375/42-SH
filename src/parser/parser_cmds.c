@@ -14,9 +14,14 @@ struct ast *parse_command()
 
         if (tok.type == T_IF || tok.type == T_O_PRTH || tok.type == T_O_BRKT
             || tok.type == T_FOR || tok.type == T_WHILE
-            || tok.type == T_UNTIL) // T_CASE
+            || tok.type == T_UNTIL || tok.type == T_CASE)
     {
         ast = parse_shell_command();
+        parse_redirs(&redirs);
+    }
+    else if (tok.type == T_FUN_INIT)
+    {
+        ast = parse_funcdec();
         parse_redirs(&redirs);
     }
     else
@@ -45,8 +50,7 @@ static int err_redir()
     struct token_info t2 = look_forward_token(2);
     if ((is_chev(t0.type) && !is_part_word(t1.type))
         || (t0.type == T_IONUMBER
-            && ((!is_chev(t1.type))
-                || !is_part_word(t2.type))))
+            && ((!is_chev(t1.type)) || !is_part_word(t2.type))))
     {
         errno = ERROR_PARSING;
         return 1;
@@ -158,4 +162,18 @@ struct list_var_assign *parse_var_assignement(struct list_redir **redirs)
     }
 
     return res;
+}
+
+struct ast *parse_funcdec()
+{
+    struct token_info tok = POP_TOKEN
+
+    skip_newlines();
+
+    struct ast *ast = parse_shell_command();
+
+    if (errno)
+        return NULL;
+
+    return build_func(ast, tok.command);
 }

@@ -1,7 +1,7 @@
 #include <err.h>
-#include <unistd.h>
-#include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "eval_ast.h"
 #include "execution.h"
@@ -11,11 +11,12 @@
 
 extern struct options *opt;
 
-int exec_pipe(struct ast *left, struct ast *right) {
+int exec_pipe(struct ast *left, struct ast *right)
+{
     int fd[2];
     pipe(fd);
 
-    int res = 0;
+    int res;
     pid_t pid1 = fork();
 
     if (pid1 == -1)

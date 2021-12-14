@@ -1,10 +1,10 @@
+#define _POSIX_SOURCE
+
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 
 #include "eval_ast.h"
 #include "execution.h"
@@ -48,7 +48,7 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         flag = "a";
         break;
     case T_REDIR_O_2:
-        flag = "wr";
+        flag = "r";
         break;
     case T_REDIR_A:
         temp = strtol(word[0], &end_ptr, 10);
@@ -72,7 +72,6 @@ int apply_redir(struct list_redir *redir, struct redir_info *redirInfo)
         }
         fcntl(redirInfo->temp_fd, F_SETFD, FD_CLOEXEC);
         return 0;
-
 
     default:
         err(127, "Unimplemented features");

@@ -3,15 +3,17 @@
 
 #include "lexer.h"
 
-struct words_converter converter = {
-    28,
-    16,
-    { "if",   "then", "elif", "else", "fi", "while", "until", "for", "in", "do",
-      "done", "!",    "||",   "&&",   "\n", ";",     "{",     "}",   "(",  ")",
-      "|",    ">",    "<",    ">&",   "<&", ">>",    "<>",    ">|" },
-    { "||", "&&", "\n", ";", "(", ")", "|", " ", "\0", ">", "<", ">&", "<&",
-      ">>", "<>", ">|" }
-};
+struct words_converter converter = { 33,
+                                     19,
+                                     { "if",    "then",  "elif", "else", "fi",
+                                       "while", "until", "for",  "in",   "do",
+                                       "done",  "!",     "||",   "&&",   "\n",
+                                       ";",     "{",     "}",    "(",    ")",
+                                       "|",     ">",     "<",    ">&",   "<&",
+                                       ">>",    "<>",    ">|",   "`",    "$(", "case", "esac", ";;" },
+                                     { "||", "&&", "\n", ";", "(", ")", "|",
+                                       " ", "\0", ">", "<", ">&", "<&", ">>",
+                                       "<>", ">|", "`", "$(", ";;" } };
 
 int separatorify(const char *token_str)
 {
@@ -34,10 +36,11 @@ int separatorify(const char *token_str)
 
 int is_token_seperator(enum token token)
 {
-    enum token sep[] = { T_AND,     T_OR,        T_NEWLINE,   T_SEMICOLON,
-                         T_C_PRTH,  T_O_PRTH,    T_PIPE,      T_EOF,
-                         T_REDIR_1, T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
-                         T_REDIR_A, T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE };
+    enum token sep[] = { T_AND,       T_OR,        T_NEWLINE,   T_SEMICOLON,
+                         T_C_PRTH,    T_O_PRTH,    T_PIPE,      T_EOF,
+                         T_REDIR_1,   T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
+                         T_REDIR_A,   T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
+                         T_BACKQUOTE, T_D_PAREN, T_DOUBLE_SCOLON };
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
@@ -81,10 +84,24 @@ int check_special(struct string *accumulator, char next_char)
         && g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         char next[2] = { next_char, 0 };
-        if (fnmatch("[$\\\"`]", next, FNM_EXTMATCH) == 0)
+        if (fnmatch("[$\\\\\"`]", next, FNM_EXTMATCH) == 0
+            || fnmatch("$(", next, FNM_EXTMATCH) == 0)
         {
             accumulator->size--;
             accumulator->data[accumulator->size] = '\0';
+        }
+    }
+
+    if (g_lexer_info.soft_expansion == IN_DQUOTE)
+    {
+        if (fnmatch("$(", accumulator->data, FNM_EXTMATCH) == 0
+            || fnmatch("`", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            return 1;
+        }
+        else if (fnmatch("$(", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            return 1;
         }
     }
 
@@ -99,6 +116,15 @@ int check_special(struct string *accumulator, char next_char)
         }
     }
 
+    if (g_lexer_info.last_exp_context == IN_ESCAPE_EXP)
+    {
+        if (fnmatch("$", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.exp_context = GENERAL_EXP_HARD;
+            return 1;
+        }
+    }
+
     if (g_lexer_info.exp_context != GENERAL_EXP_HARD
         || g_lexer_info.last_exp_context != GENERAL_EXP_HARD
         || g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
@@ -108,7 +134,8 @@ int check_special(struct string *accumulator, char next_char)
 
     int token;
 
-    if (g_lexer_info.pos + 1 < g_lexer_info.script_size)
+    if (g_lexer_info.pos + 1 < g_lexer_info.script_size
+        && accumulator->size >= 1)
     {
         accumulator = string_append(accumulator, next_char);
         token = separatorify(accumulator->data);
@@ -118,6 +145,16 @@ int check_special(struct string *accumulator, char next_char)
             return 1;
         }
         accumulator = string_pop(accumulator, NULL);
+    }
+
+    if (g_lexer_info.var_context == GENERAL_VAR
+        && g_lexer_info.for_context == GENERAL_FOR)
+    {
+        if (fnmatch("*@([(])@([)])", accumulator->data, FNM_EXTMATCH) == 0)
+        {
+            g_lexer_info.fun_context = IN_FUN_NAME;
+            return 1;
+        }
     }
 
     token = separatorify(accumulator->data);

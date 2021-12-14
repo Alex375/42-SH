@@ -10,7 +10,7 @@
 #include "vars.h"
 
 struct options *opt = NULL;
-struct vars_vect *vars = NULL;
+struct context *context = NULL;
 
 char *read_stdin(void)
 {
@@ -32,11 +32,13 @@ char *read_stdin(void)
 
 int launch_program(int argc, char **argv)
 {
-    vars = init_vars_vect();
+    context = init_context();
 
     opt = xcalloc(1, sizeof(struct options));
 
     int prog_index = preparseopt(argc, argv);
+    if (prog_index > argc)
+        prog_index = argc;
     char **options = dupplicate(prog_index, argv);
     get_option(opt, prog_index, options);
     if (opt->help)
@@ -45,6 +47,13 @@ int launch_program(int argc, char **argv)
         return 0;
     }
 
+    if (opt->script != NULL)
+    {
+        opt->argv = argv + prog_index;
+        opt->argc = argc - prog_index;
+        if (opt->argc == 0)
+            opt->argc = 1;
+    }
 
     if (opt->script == NULL && prog_index < argc)
     {
@@ -61,7 +70,7 @@ int launch_program(int argc, char **argv)
     }
     if (opt->verbose)
         printf("Executing command \n\'%s\'\n", opt->script);
-    int res = exec_script(opt->script, strlen(opt->script));
+    int res = exec_script(opt->script, strlen(opt->script), 1);
     xfree_all();
     return res;
 }

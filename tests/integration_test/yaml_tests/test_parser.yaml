@@ -43,17 +43,32 @@
 
 - name: only redir
   input: |
-    > test.txt
+    > trash/test.txt
   type: success
 
 - name: corner parse redir
   input: |
     if true; then
         echo coucou
-    fi; > test.txt
+    fi; > trash/test.txt
   type: success
 
 - name: weird quote
   input: "'ec'ho"
   type: noerrcheck
 
+- name: If in if
+  input: |
+    if ! echo c; then
+          echo lets see if the if is recognized
+          if echo "false 1";then
+            for a in 1 in 3;
+            do
+                echo 'in' 'for'
+            done
+          else
+            echo "in false2"
+            echo yeeeeeee a
+          fi;
+        fi;
+  type: success

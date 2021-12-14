@@ -134,6 +134,10 @@
     echo $OLDPWD
   type: success
 
+- name: var prefix
+  input: a=3 echo $a
+  type: success
+
 - name: var return value
   input: |
     echo a
@@ -144,9 +148,9 @@
 
 - name: var poitional at and star
   arguments:
-    - test_var_positional_at_star.sh
+    - yaml_tests/sample_script/test_var_positional_at_star.sh
     - ya
-    - "no"
+    - "no  dceef"
   type: success
 
 - name: var 16 char
@@ -156,3 +160,17 @@
 - name: var 30 char
   input: a=thisisa30charvaraaaaaaaaaaaaaa
   type: success
+
+- name: Var redir
+  input: |
+    a=trash/test.txt
+    echo 'echo coucou>&$1'> $a
+    cat trash/test.txt
+  type: success
+
+- name: Var redir arguments
+  arguments:
+    - trash/test.txt
+    - "2"
+  type: success
+

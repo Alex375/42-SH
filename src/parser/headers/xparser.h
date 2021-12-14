@@ -83,6 +83,24 @@ struct n_for
     struct ast *statement;
 };
 
+/**
+** @brief                   AST_CASE ast member.
+*/
+struct n_case
+{
+    struct tok_vect *pattern;
+    struct list_case_item *case_items;
+};
+
+/**
+** @brief                   AST_FUNC ast member.
+*/
+struct n_func
+{
+    char *name;
+    struct ast *ast;
+};
+
 ////////////////
 
 /**
@@ -104,6 +122,16 @@ struct list_redir
     enum token redir_type;
     struct tok_vect *word;
     struct list_redir *next;
+};
+
+/**
+** @brief                   chained list of case items.
+*/
+struct list_case_item
+{
+    struct tok_vect *seq;
+    struct ast *statement;
+    struct list_case_item *next;
 };
 
 ///////////////
@@ -150,6 +178,28 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
 */
 struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement);
 
+/*!
+** @brief               builds a n_func node
+** @param name          name of the function
+** @param statement     ast inside the function
+*/
+struct ast *build_func(struct ast *ast, char *name);
+
+/*!
+** @brief               builds a single node
+** @param ast           ast folowing
+** @param t             type of the node
+*/
+struct ast *build_single(struct ast *ast, enum AST_TYPE t);
+
+/*!
+** @brief               builds a case node
+** @param pattern       pattern to match
+** @param case_items    list of case items
+*/
+struct ast *build_case(struct tok_vect *pattern,
+                       struct list_case_item *case_items);
+
 #include <stddef.h>
 
 #define ERROR_PARSING 127
@@ -160,9 +210,10 @@ struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement);
 *                      (crash if a parsing error is found)
 ** @param script        string containing block
 ** @param size          len of script parameter
+** @param set_var       If true will set vars
 ** @return              Return le exit code of the last executed command
 */
-int exec_script(char *script, size_t size);
+int exec_script(char *script, size_t size, int set_var);
 
 /**
 ** @brief               printing the ast obtain from a script
@@ -239,9 +290,35 @@ struct ast *parse_while_until_rule(enum token tokT);
 struct ast *parse_for_rule();
 
 /**
+** @brief               Parsing a case rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_case_rule();
+
+/**
+** @brief               Parsing a case clause
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_clause();
+
+/**
+** @brief               Parsing a case item
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_item();
+
+/**
+** @brief               Parsing a funcdec rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_funcdec();
+
+/**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
 */
 struct ast *parse_compound();
+
+//////////////////////
 
 /**
 ** @brief               calling lexer while newline (cf sh_grammar.txt)

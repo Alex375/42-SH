@@ -6,7 +6,8 @@ project(
     default_options: [
         'c_std=c99',
         'warning_level=3',
-        'werror=true'
+        'werror=true',
+        'b_sanitize=address'
     ],
 )
 
@@ -16,7 +17,7 @@ summary({
     'debug': get_option('debug'),
     'b_sanitize': get_option('b_sanitize'),
     'warning_level': get_option('warning_level'),
-    'werror': get_option('werror'),
+    'werror': get_option('werror')
 })
 
 
@@ -29,22 +30,29 @@ add_project_arguments(cflags, language: 'c')
 #Sources
 sources = [
 
-    'src/execution/execution.c',
+    'src/execution/xexecution.c',
     'src/execution/pipe.c',
     'src/execution/redir.c',
+    'src/execution/funcx.c',
+    'src/execution/subshell.c',
     'src/data_types/token_vec.c',
     'src/data_types/xstring.c',
     'src/builtins/builtins_dispatch.c',
     'src/builtins/echo.c',
     'src/builtins/exit.c',
+    'src/builtins/unset.c',
+    'src/builtins/cd.c',
+    'src/builtins/dot.c',
+    'src/builtins/export.c',
     'src/parser/ast_pretty_print.c',
     'src/parser/parser_cmds.c',
     'src/parser/builds.c',
+    'src/parser/builds2.c',
     'src/parser/tools_parse.c',
     'src/parser/parser_shell_cmds.c',
     'src/parser/exec_script.c',
     'src/parser/parser.c',
-    'src/parser/vector_tokens.c',
+    'src/parser/xvector_tokens.c',
     'src/program_start/options.c',
     'src/program_start/read_script.c',
     'src/program_start/launch_program.c',
@@ -64,8 +72,16 @@ sources = [
     'src/lexer/lexer_var.c',
     'src/lexer/recognize_words.c',
     'src/lexer/lexer_command.c',
+    'src/lexer/lexer_command_sub.c',
+    'src/lexer/lexer_fun.c',
     'src/eval_ast/eval_ast.c',
     'src/vars/expand_vars.c',
+    'src/lexer/lexer_fun.c',
+    'src/vars/xvars.c',
+    'src/vars/xvars2.c',
+    'src/vars/context.c',
+    'src/handle_ast/handle_ast.c',
+    'src/func/func.c'
 ]
 
 includes = [
@@ -77,8 +93,10 @@ includes = [
     'src/xalloc/headers',
     'src/program_start/headers',
     'src/data_types/headers',
-    'src/builtins/headers'
-    'src/vars/headers'
+    'src/builtins/headers',
+    'src/vars/headers',
+    'src/func/headers',
+    'src/handle_ast/headers'
 ]
 
 #42SH binary

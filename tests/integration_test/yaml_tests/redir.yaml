@@ -1,48 +1,48 @@
 - name: Simple redir
   input: |
-    echo coucou > test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou > trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 
 - name: Simple redir 2
   input: |
-    echo coucou 3> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 3> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir high fd
   input: |
-    echo coucou 10> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 10> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir higher fd
   input: |
-    echo coucou 11> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 11> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir very high fd
   input: |
-    echo coucou 1100> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 1100> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir bad fd
   input: |
-    echo coucou fzer> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou fzer> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir exit
-  input: exit 3 > test.txt ; echo coucou ; rm test.txt
+  input: exit 3 > trash/test.txt ; echo coucou ; rm trash/test.txt
   type: success
 
 - name: Simple redir input
@@ -61,34 +61,34 @@
   input: |
     if true; then
         echo coucou
-    fi > test.txt
-    cat test.txt
-    rm test.txt
+    fi > trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir 2
   input: |
     if true; then
         echo coucou
-    fi; > test.txt
-    cat test.txt
-    rm test.txt
+    fi; > trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir with append redir
   input: |
-    echo coucou > test.txt
-    cat test.txt
-    echo coucou2 >> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou > trash/test.txt
+    cat trash/test.txt
+    echo coucou2 >> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Redir append no file
   input: |
-    echo coucou2 >> test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou2 >> trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Redir file d
@@ -103,13 +103,13 @@
 
 - name: Redir bad fd number file exist
   input: |
-    touch test.txt
-    echo coucou >&test.txt
-    cat test.txt
+    touch trash/test.txt
+    echo coucou >&trash/test.txt
+    cat trash/test.txt
   type: failed
 
 - name: Remove file
-  input: rm -f test.txt
+  input: rm -f trash/test.txt
   type: success
 
 - name: Redir bad file descriptor number
@@ -128,51 +128,55 @@
 
 - name: Simple redir pipe
   input: |
-    echo coucou >| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou >| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 
 - name: Simple redir 2 pipe
   input: |
-    echo coucou 3>| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 3>| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir high fd pipe
   input: |
-    echo coucou 10>| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 10>| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir higher fd pipe
   input: |
-    echo coucou 11>| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 11>| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir very high fd pipe
   input: |
-    echo coucou 1100>| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou 1100>| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir bad fd pipe
   input: |
-    echo coucou fzer>| test.txt
-    cat test.txt
-    rm test.txt
+    echo coucou fzer>| trash/test.txt
+    cat trash/test.txt
+    rm trash/test.txt
   type: success
 
 - name: Simple redir exit pipe
-  input: exit 3 >| test.txt ; echo coucou ; rm test.txt
+  input: exit 3 >| trash/test.txt ; echo coucou ; rm trash/test.txt
   type: success
 
 - name: Redir quote in fd
   input: "echo coucou >&'"
   type: failed
+
+- name: Double redir
+  input: echo test > trash/testd.txt; echo coucou <> trash/testd.txt ; cat <> trash/testd.txt
+  type: success

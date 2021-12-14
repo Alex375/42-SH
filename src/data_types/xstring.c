@@ -12,9 +12,11 @@ struct string *string_create()
 
 struct string *string_append(struct string *string, char c)
 {
+    if (string == NULL)
+        return NULL;
     if (string->size == string->capacity)
     {
-        string->capacity = (string->capacity - 1) * 2 + 1;
+        string->capacity = (string->capacity) * 2 + 1;
         string->data = xrecalloc(string->data, string->capacity * sizeof(char));
     }
     string->data[string->size] = c;
@@ -24,8 +26,22 @@ struct string *string_append(struct string *string, char c)
 
 struct string *string_concat(struct string *destination, char *source)
 {
-    if (destination == NULL)
+    if (source == NULL)
         return destination;
+
+    if (destination == NULL)
+    {
+        struct string *res = string_create();
+
+        size_t i = 0;
+        while (source[i])
+        {
+            res = string_append(destination, source[i]);
+            i++;
+        }
+        return res;
+    }
+
     size_t i = 0;
     while (source[i])
     {
@@ -53,7 +69,7 @@ struct string *string_pop(struct string *string, char *pop)
     return string;
 }
 
-void *string_get(struct string *string)
+char *string_get(struct string *string)
 {
     char *res = string->data;
     xfree(string);

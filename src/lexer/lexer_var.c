@@ -9,6 +9,10 @@ struct token_info lex_varname(struct token_info res, struct string *string)
 {
     res.type = T_VAR_INIT;
     g_lexer_info.var_context = GENERAL_VAR;
+    if (!res.is_space_after)
+    {
+        g_lexer_info.var_context = IN_VAR_INIT;
+    }
 
     string->data[--string->size] = '\0';
 
@@ -35,6 +39,12 @@ struct token_info lex_var(struct token_info res, struct string *string)
     {
         res.command++;
     }
+
+    if (g_lexer_info.case_context == IN_CASE)
+    {
+        g_lexer_info.word_context = GENERAL;
+    }
+
     g_lexer_info.var_context = GENERAL_VAR;
 
     return res;

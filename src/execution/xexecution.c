@@ -5,12 +5,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-
-#include "xalloc.h"
-
-#include "execution.h"
 #include "builtins.h"
+#include "eval_ast.h"
+#include "execution.h"
 #include "options.h"
+#include "special_vars.h"
+#include "xalloc.h"
 
 extern struct options *opt;
 
@@ -26,7 +26,13 @@ int execute(char **args)
         return 0;
     if (opt && opt->verbose)
     {
-        fprintf(stdout, "Executing command -> %s\nWith args -> \n", args[0]);
+        fprintf(stdout, "Executing command -> %s\nWith args1 -> %s\n", args[0],
+                args[1]);
+    }
+    struct ast *fc_ast;
+    if (get_fc(args[0], &fc_ast) == 1)
+    {
+        return exec_func(args, fc_ast);
     }
     int index;
     if ((index = get_builins_index(args[0])) != -1)

@@ -37,7 +37,8 @@ void get_option(struct options *options, int argc, char **argv)
         case 'c':
             options->argv = argv;
             options->argc = 1;
-            exit(exec_script(optarg, strlen(optarg)));
+            options->script = optarg;
+            break;
         case 'p':
             options->print = 1;
             break;
@@ -73,7 +74,7 @@ int preparseopt(int argc, char **argv)
         if (argv[i][0] == '-' && strlen(argv[i]) > 1)
         {
             if (strcmp(argv[i], "-c") == 0)
-                return argc;
+                return i + 2;
             i++;
             continue;
         }

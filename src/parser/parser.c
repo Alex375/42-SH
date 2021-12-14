@@ -127,11 +127,7 @@ struct ast *parse_pipeline()
     if (!ast || errno != 0)
         return NULL;
 
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = (baseType == T_NOT) ? AST_NOT : AST_PIPE;
-    res->t_ast = ast;
-
-    return res;
+    return build_single(ast, (baseType == T_NOT) ? AST_NOT : AST_PIPE);
 }
 
 struct ast *parse_compound()

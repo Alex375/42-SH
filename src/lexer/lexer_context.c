@@ -11,13 +11,18 @@ int skip_character(char c)
     {
         return 1;
     }
-    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP && g_lexer_info.soft_expansion != IN_DQUOTE)
+    if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP
+        && g_lexer_info.soft_expansion != IN_DQUOTE)
     {
         return 1;
     }
     if (c == '"' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {
         return 1;
+    }
+    if (c == '`')
+    {
+        return 0;
     }
     if ((c == '{' || c == '}') && g_lexer_info.var_context == IN_VAR)
     {
@@ -39,7 +44,8 @@ int detect_context(char c)
         g_lexer_info.exp_context = IN_ESCAPE_EXP;
         g_lexer_info.last_exp_context = IN_ESCAPE_EXP;
     }
-    else if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP)
+    else if (c == '\'' && g_lexer_info.exp_context != IN_ESCAPE_EXP
+             && g_lexer_info.soft_expansion != IN_DQUOTE)
     {
         g_lexer_info.last_exp_context = IN_SQUOTE_EXP;
         g_lexer_info.exp_context = (g_lexer_info.exp_context == IN_SQUOTE_EXP)
@@ -49,7 +55,9 @@ int detect_context(char c)
     else if (c == '$' && g_lexer_info.for_context != VAR_FOR
              && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {
-        g_lexer_info.var_context = IN_VAR;
+        if (g_lexer_info.pos + 1 >= g_lexer_info.script_size
+            || g_lexer_info.script[g_lexer_info.pos + 1] != '(')
+            g_lexer_info.var_context = IN_VAR;
     }
     else if (c == '"' && g_lexer_info.exp_context == GENERAL_EXP_HARD)
     {
@@ -61,6 +69,11 @@ int detect_context(char c)
     else if (g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         g_lexer_info.exp_context = GENERAL_EXP_HARD;
+    }
+    else if (c == '}' && g_lexer_info.fun_context == IN_FUN)
+    {
+        g_lexer_info.word_context = GENERAL;
+        return 1;
     }
     return 0;
 }

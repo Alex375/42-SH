@@ -44,13 +44,28 @@ enum var_context
 {
     GENERAL_VAR,
     IN_VAR,
-    IN_VAR_NAME
+    IN_VAR_NAME,
+    IN_VAR_INIT
 };
 
 enum redir_context
 {
     GENERAL_REDIR,
     IN_REDIR
+};
+
+enum fun_context
+{
+    GENERAL_FUN,
+    IN_FUN_NAME,
+    IN_FUN
+};
+
+enum case_context
+{
+    GENERAL_CASE,
+    IN_CASE,
+    IN_CASE_COMMAND,
 };
 
 /**
@@ -64,6 +79,8 @@ enum redir_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum case_context case_context;
+    enum fun_context fun_context;
     enum redir_context redir_context;
     enum soft_expansion last_soft;
     enum soft_expansion soft_expansion;
@@ -82,8 +99,8 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[28];
-    char *separator[16];
+    char *token_converter[33];
+    char *separator[19];
 };
 
 /**
@@ -129,6 +146,8 @@ struct token_info lex_command(struct token_info res, struct string *string);
 
 int skip_character(char c);
 
+struct token_info lex_fun(struct token_info res, struct string *string);
+
 void context_update(struct token_info res);
 
 int detect_context(char c);
@@ -137,9 +156,24 @@ int look_ahead_dquote(const char *script, size_t size, size_t acu_size);
 
 int look_ahead_squote(size_t size);
 
-void lexer_start(char *script, size_t size);
+struct token_info lex_sub(struct token_info res);
+
+void lexer_start(char *script, size_t size, long end);
 
 void lexer_reset();
+
+/**
+** @brief                   Save the current state of the lexer
+** @return                  Return the saved state (lexer_info)
+*/
+struct lexer_info save_lexer();
+
+/**
+** @brief                   Revert the state of the lexer from a copy
+** @param copy              The copied state of the lexer
+*/
+
+void revert_lexer(struct lexer_info copy);
 
 /**
 ** @brief                   Token-ify the next element of a script without
