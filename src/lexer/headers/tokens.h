@@ -11,6 +11,12 @@ enum token
     T_ELIF,
     T_ELSE,
     T_FI,
+    T_WHILE,
+    T_UNTIL,
+    T_FOR,
+    T_IN,
+    T_DO,
+    T_DONE,
     T_NOT,
     T_OR,
     T_AND,
@@ -28,7 +34,19 @@ enum token
     T_REDIR_2,
     T_REDIR_O_2,
     T_REDIR_PIPE,
+    T_BACKQUOTE,
+    T_D_PAREN,
+    T_CASE,
+    T_ESAC,
+    T_DOUBLE_SCOLON,
     T_EOF,
+    T_IONUMBER,
+    T_VAR,
+    T_VAR_INQUOTE,
+    T_VAR_INIT,
+    T_FUN_INIT,
+    T_COMMAND_SUB_START,
+    T_COMMAND_SUB_END,
     T_WORD,
     T_ERROR
 };
@@ -43,6 +61,7 @@ struct token_info
 {
     enum token type;
     char *command;
+    char is_space_after;
 };
 
 #endif // INC_42_SH_TOKENS_H

@@ -1,16 +1,71 @@
 #ifndef INC_42_SH_TYPE_H
 #define INC_42_SH_TYPE_H
 
+#if __APPLE__
+#    include "xfnmatch.h"
+#else
+#    define _GNU_SOURCE
+#    include <fnmatch.h>
+#endif
+
 #include <stddef.h>
 
 #include "token_vec.h"
 #include "tokens.h"
 #include "xstring.h"
 
-enum expansion_context
+enum word_context
 {
     GENERAL,
-    IN_SQUOTE
+    IN_COMMAND
+};
+
+enum hard_expansion
+{
+    GENERAL_EXP_HARD,
+    IN_SQUOTE_EXP,
+    IN_ESCAPE_EXP
+};
+
+enum soft_expansion
+{
+    GENERAL_EXP_SOFT,
+    IN_DQUOTE
+};
+
+enum for_context
+{
+    GENERAL_FOR,
+    VAR_FOR,
+    IN_FOR,
+};
+
+enum var_context
+{
+    GENERAL_VAR,
+    IN_VAR,
+    IN_VAR_NAME,
+    IN_VAR_INIT
+};
+
+enum redir_context
+{
+    GENERAL_REDIR,
+    IN_REDIR
+};
+
+enum fun_context
+{
+    GENERAL_FUN,
+    IN_FUN_NAME,
+    IN_FUN
+};
+
+enum case_context
+{
+    GENERAL_CASE,
+    IN_CASE,
+    IN_CASE_COMMAND,
 };
 
 /**
@@ -24,8 +79,16 @@ enum expansion_context
 struct lexer_info
 {
     struct tkvec *token_list;
-    enum expansion_context exp_context;
-    enum expansion_context last_context;
+    enum case_context case_context;
+    enum fun_context fun_context;
+    enum redir_context redir_context;
+    enum soft_expansion last_soft;
+    enum soft_expansion soft_expansion;
+    enum var_context var_context;
+    enum for_context for_context;
+    enum word_context word_context;
+    enum hard_expansion exp_context;
+    enum hard_expansion last_exp_context;
     size_t array_pos;
     size_t pos;
     char *script;
@@ -36,9 +99,10 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[17];
-    char *separator[11];
+    char *token_converter[33];
+    char *separator[19];
 };
+
 /**
 ** @brief                   Global variable that store the infos about the
 *lexer.
@@ -50,23 +114,66 @@ extern struct lexer_info g_lexer_info;
 */
 int separatorify(const char *token_str);
 
+int is_token_seperator(enum token token);
+
 enum token tokenify(const char *token_str);
 
-int detect_first_seperator(struct string *accumulator);
+int is_ionumber(struct token_info res, struct string *string);
+
+int look_ahead_var(const char *script, size_t size);
+
+int is_valid_var(const char *string);
+
+struct token_info lex_varvalue(struct token_info res, struct string *string);
+
+struct token_info lex_varname(struct token_info res, struct string *string);
+
+struct token_info lex_var(struct token_info res, struct string *string);
+
+struct token_info lex_ionumber(struct token_info res, struct string *string);
+
+int check_special(struct string *accumulator, char next_char);
 
 int look_ahead_keywords(const char *script, size_t size);
 
+struct token_info lex_for(struct token_info res, struct string *string);
+
 struct token_info lex_keywords(struct token_info res, struct string *string);
+
+int is_command(struct token_info res);
 
 struct token_info lex_command(struct token_info res, struct string *string);
 
+int skip_character(char c);
+
+struct token_info lex_fun(struct token_info res, struct string *string);
+
+void context_update(struct token_info res);
+
 int detect_context(char c);
+
+int look_ahead_dquote(const char *script, size_t size, size_t acu_size);
 
 int look_ahead_squote(size_t size);
 
-void lexer_start(char *script, size_t size);
+struct token_info lex_sub(struct token_info res);
+
+void lexer_start(char *script, size_t size, long end);
 
 void lexer_reset();
+
+/**
+** @brief                   Save the current state of the lexer
+** @return                  Return the saved state (lexer_info)
+*/
+struct lexer_info save_lexer();
+
+/**
+** @brief                   Revert the state of the lexer from a copy
+** @param copy              The copied state of the lexer
+*/
+
+void revert_lexer(struct lexer_info copy);
 
 /**
 ** @brief                   Token-ify the next element of a script without

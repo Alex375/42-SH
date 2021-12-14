@@ -29,12 +29,13 @@ struct string *string_append(struct string *string, char c);
 */
 struct string *string_concat(struct string *destination, char *source);
 
+struct string *string_pop(struct string *string, char *pop);
 /**
 ** @brief                   Free the data structure around string and return the
-*string date (you will need to free it).
+*string data (you will need to free it).
 ** @param destination       String data that will be free.
 */
-void *string_get(struct string *string);
+char *string_get(struct string *string);
 
 /**
 ** @brief                   Free a string structure.

@@ -5,23 +5,23 @@
 
 #include "xalloc.h"
 
-char *read_script(char *filename, size_t *size)
+char *read_script(char *filename)
 {
     FILE *f = fopen(filename, "r");
     if (f == NULL)
     {
         xfree_all();
-        err(1, "Failed to open %s", filename);
+        err(127, "Failed to open file.");
     }
     char *res = xmalloc(BUFFER_SIZE + 1);
-    *size = 0;
+    int i = 0;
     size_t r = 0;
-    while ((r = fread(res + *size, 1, BUFFER_SIZE, f)))
+    while ((r = fread(res + i, 1, BUFFER_SIZE, f)))
     {
-        *size += r;
-        res = xrealloc(res, *size + 1);
+        i += r;
+        res = xrealloc(res, i + 1);
     }
-    res[(*size)++] = '\0';
+    res[i] = '\0';
     fclose(f);
     return res;
 }

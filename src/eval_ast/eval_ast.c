@@ -1,69 +1,136 @@
 #include "eval_ast.h"
 
+#include <err.h>
+
+#include "ast_info.h"
 #include "execution.h"
 
-int eval_ast(struct ast *ast,
-             struct pipeline *pipeline) // TODO alloc pipline with null
+int eval_ast(struct ast *ast)
 {
     if (!ast)
         return 0;
 
     struct n_s_cmd *s_cmd_ast;
-    struct n_binary *binary_ast;
+    struct n_binary *b_ast;
     struct n_if *if_ast;
     struct n_command *cmd;
+    struct n_for *for_ast;
+    struct n_func *func;
+    struct n_case *case_ast;
 
-    int res;
+    enum ast_info_type t;
+    int continued = 0;
+
+    int res = 0;
 
     switch (ast->type)
     {
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
-        res = execute(s_cmd_ast->cmd, s_cmd_ast->cmd_arg->data, pipeline);
-        return res;
+
+        char **cmd_arg = expand_vars_vect(s_cmd_ast->cmd_arg);
+        if (!s_cmd_ast->cmd_arg->len || !cmd_arg || !cmd_arg[0])
+        {
+            struct list_var_assign *tmp = s_cmd_ast->vars;
+            while (tmp)
+            {
+                char **value = expand_vars_vect(tmp->value);
+                add_var(tmp->name, value[0]);
+                tmp = tmp->next;
+            }
+        }
+        else
+            res = execute(cmd_arg);
+        RETURN(res)
     case AST_IF:
         if_ast = ast->t_ast;
-        if (eval_ast(if_ast->condition, pipeline) == 0)
-            res = eval_ast(if_ast->true, pipeline);
+        EVAL_AST(if_ast->condition)
+        if (res == 0)
+        {
+            EVAL_AST(if_ast->true_c)
+        }
         else
-            res = eval_ast(if_ast->false, pipeline);
-        return res;
+        {
+            EVAL_AST(if_ast->false_c)
+        }
+        RETURN(res)
     case AST_WHILE:
-        return 0;
-    case AST_FOR:
-        return 0;
-    case AST_CASE:
-        return 0;
     case AST_UNTIL:
-        return 0;
+        b_ast = ast->t_ast;
+
+        EVAL_AST_IN_LOOP(b_ast->left)
+        while ((ast->type == AST_UNTIL && res != 0)
+               || (ast->type == AST_WHILE && res == 0))
+        {
+            if (!continued)
+            {
+                EVAL_AST_IN_LOOP(b_ast->right)
+            }
+            continued = 0;
+            EVAL_AST_IN_LOOP(b_ast->left)
+        }
+
+        RETURN(res)
+    case AST_FOR:
+        for_ast = ast->t_ast;
+        char **seq = expand_vars_vect(for_ast->seq);
+        for (int i = 0; seq[i]; ++i)
+        {
+            add_var(for_ast->name, seq[i]);
+            EVAL_AST_IN_LOOP(for_ast->statement);
+        }
+
+        RETURN(res)
+    case AST_CASE:
+        case_ast = ast->t_ast;
+        RETURN(treat_case(case_ast))
     case AST_PIPE:
-        binary_ast = ast->t_ast;
-        return exec_pipe(binary_ast->left, binary_ast->right, pipeline);
-    case AST_REDIR:
-        return 0;
+        b_ast = ast->t_ast;
+        RETURN(exec_pipe(b_ast->left, b_ast->right))
+    case AST_SUBSHELL:
+        RETURN(subhsell(ast))
     case AST_FUNC:
-        return 0;
+        func = ast->t_ast;
+        add_fc(func->name, func->ast);
+        RETURN(0)
     case AST_LIST:
-        binary_ast = ast->t_ast;
-        eval_ast(binary_ast->left, pipeline);
-        return eval_ast(binary_ast->right, pipeline);
+        b_ast = ast->t_ast;
+        EVAL_AST(b_ast->left)
+        EVAL_AST(b_ast->right)
+        RETURN(res)
     case AST_NOT:
-        return !eval_ast(ast->t_ast, pipeline);
+        EVAL_AST(ast->t_ast)
+        RETURN(!res)
     case AST_AND:
-        binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left, pipeline)
-            && eval_ast(binary_ast->right, pipeline);
+        b_ast = ast->t_ast;
+        EVAL_AST(b_ast->left)
+
+        if (res == 0)
+        {
+            EVAL_AST(b_ast->right)
+        }
+
+        RETURN(res)
     case AST_OR:
-        binary_ast = ast->t_ast;
-        return eval_ast(binary_ast->left, pipeline)
-            || eval_ast(binary_ast->right, pipeline);
+        b_ast = ast->t_ast;
+        EVAL_AST(b_ast->left)
+
+        if (res != 0)
+        {
+            EVAL_AST(b_ast->right)
+        }
+
+        RETURN(res)
     case AST_BRACKET:
-        return 0;
+        RETURN(0)
     case AST_PARENTH:
-        return 0;
+        RETURN(0)
     case AST_CMD:
         cmd = ast->t_ast;
-        // TODO exec redirs
-        return eval_ast(cmd->ast, pipeline);
+        RETURN(exec_redirs(cmd->ast, cmd->redirs))
+    default:
+        errx(1,
+             "Mettez un default svp ça fait crash cmake ok | j'ai mis un "
+             "default | nan cest moi qui met le default");
     }
 }

@@ -1,0 +1,105 @@
+- name: simple dot
+  input: |
+    cd .
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: double dot
+  input: |
+    cd ..
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: no args (goto HOME)
+  input: |
+    cd
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: lot of simple dot
+  input: |
+    cd ./././././././././././././././././././
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: back & come again
+  input: |
+    cd ../integration_test
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: absolute
+  input: |
+    cd /
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: absolute set pwd
+  input: |
+    cd /
+    env -i pwd
+    echo $OLDPWD
+    pwd
+  type: success
+
+- name: hard one
+  input: |
+    cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
+    env -i pwd
+    echo $OLDPWD
+  type: success
+
+- name: hard one set pwd
+  input: |
+    cd ../../../../../../../../../../../../../../../../../../.././../././././././././../../../../../././././././etc
+    env -i pwd
+    echo $OLDPWD
+    pwd
+  type: success
+
+- name: TDB 1
+  input: |
+    cd `echo './'`
+    ls
+  type: success
+
+- name: Failed
+  input: cd efw; ls
+  type: failed
+
+- name: Complexe
+  input: |
+    dir=src
+    cd .././../$dir/.
+    ls
+    env -i pwd
+    echo $OLDPWD
+    pwd
+  type: success
+
+- name: Failed complex
+  input: |
+    dir=srcs
+    cd ../../tests/$dir/
+    echo Exit code $?
+    env -i pwd
+    echo $OLDPWD
+    pwd
+  type: failed
+
+- name: Minus
+  input: |
+    pwd
+    cd ../
+    pwd
+    cd -
+    pwd
+  type: success
+
+

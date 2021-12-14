@@ -104,6 +104,8 @@ void *xrealloc(void *data, size_t new_size)
 
 void *xrecalloc(void *data, size_t new_size)
 {
+    if (data == NULL)
+        return xcalloc(1, new_size);
     size_t old_size = get_header(data)->allocation_size;
     data = xrealloc(data, new_size);
 
