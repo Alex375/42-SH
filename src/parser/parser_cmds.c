@@ -13,8 +13,8 @@ struct ast *parse_command()
     struct token_info tok = GET_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF)
 
         if (tok.type == T_IF || tok.type == T_O_PRTH || tok.type == T_O_BRKT
-            || tok.type == T_FOR || tok.type == T_WHILE
-            || tok.type == T_UNTIL || tok.type == T_CASE)
+            || tok.type == T_FOR || tok.type == T_WHILE || tok.type == T_UNTIL
+            || tok.type == T_CASE)
     {
         ast = parse_shell_command();
         parse_redirs(&redirs);

@@ -24,7 +24,8 @@ struct ast *build_single(struct ast *ast, enum AST_TYPE t)
     return res;
 }
 
-struct ast *build_case(struct tok_vect *pattern, struct list_case_item *case_items)
+struct ast *build_case(struct tok_vect *pattern,
+                       struct list_case_item *case_items)
 {
     struct n_case *n_case = xcalloc(1, sizeof(struct n_case));
     n_case->pattern = pattern;

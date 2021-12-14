@@ -83,4 +83,3 @@ void revert_lexer(struct lexer_info copy)
     g_lexer_info.script = copy.script;
     g_lexer_info.script_size = copy.script_size;
 }
-

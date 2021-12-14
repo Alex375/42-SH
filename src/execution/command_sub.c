@@ -1,7 +1,7 @@
 #include <err.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "eval_ast.h"
 #include "xalloc.h"

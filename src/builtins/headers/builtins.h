@@ -61,7 +61,6 @@ int xcontinue(char **args);
  */
 int pwd(char **args);
 
-
 /*!
  * @brief Execute the builtins at the given index (call get_builtins_index to
  * get index)

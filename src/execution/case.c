@@ -1,9 +1,8 @@
-#include "eval_ast.h"
-
 #include <err.h>
 #include <string.h>
 
 #include "ast_info.h"
+#include "eval_ast.h"
 #include "execution.h"
 
 int treat_case(struct n_case *case_ast)

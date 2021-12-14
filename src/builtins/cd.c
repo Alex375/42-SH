@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <xstrdup.h>
 
-#include "xalloc.h"
 #include "vars.h"
+#include "xalloc.h"
 #include "xstring.h"
 
 /*
@@ -113,7 +113,7 @@ static struct string **arr_pop(struct string **arr)
 
     string_free(arr[size_arr - 1]);
     arr[size_arr - 1] = NULL;
-    //arr = xrealloc(arr, --size_arr * sizeof(struct string *));
+    // arr = xrealloc(arr, --size_arr * sizeof(struct string *));
     return arr;
 }
 
@@ -199,7 +199,6 @@ int cd(char **args)
     else
         path = xstrdup(args[1]); // on recup le path passe en arg
 
-
     int code_cd = chdir(path);
     if (code_cd == -1)
     {
@@ -207,12 +206,12 @@ int cd(char **args)
         return 2;
     }
 
-    //printf("before PWD : %s\n", getenv("PWD"));
-    //printf("before OLDPWD : %s\n", getenv("OLDPWD"));
+    // printf("before PWD : %s\n", getenv("PWD"));
+    // printf("before OLDPWD : %s\n", getenv("OLDPWD"));
     set_Envar(path);
 
-    //printf("PWD : %s\n", getenv("PWD"));
-    //printf("OLDPWD : %s\n", getenv("OLDPWD"));
+    // printf("PWD : %s\n", getenv("PWD"));
+    // printf("OLDPWD : %s\n", getenv("OLDPWD"));
 
     return 0;
 }
