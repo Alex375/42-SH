@@ -1,3 +1,13 @@
+- name: Doesn't exist with slash
+  input: ". /test/lucas/test.sh"
+  type: failed
+
+
+- name: Doesn't exist with no slash
+  input: ". dasdskopdefwefwefkwfjweiopdjfknl"
+  type: failed
+
 - name: Simple
-  input: ". /home/lucas/test.sh"
+  input: ". yaml_tests/sample_script/hello.sh"
   type: success
+
