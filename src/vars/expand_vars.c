@@ -64,6 +64,12 @@ static char *my_strsep(char *copy, char *ifs, int nb_strtok)
     return w;
 }
 
+static int is_quoted(enum token t)
+{
+    return t == T_VAR_INQUOTE || t == T_COMMAND_SUB_START_Q
+        || t == T_BACKQUOTE_Q;
+}
+
 static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
                       int *nb_at)
 {
@@ -83,7 +89,8 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
             int old_at = *nb_at;
 
             char *val;
-            if (tok_vect->list[*i].type == T_COMMAND_SUB_START)
+            if (tok_vect->list[*i].type == T_COMMAND_SUB_START
+                || tok_vect->list[*i].type == T_COMMAND_SUB_START_Q)
             {
                 if (!acc)
                     get_stdout(tok_vect->cmd_sub_list[*i], &acc);
@@ -103,7 +110,7 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
                 continue;
             }
 
-            if (tok_vect->list[*i].type == T_VAR_INQUOTE)
+            if (is_quoted(tok_vect->list[*i].type))
                 string_concat(res, val);
             else
             {

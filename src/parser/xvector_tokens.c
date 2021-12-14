@@ -9,7 +9,7 @@
 int is_part_word(enum token t)
 {
     return t == T_WORD || t == T_VAR || t == T_VAR_INQUOTE
-        || t == T_COMMAND_SUB_START;
+        || t == T_COMMAND_SUB_START || t == T_COMMAND_SUB_START_Q;
 }
 
 struct tok_vect *init_tok_vect()
@@ -42,26 +42,39 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
         }
         pop_token();
 
-        if (tok.type == T_COMMAND_SUB_START || tok.type == T_BACKQUOTE)
+        if (tok.type == T_COMMAND_SUB_START || tok.type == T_COMMAND_SUB_START_Q
+            || tok.type == T_BACKQUOTE || tok.type == T_BACKQUOTE_Q)
         {
             tok_vect->cmd_sub_list[tok_vect->len] = parse_compound();
             struct token_info after_sub = pop_token();
 
-            if ((tok.type == T_COMMAND_SUB_START
+            if (((tok.type == T_COMMAND_SUB_START
+                  || tok.type == T_COMMAND_SUB_START_Q)
                  && after_sub.type != T_COMMAND_SUB_END)
-                || (tok.type == T_BACKQUOTE && after_sub.type != T_BACKQUOTE))
+                || ((tok.type == T_BACKQUOTE || tok.type == T_BACKQUOTE_Q)
+                    && (after_sub.type != T_BACKQUOTE
+                        && after_sub.type != T_BACKQUOTE_Q)))
             {
                 errno = ERROR_PARSING;
                 return 0;
             }
             tok_vect->list[tok_vect->len] = tok;
-            tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START;
+            if (tok.type == T_COMMAND_SUB_START || tok.type == T_BACKQUOTE)
+                tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START;
+            else
+                tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START_Q;
         }
         else
             tok_vect->list[tok_vect->len] = tok;
 
-        if (quote_word && tok_vect->list[tok_vect->len].type == T_VAR)
-            tok_vect->list[tok_vect->len].type = T_VAR_INQUOTE;
+        if (quote_word)
+        {
+            if (tok_vect->list[tok_vect->len].type == T_VAR)
+                tok_vect->list[tok_vect->len].type = T_VAR_INQUOTE;
+            if (tok_vect->list[tok_vect->len].type == T_COMMAND_SUB_START)
+                tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START_Q;
+        }
+
         tok_vect->len++;
 
         if (tok.is_space_after)
