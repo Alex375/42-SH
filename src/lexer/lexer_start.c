@@ -25,14 +25,21 @@ void lexer_start(char *script, size_t size, long end)
 
 void lexer_reset()
 {
+    g_lexer_info.fun_context = GENERAL_FUN;
+    g_lexer_info.exp_context = GENERAL_EXP_HARD;
+    g_lexer_info.soft_expansion = GENERAL_EXP_SOFT;
+    g_lexer_info.redir_context = GENERAL_REDIR;
+    g_lexer_info.var_context = GENERAL_VAR;
+    g_lexer_info.for_context = GENERAL_FOR;
+    g_lexer_info.last_exp_context = GENERAL_EXP_HARD;
+    g_lexer_info.last_soft = GENERAL_EXP_SOFT;
+    g_lexer_info.word_context = GENERAL;
     g_lexer_info.array_pos = 0;
     g_lexer_info.pos = 0;
-    g_lexer_info.exp_context = GENERAL_EXP_HARD;
-    g_lexer_info.last_exp_context = GENERAL_EXP_HARD;
-    g_lexer_info.word_context = GENERAL;
     g_lexer_info.script = NULL;
     g_lexer_info.script_size = 0;
-    tkvec_free(g_lexer_info.token_list);
+    if (g_lexer_info.token_list != NULL)
+        tkvec_free(g_lexer_info.token_list);
     g_lexer_info.token_list = NULL;
 }
 

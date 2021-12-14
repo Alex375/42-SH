@@ -30,7 +30,7 @@
   input: exit 42 | echo $?
   type: success
 
-- name: Bad triple pipe
+- name: Simple pipe
   input: echo coucou | fwe
   type: failed
 

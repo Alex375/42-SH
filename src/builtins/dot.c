@@ -56,5 +56,5 @@ int dot(char **args)
     }
 
     char *script = read_script(file);
-    return exec_script(script, strlen(file), 0);
+    return exec_script(script, strlen(script), 0);
 }
