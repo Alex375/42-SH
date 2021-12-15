@@ -214,7 +214,7 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
         }
         else
         {
-            return build_single(handle_rec(ast, h), ast->type);
+            return build_single(handle_rec(ast->t_ast, h), ast->type);
         }
     case AST_FUNC:
         func = ast->t_ast;
