@@ -90,6 +90,9 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
 
 struct tok_vect *dup_token_vect(struct tok_vect *vect)
 {
+    if (!vect)
+        return NULL;
+
     struct tok_vect *res = xcalloc(1, sizeof(struct tok_vect));
 
     res->cap = vect->cap;
