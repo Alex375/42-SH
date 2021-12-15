@@ -1218,6 +1218,17 @@ Test(COMMAND_SUB, medium)
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
 
+Test(COMMAND_SUB, medium15)
+{
+    char *script = "$( echo ls )";
+    struct token_info expected[] = { { T_COMMAND_SUB_START, NULL, 1 },
+                                     { T_WORD, "echo", 1 },
+                                     { T_WORD, "ls", 1 },
+                                     { T_COMMAND_SUB_END, NULL, 0 } };
+
+    test_lexer(script, EXPECTED_SIZE(expected), expected);
+}
+
 Test(COMMAND_SUB, medium2)
 {
     char *script = "i=\"$(echo test)\"test2";
@@ -1451,7 +1462,7 @@ Test(CASE, MEDIUM_VAR_IF)
 
 // int main()
 //{
-//    char *script = "case test in\ntest)\n   echo test;;\nesac";
+//    char *script = "$( echo ls )";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

@@ -102,8 +102,13 @@ struct token_info lex_sub(struct token_info res)
         g_lexer_info.pos++;
     }
 
+
+
     res.is_space_after = isblank(g_lexer_info.script[g_lexer_info.pos])
         || g_lexer_info.script[g_lexer_info.pos] == '\n';
+
+    if (g_lexer_info.soft_expansion != IN_DQUOTE)
+        skip_class(isblank, g_lexer_info.script, &g_lexer_info.pos);
 
     return res;
 }

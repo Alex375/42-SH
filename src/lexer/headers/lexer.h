@@ -192,6 +192,8 @@ struct token_info pop_token(void);
 
 struct token_info tokenify_next();
 
+void skip_class(int (*classifier)(int c), const char *string, size_t *cursor);
+
 struct token_info look_forward_token(int i);
 
 #endif // INC_42_SH_TYPE_H
