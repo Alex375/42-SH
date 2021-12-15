@@ -94,3 +94,9 @@
 - name: C args teroff 3
   input: 'echo $1 $2 $#'
   type: success
+
+- name: Long args
+  arguments:
+    - yaml_tests/sample_script/long_args.sh
+  type: success
+  timeout: 50

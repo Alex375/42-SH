@@ -20,8 +20,8 @@ char *read_script(char *filename)
     {
         i += r;
         res = xrealloc(res, i + 1);
+        res[i] = '\0';
     }
-    res[i] = '\0';
     fclose(f);
     return res;
 }

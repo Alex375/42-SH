@@ -31,6 +31,7 @@ class TestCase:
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
     arguments: List[str] = field(default_factory=lambda: [])
+    timeout: int = field(default_factory=lambda: 1)
 
 
 @dataclass
@@ -299,7 +300,7 @@ def main() -> int:
                 if key == testcase.type:
                     testcase.checks = value
             try:
-                with timeout(1):
+                with timeout(testcase.timeout):
                     dash_proc = run_shell(categ.reference, stdin,
                                           testcase.arguments)
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
