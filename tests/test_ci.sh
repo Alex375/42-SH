@@ -8,6 +8,6 @@ source env/bin/activate
 
 pip install -r requirements.txt
 
-python testsuite.py --builddir ../../builddir --binary 42sh --no_compile
+python testsuite.py --builddir ../../builddir --binary 42sh --no_compile --raise_exception
 
 deactivate

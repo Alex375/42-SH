@@ -1,7 +1,4 @@
-import dataclasses
-import json
 import os.path
-import pathlib
 from argparse import ArgumentParser
 from pathlib import Path
 import subprocess as sp
@@ -10,7 +7,6 @@ from dataclasses import dataclass, field
 from contextlib import contextmanager
 from os import listdir
 from os.path import isfile, join
-import subprocess
 import signal
 import time
 import shutil
@@ -55,7 +51,7 @@ class TestCategory:
     file: str
 
 
-def raise_timeout(signum, frame):
+def raise_timeout(_, __):
     raise TimeoutError()
 
 
@@ -241,20 +237,23 @@ def build_binary(binary: Path, build_path: Path):
 
 def main() -> int:
     parser = ArgumentParser("Testsuite")
-    parser.add_argument("--binary", required=False, type=Path, default="42SH")
-    parser.add_argument("--category", required=False, type=str)
-    parser.add_argument("--reference", required=False, type=str, default="dash")
+    parser.add_argument("--binary", required=False, type=Path, default="42SH", help="Name of the binary to be tested")
+    parser.add_argument("--category", required=False, type=str, help="categories to be tested")
+    parser.add_argument("--reference", required=False, type=str, default="dash", help="reference for tests")
     parser.add_argument("--builddir", required=False, type=Path,
-                        default="../../cmake-build-debug")
-    parser.add_argument("--no_compile", required=False, action='store_true')
-    parser.add_argument("--clean", required=False, action='store_true')
-    parser.add_argument("--only_failed", required=False, action='store_true')
+                        default="../../cmake-build-debug", help="directory of the build where binary is")
+    parser.add_argument("--no_compile", required=False, action='store_true', help="doesn't compile the target")
+    parser.add_argument("--clean", required=False, action='store_true', help="clean all temporary files after execution")
+    parser.add_argument("--only_failed", required=False, action='store_true', help="only print failed tests")
+    parser.add_argument("--raise_exception", required=False, action='store_true', help="raise exception if not all test passes")
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
     ref = args.reference
     build_dir = args.builddir
     no_compile = args.no_compile
+    only_failed = args.only_failed
+    raise_exception = args.raise_exception
     try:
         os.system(f"cat yaml_tests/sample_script/.hidden")
     except Exception:
@@ -307,7 +306,7 @@ def main() -> int:
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_result = get_testres(dash_proc, sh_proc, testcase, categ.name)
                     test_results.append(test_result)
-                    if not test_result.passed:
+                    if not only_failed or not test_result.passed:
                         print(format_test(test_result))
             except Exception as err:
                 test_result = TestResult(
@@ -338,6 +337,7 @@ def main() -> int:
             os.remove(binary_path)
         except Exception:
             pass
+    assert not raise_exception or failed == 0
     return int(failed != 0)
 
 
