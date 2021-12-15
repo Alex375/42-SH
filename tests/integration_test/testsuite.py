@@ -248,6 +248,7 @@ def main() -> int:
                         default="../../cmake-build-debug")
     parser.add_argument("--no_compile", required=False, action='store_true')
     parser.add_argument("--clean", required=False, action='store_true')
+    parser.add_argument("--only_failed", required=False, action='store_true')
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
@@ -306,7 +307,8 @@ def main() -> int:
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_result = get_testres(dash_proc, sh_proc, testcase, categ.name)
                     test_results.append(test_result)
-                    print(format_test(test_result))
+                    if not test_result.passed:
+                        print(format_test(test_result))
             except Exception as err:
                 test_result = TestResult(
                     False,
