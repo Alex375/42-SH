@@ -7,3 +7,8 @@
   input: |
     `echo ls`
   type: success
+
+- name: simple space
+  input: |
+    $( echo ls )
+  type: success
