@@ -40,7 +40,7 @@ int is_token_seperator(enum token token)
                          T_C_PRTH,    T_O_PRTH,    T_PIPE,      T_EOF,
                          T_REDIR_1,   T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
                          T_REDIR_A,   T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
-                         T_BACKQUOTE, T_D_PAREN, T_DOUBLE_SCOLON, T_EVALEXPR_START, T_EVALEXPR_END };
+                         T_BACKQUOTE, T_D_PAREN, T_DOUBLE_SCOLON, T_EVALEXPR};
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
@@ -79,7 +79,6 @@ int check_special(struct string *accumulator, char next_char)
         return 0;
     }
 
-
     if (g_lexer_info.exp_context == GENERAL_EXP_HARD && g_lexer_info.pos > 0 && g_lexer_info.pos + 1 < g_lexer_info.script_size)
     {
         size_t i = g_lexer_info.pos;
@@ -92,6 +91,7 @@ int check_special(struct string *accumulator, char next_char)
         if (tmp == 19)
         {
             g_lexer_info.pos += 2;
+            g_lexer_info.eval_context = IN_EVAL;
             return 2;
         }
 

@@ -1462,9 +1462,9 @@ Test(CASE, MEDIUM_VAR_IF)
 Test(EVAL, EASY)
 {
     char *script = "$(( 1 + 1 ))";
-    struct token_info expected[] = { { T_EVALEXPR_START, NULL, 1 },
+    struct token_info expected[] = { { T_EVALEXPR, NULL, 1 },
                                      { T_WORD, "1 + 1 ", 0 },
-                                        { T_EVALEXPR_END, NULL, 0 },};
+                                        { T_EVALEXPR, NULL, 0 },};
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1474,9 +1474,9 @@ Test(EVAL, EASY2)
     char *script = "i=$((1))";
     struct token_info expected[] = {
         { T_VAR_INIT, "i", 0 },
-        { T_EVALEXPR_START, NULL, 0 },
+        { T_EVALEXPR, NULL, 0 },
         { T_WORD, "1", 0 },
-        { T_EVALEXPR_END, NULL, 0 },};
+        { T_EVALEXPR, NULL, 0 },};
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1484,9 +1484,9 @@ Test(EVAL, EASY2)
 Test(EVAL, MEDIUM)
 {
     char *script = "$(( 1 + 1 && 1 + 1 )); $(echo echo test)";
-    struct token_info expected[] = { { T_EVALEXPR_START, NULL, 1 },
+    struct token_info expected[] = { { T_EVALEXPR, NULL, 1 },
         { T_WORD, "1 + 1 && 1 + 1 ", 0 },
-        { T_EVALEXPR_END, NULL, 0 },
+        { T_EVALEXPR, NULL, 0 },
         { T_SEMICOLON, NULL, 1 },
         { T_COMMAND_SUB_START, NULL, 0 },
         { T_WORD, "echo", 1 },
@@ -1500,7 +1500,7 @@ Test(EVAL, MEDIUM)
 
 // int main()
 //{
-//    char *script = "echo test; ((echo test))";
+//    char *script = "`echo ls`";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)

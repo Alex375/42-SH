@@ -48,21 +48,14 @@ static int look_ahead(const char *script, size_t size, struct string *acu)
 static struct token_info lex_accumulator(struct token_info res,
                                          struct string *string)
 {
-    if (res.type != T_ERROR && res.type != T_EVALEXPR_START)
+    if (res.type != T_ERROR && res.type != T_EVALEXPR)
         res.type = tokenify(string->data);
     context_update(res);
 
-    if (g_lexer_info.eval_context == IN_EVAL && res.type != T_EVALEXPR_END)
-    {
-        res = lex_command(res, string);
-    }
-    else if (res.type == T_EVALEXPR_START)
-    {
-        g_lexer_info.eval_context = IN_EVAL;
-    }
-    else if (res.type == T_EVALEXPR_END)
+    if (res.type == T_EVALEXPR)
     {
         g_lexer_info.eval_context = GENERAL_EVAL;
+        res.command = string_get(string);
     }
     else if (res.type == T_ERROR)
     {
@@ -159,8 +152,12 @@ struct token_info tokenify_next(const char *script, size_t size)
         if (tmp != 0)
         {
             if (tmp == 2)
-                res.type = T_EVALEXPR_START;
-            break;
+            {
+                res.type = T_EVALEXPR;
+                accumulator->size = 0;
+            }
+            else
+                break;
         }
 
 

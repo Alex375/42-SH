@@ -9,6 +9,7 @@ int look_eval(const char *script, size_t size)
     {
         if (script[i] == ')' && script[i+1] == ')')
         {
+            g_lexer_info.pos += 2;
             return 0;
         }
     }
