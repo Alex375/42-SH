@@ -41,7 +41,7 @@ class TestResult:
     refstderr: str
     refexitcode: int
     category: str
-    exception: Exception = None
+    exception: Exception = field(default_factory=lambda: None)
 
 
 @dataclass
@@ -204,13 +204,11 @@ def get_categories(category: str, reference: str) -> List[TestCategory]:
         if catego not in all_categories:
             print(
                 f"Unknown category : {catego}\nChoose in all categories : {all_categories}")
-            raise SyntaxError("Bad category name")
+            raise NameError("Bad category name")
         ext = ".yaml"
         if not isfile(join("./yaml_tests", catego + ext)):
             ext = ".json"
-        refer = reference
-        if catego == "echo":
-            refer = "bash"
+        refer = reference if catego != "echo" else "bash"
         categlist.append(
             TestCategory(catego, refer, join("./yaml_tests", catego + ext)))
     return categlist
@@ -237,15 +235,19 @@ def build_binary(binary: Path, build_path: Path):
 
 def main() -> int:
     parser = ArgumentParser("Testsuite")
-    parser.add_argument("--binary", required=False, type=Path, default="42SH", help="Name of the binary to be tested")
-    parser.add_argument("--category", required=False, type=str, help="categories to be tested")
-    parser.add_argument("--reference", required=False, type=str, default="dash", help="reference for tests")
+    parser.add_argument("--binary", required=False, type=Path, default="42SH", metavar="<path>", help="Name of the binary to be tested")
+    parser.add_argument("--category", required=False, type=str, metavar="<categories>", help="categories to be tested")
+    parser.add_argument("--reference", required=False, type=str, default="dash", metavar="<ref>", help="reference for tests")
     parser.add_argument("--builddir", required=False, type=Path,
-                        default="../../cmake-build-debug", help="directory of the build where binary is")
+                        default="../../cmake-build-debug", metavar="<path>", help="directory of the build where binary is")
     parser.add_argument("--no_compile", required=False, action='store_true', help="doesn't compile the target")
     parser.add_argument("--clean", required=False, action='store_true', help="clean all temporary files after execution")
     parser.add_argument("--only_failed", required=False, action='store_true', help="only print failed tests")
     parser.add_argument("--raise_exception", required=False, action='store_true', help="raise exception if not all test passes")
+
+    parser.description = "A functional test suite to test the 42sh program"
+    parser.epilog = "Thank you"
+
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
