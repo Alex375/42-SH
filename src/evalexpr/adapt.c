@@ -13,7 +13,7 @@ char *adapt(char *line, int len)
         {
             char *acc = xcalloc(1000, 1);
             int j = 0;
-            while (isalpha(line[i]))
+            while (i < len && isalpha(line[i]))
             {
                 acc[j] = line[i];
                 j++;
@@ -29,6 +29,22 @@ char *adapt(char *line, int len)
 
 
         }
+        else
+        {
+            char *acc = xcalloc(10000, 1);
+            int j = 0;
+            while (i < len && !isalpha(line[i]))
+            {
+                acc[j] = line[i];
+                j++;
+                i++;
+            }
 
+            xfree(acc);
+
+            string_concat(new_line, acc);
+        }
     }
+
+    return string_get(new_line);
 }

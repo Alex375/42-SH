@@ -47,4 +47,6 @@ void my_exit(int code);
 
 char *launch_evalexpr(char *line);
 
+char *adapt(char *line, int len);
+
 #endif /* !EVALEXPR_H */

@@ -103,6 +103,8 @@ char *launch_evalexpr(char *line)
     if (!line)
         my_exit(2);
 
+    line = adapt(line, strlen(line));
+
     int len = strlen(line);
 
     check_clean(line, len);
