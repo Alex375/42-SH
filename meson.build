@@ -87,7 +87,12 @@ sources = [
     'src/vars/context.c',
     'src/handle_ast/handle_ast.c',
     'src/func/func.c',
-    'src/ast_info/ast_info.c'
+    'src/ast_info/ast_info.c',
+    'src/evalexpr/adapt.c',
+    'src/evalexpr/eval.c',
+    'src/evalexpr/evalexpr.c',
+    'src/evalexpr/launch.c',
+    'src/evalexpr/rpn.c',
 ]
 
 includes = [
@@ -103,7 +108,8 @@ includes = [
     'src/vars/headers',
     'src/func/headers',
     'src/handle_ast/headers',
-    'src/ast_info/headers'
+    'src/ast_info/headers',
+    'src/evalexpr/headers'
 ]
 
 #42SH binary
