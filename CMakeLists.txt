@@ -21,7 +21,7 @@ include_directories(src/ast_info/headers)
 include_directories(src/evalexpr/headers)
 
 
-file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c src/vars/*.c src/func/*.c src/handle_ast/*.c src/ast_info/*.c src/evalexpr/*.C)
+file(GLOB SRC src/xalloc/*.c src/io/*.c src/lexer/*.c src/parser/*.c src/eval_ast/*.c src/program_start/*c src/execution/*.c src/data_types/*.c src/builtins/*.c src/xfnmatch/*.c src/vars/*.c src/func/*.c src/handle_ast/*.c src/ast_info/*.c src/evalexpr/*.c)
 
 if (APPLE)
     include_directories(src/xfnmatch)
