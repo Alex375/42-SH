@@ -68,6 +68,12 @@ enum case_context
     IN_CASE_COMMAND,
 };
 
+enum eval_context
+{
+    GENERAL_EVAL,
+    IN_EVAL
+};
+
 /**
 ** @brief                   Global info for the lexer
 ** @param nb_token          The number of token in the token converter.
@@ -79,6 +85,7 @@ enum case_context
 struct lexer_info
 {
     struct tkvec *token_list;
+    enum eval_context eval_context;
     enum case_context case_context;
     enum fun_context fun_context;
     enum redir_context redir_context;
@@ -99,8 +106,8 @@ struct words_converter
 {
     size_t nb_token;
     size_t nb_separator;
-    char *token_converter[33];
-    char *separator[19];
+    char *token_converter[35];
+    char *separator[21];
 };
 
 /**
@@ -159,6 +166,8 @@ int look_ahead_squote(size_t size);
 struct token_info lex_sub(struct token_info res);
 
 void lexer_start(char *script, size_t size, long end);
+
+int look_eval(const char *script, size_t size);
 
 void lexer_reset();
 

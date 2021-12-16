@@ -2,6 +2,21 @@
 
 #include "lexer.h"
 
+int look_eval(const char *script, size_t size)
+{
+    size_t i = g_lexer_info.pos;
+    if (i + 1 < size)
+    {
+        if (script[i] == ')' && script[i+1] == ')')
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+
 static long find_end_sub(const char *script, size_t size, enum token init_type)
 {
     char start = '(';

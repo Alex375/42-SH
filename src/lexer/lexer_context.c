@@ -2,6 +2,8 @@
 
 int skip_character(char c)
 {
+    if (g_lexer_info.eval_context == IN_EVAL)
+        return 0;
     if (c == '\n' && g_lexer_info.exp_context == IN_ESCAPE_EXP)
     {
         return 1;

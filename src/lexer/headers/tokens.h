@@ -39,6 +39,8 @@ enum token
     T_CASE,
     T_ESAC,
     T_DOUBLE_SCOLON,
+    T_EVALEXPR_START,
+    T_EVALEXPR_END,
     T_EOF,
     T_IONUMBER,
     T_VAR,

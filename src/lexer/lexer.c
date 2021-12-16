@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 struct lexer_info g_lexer_info = { NULL,
+                                   GENERAL_EVAL,
                                    GENERAL_CASE,
                                    GENERAL_FUN,
                                    GENERAL_REDIR,
@@ -26,7 +27,11 @@ void skip_class(int (*classifier)(int c), const char *string, size_t *cursor)
 
 static int look_ahead(const char *script, size_t size, struct string *acu)
 {
-    if (g_lexer_info.exp_context != GENERAL_EXP_HARD)
+    if (g_lexer_info.eval_context == IN_EVAL)
+    {
+        return look_eval(script, size);
+    }
+    else if (g_lexer_info.exp_context != GENERAL_EXP_HARD)
     {
         return look_ahead_squote(size);
     }
@@ -43,11 +48,23 @@ static int look_ahead(const char *script, size_t size, struct string *acu)
 static struct token_info lex_accumulator(struct token_info res,
                                          struct string *string)
 {
-    if (res.type != T_ERROR)
+    if (res.type != T_ERROR && res.type != T_EVALEXPR_START)
         res.type = tokenify(string->data);
     context_update(res);
 
-    if (res.type == T_ERROR)
+    if (g_lexer_info.eval_context == IN_EVAL && res.type != T_EVALEXPR_END)
+    {
+        res = lex_command(res, string);
+    }
+    else if (res.type == T_EVALEXPR_START)
+    {
+        g_lexer_info.eval_context = IN_EVAL;
+    }
+    else if (res.type == T_EVALEXPR_END)
+    {
+        g_lexer_info.eval_context = GENERAL_EVAL;
+    }
+    else if (res.type == T_ERROR)
     {
         res.type = T_ERROR;
     }
@@ -101,7 +118,7 @@ struct token_info tokenify_next(const char *script, size_t size)
 {
     struct token_info res = { 0, NULL, 0 };
 
-    if (g_lexer_info.soft_expansion != IN_DQUOTE)
+    if (g_lexer_info.soft_expansion != IN_DQUOTE && g_lexer_info.eval_context != IN_EVAL)
         skip_class(isblank, script, &g_lexer_info.pos);
 
     /* CHECK IF FINISHED TO READ THE SCRIPT */
@@ -118,6 +135,7 @@ struct token_info tokenify_next(const char *script, size_t size)
     }
 
     /* LEXER */
+    int tmp;
     struct string *accumulator = string_create();
     do
     {
@@ -137,8 +155,14 @@ struct token_info tokenify_next(const char *script, size_t size)
         detect_context(script[g_lexer_info.pos]);
         g_lexer_info.pos++;
 
-        if (check_special(accumulator, script[g_lexer_info.pos]))
+        tmp = check_special(accumulator, script[g_lexer_info.pos]);
+        if (tmp != 0)
+        {
+            if (tmp == 2)
+                res.type = T_EVALEXPR_START;
             break;
+        }
+
 
     } while (look_ahead(script, size, accumulator));
 
@@ -146,7 +170,7 @@ struct token_info tokenify_next(const char *script, size_t size)
         res.is_space_after = isblank(script[g_lexer_info.pos])
             || script[g_lexer_info.pos] == '\n';
 
-    if (g_lexer_info.soft_expansion != IN_DQUOTE)
+    if (g_lexer_info.soft_expansion != IN_DQUOTE && g_lexer_info.eval_context != IN_EVAL)
         skip_class(isblank, script, &g_lexer_info.pos);
 
     return lex_accumulator(res, accumulator);
