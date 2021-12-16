@@ -7,7 +7,7 @@ int look_eval(const char *script, size_t size)
     size_t i = g_lexer_info.pos;
     if (i + 1 < size)
     {
-        if (script[i] == ')' && script[i+1] == ')')
+        if (script[i] == ')' && script[i + 1] == ')')
         {
             g_lexer_info.pos += 2;
             return 0;
@@ -16,7 +16,6 @@ int look_eval(const char *script, size_t size)
 
     return 1;
 }
-
 
 static long find_end_sub(const char *script, size_t size, enum token init_type)
 {
@@ -117,8 +116,6 @@ struct token_info lex_sub(struct token_info res)
             : IN_DQUOTE;
         g_lexer_info.pos++;
     }
-
-
 
     res.is_space_after = isblank(g_lexer_info.script[g_lexer_info.pos])
         || g_lexer_info.script[g_lexer_info.pos] == '\n';

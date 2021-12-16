@@ -1,8 +1,9 @@
+#include "cd_vector.h"
+
 #include <err.h>
 #include <stdlib.h>
 
 #include "xalloc.h"
-#include "cd_vector.h"
 #include "xstring.h"
 
 struct vector *vector_create()

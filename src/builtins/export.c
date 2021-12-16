@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "vars.h"
 #include "xalloc.h"
 #include "xstrdup.h"
-#include "vars.h"
 #if __APPLE__
 #    include "xfnmatch.h"
 #else
@@ -19,12 +19,13 @@ int export(char **args)
     int i = 1;
     while (args[i] && args[i][0])
     {
-        if (fnmatch("@(+([a-zA-Z0-9_])=*|+([a-zA-Z0-9_]))", args[i], FNM_EXTMATCH) != 0)
+        if (fnmatch("@(+([a-zA-Z0-9_])=*|+([a-zA-Z0-9_]))", args[i],
+                    FNM_EXTMATCH)
+            != 0)
             errx(2, "export: '%s': bad variable name", args[i]);
 
         char *copy = xstrdup(args[i]);
         char *pos_equal = strchr(copy, '=');
-
 
         char *var_name = copy;
         char *var_value = "";
@@ -37,7 +38,7 @@ int export(char **args)
         }
 
         char *env_var = getenv(var_name);
-        char* var = get_var(var_name, NULL);
+        char *var = get_var(var_name, NULL);
         if (env_var == NULL || var_value[0] != '\0')
         {
             if (setenv(var_name, var_value, 1) == -1)

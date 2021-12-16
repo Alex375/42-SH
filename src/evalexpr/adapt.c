@@ -1,7 +1,7 @@
 #include "evalexpr.h"
-#include "xalloc.h"
 #include "string.h"
 #include "vars.h"
+#include "xalloc.h"
 
 char *adapt(char *line, int len)
 {

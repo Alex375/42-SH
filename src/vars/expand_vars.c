@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "evalexpr.h"
 #include "execution.h"
 #include "vars.h"
 #include "xalloc.h"
 #include "xstrdup.h"
 #include "xstring.h"
-#include "evalexpr.h"
 
 static char *acc = NULL;
 
@@ -87,7 +87,8 @@ static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,
             string_concat(res, tok_vect->list[*i].command);
         else if (tok_vect->list[*i].type == T_EVALEXPR)
         {
-            char *res_evalexpr = launch_evalexpr(xstrdup(tok_vect->list[*i].command));
+            char *res_evalexpr =
+                launch_evalexpr(xstrdup(tok_vect->list[*i].command));
             string_concat(res, res_evalexpr);
             xfree(res_evalexpr);
         }

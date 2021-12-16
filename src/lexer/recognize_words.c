@@ -3,17 +3,16 @@
 
 #include "lexer.h"
 
-struct words_converter converter = { 35,
-                                     21,
-                                     { "if",    "then",  "elif", "else", "fi",
-                                       "while", "until", "for",  "in",   "do",
-                                       "done",  "!",     "||",   "&&",   "\n",
-                                       ";",     "{",     "}",    "(",    ")",
-                                       "|",     ">",     "<",    ">&",   "<&",
-                                       ">>",    "<>",    ">|",   "`",    "$(", "case", "esac", ";;", "$((", "))" },
-                                     { "||", "&&", "\n", ";", "(", ")", "|",
-                                       " ", "\0", ">", "<", ">&", "<&", ">>",
-                                       "<>", ">|", "`", "$(", ";;", "$((", "))" } };
+struct words_converter converter = {
+    35,
+    21,
+    { "if", "then", "elif", "else", "fi",   "while", "until", "for", "in",
+      "do", "done", "!",    "||",   "&&",   "\n",    ";",     "{",   "}",
+      "(",  ")",    "|",    ">",    "<",    ">&",    "<&",    ">>",  "<>",
+      ">|", "`",    "$(",   "case", "esac", ";;",    "$((",   "))" },
+    { "||", "&&", "\n", ";",  "(",  ")", "|",  " ",  "\0",  ">", "<",
+      ">&", "<&", ">>", "<>", ">|", "`", "$(", ";;", "$((", "))" }
+};
 
 int separatorify(const char *token_str)
 {
@@ -36,11 +35,12 @@ int separatorify(const char *token_str)
 
 int is_token_seperator(enum token token)
 {
-    enum token sep[] = { T_AND,       T_OR,        T_NEWLINE,   T_SEMICOLON,
-                         T_C_PRTH,    T_O_PRTH,    T_PIPE,      T_EOF,
-                         T_REDIR_1,   T_REDIR_2,   T_REDIR_O_2, T_REDIR_O_2,
-                         T_REDIR_A,   T_REDIR_I_1, T_REDIR_I_A, T_REDIR_PIPE,
-                         T_BACKQUOTE, T_D_PAREN, T_DOUBLE_SCOLON, T_EVALEXPR};
+    enum token sep[] = {
+        T_AND,        T_OR,        T_NEWLINE, T_SEMICOLON,     T_C_PRTH,
+        T_O_PRTH,     T_PIPE,      T_EOF,     T_REDIR_1,       T_REDIR_2,
+        T_REDIR_O_2,  T_REDIR_O_2, T_REDIR_A, T_REDIR_I_1,     T_REDIR_I_A,
+        T_REDIR_PIPE, T_BACKQUOTE, T_D_PAREN, T_DOUBLE_SCOLON, T_EVALEXPR
+    };
     size_t nb_sep = sizeof(sep) / sizeof(enum token);
 
     for (size_t i = 0; i < nb_sep; ++i)
@@ -79,7 +79,8 @@ int check_special(struct string *accumulator, char next_char)
         return 0;
     }
 
-    if (g_lexer_info.exp_context == GENERAL_EXP_HARD && g_lexer_info.pos > 0 && g_lexer_info.pos + 1 < g_lexer_info.script_size)
+    if (g_lexer_info.exp_context == GENERAL_EXP_HARD && g_lexer_info.pos > 0
+        && g_lexer_info.pos + 1 < g_lexer_info.script_size)
     {
         size_t i = g_lexer_info.pos;
         struct string *temp = string_create();
@@ -94,7 +95,6 @@ int check_special(struct string *accumulator, char next_char)
             g_lexer_info.eval_context = IN_EVAL;
             return 2;
         }
-
     }
 
     if (g_lexer_info.var_context == IN_VAR && !is_valid_var(accumulator->data))
@@ -159,12 +159,12 @@ int check_special(struct string *accumulator, char next_char)
 
     int token;
 
-    if (g_lexer_info.pos < g_lexer_info.script_size
-        && accumulator->size >= 1)
+    if (g_lexer_info.pos < g_lexer_info.script_size && accumulator->size >= 1)
     {
         accumulator = string_append(accumulator, next_char);
         token = separatorify(accumulator->data);
-        if ((token != -1 && token != 20) || (token == 20 && g_lexer_info.eval_context == IN_EVAL))
+        if ((token != -1 && token != 20)
+            || (token == 20 && g_lexer_info.eval_context == IN_EVAL))
         {
             g_lexer_info.pos++;
             return 1;
@@ -185,7 +185,6 @@ int check_special(struct string *accumulator, char next_char)
     token = separatorify(accumulator->data);
     if (token == -1)
         return 0;
-
 
     return 1;
 }

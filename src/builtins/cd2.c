@@ -1,8 +1,8 @@
 #include <err.h>
-#include <xstrdup.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <xstrdup.h>
 
 #include "cd_vector.h"
 #include "vars.h"
@@ -58,7 +58,7 @@ static int set_var(char *path)
 
     struct string *value_PWD = string_create();
     if (vector_PATH == NULL)
-        value_PWD = string_append(value_PWD,'/');
+        value_PWD = string_append(value_PWD, '/');
 
     for (struct vector *ptr = vector_PWD; ptr != NULL; ptr = ptr->next)
     {
@@ -116,5 +116,4 @@ int cd_helpme(char **args)
 
     set_var(path);
     return 0;
-
 }

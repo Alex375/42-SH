@@ -111,7 +111,8 @@ struct token_info tokenify_next(const char *script, size_t size)
 {
     struct token_info res = { 0, NULL, 0 };
 
-    if (g_lexer_info.soft_expansion != IN_DQUOTE && g_lexer_info.eval_context != IN_EVAL)
+    if (g_lexer_info.soft_expansion != IN_DQUOTE
+        && g_lexer_info.eval_context != IN_EVAL)
         skip_class(isblank, script, &g_lexer_info.pos);
 
     /* CHECK IF FINISHED TO READ THE SCRIPT */
@@ -160,14 +161,14 @@ struct token_info tokenify_next(const char *script, size_t size)
                 break;
         }
 
-
     } while (look_ahead(script, size, accumulator));
 
     if (g_lexer_info.soft_expansion == GENERAL_EXP_SOFT)
         res.is_space_after = isblank(script[g_lexer_info.pos])
             || script[g_lexer_info.pos] == '\n';
 
-    if (g_lexer_info.soft_expansion != IN_DQUOTE && g_lexer_info.eval_context != IN_EVAL)
+    if (g_lexer_info.soft_expansion != IN_DQUOTE
+        && g_lexer_info.eval_context != IN_EVAL)
         skip_class(isblank, script, &g_lexer_info.pos);
 
     return lex_accumulator(res, accumulator);

@@ -1,7 +1,8 @@
 #include "evalexpr.h"
-#include "xalloc.h"
 
 #include <err.h>
+
+#include "xalloc.h"
 
 static struct node *build_type(enum node_type t, int v, struct node *left,
                                struct node *right)
@@ -136,7 +137,6 @@ void expr_delete(struct node *root)
 
 void my_exit(int code)
 {
-
     xfree_all();
     err(code, "evalexpr failed");
 }
