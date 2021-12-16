@@ -27,7 +27,11 @@ char *adapt(char *line, int len)
                 val[0] = '0';
             }
 
+            xfree(acc);
 
+            string_concat(new_line, val);
+
+            i--;
         }
         else
         {
@@ -43,6 +47,8 @@ char *adapt(char *line, int len)
             xfree(acc);
 
             string_concat(new_line, acc);
+
+            i--;
         }
     }
 

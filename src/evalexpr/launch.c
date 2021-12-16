@@ -84,7 +84,7 @@ char *fullCheck(char *line1, int *len)
         }
         if (line[j] == ')')
         {
-            if (j < *len - 1 && validchar(line[j - 1], '('))
+            if (j < *len - 1 && validchar(line[j + 1], '('))
                 exit(2);
             open--;
         }

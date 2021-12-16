@@ -38,6 +38,8 @@ int validchar(char c, char c2)
 {
     if (c == c2)
         return 1;
+    if (c == ' ')
+        return 1;
     int i = 0;
     while (i <= 9)
     {
