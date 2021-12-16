@@ -1,3 +1,16 @@
 - name: export
   input: "export a=2"
   type: success
+
+- name: export echo
+  input: "export a=2; echo $a"
+  type: success
+
+
+- name: export echo 2
+  input: "a=8; export a=2; echo $a"
+  type: success
+
+- name: export echo 3
+  input: "a=8; export a; echo $a"
+  type: success
