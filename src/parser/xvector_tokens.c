@@ -9,7 +9,8 @@
 int is_part_word(enum token t)
 {
     return t == T_WORD || t == T_VAR || t == T_VAR_INQUOTE
-        || t == T_COMMAND_SUB_START || t == T_COMMAND_SUB_START_Q;
+        || t == T_COMMAND_SUB_START || t == T_COMMAND_SUB_START_Q
+        || t == T_BACKQUOTE || t == T_BACKQUOTE_Q || t == T_EVALEXPR;
 }
 
 struct tok_vect *init_tok_vect()
