@@ -1,5 +1,5 @@
 - name: export
-  input: "export azs=2; echo $azs; env | azs"
+  input: "export azs=2; echo $azs; env | grep azs"
   type: success
 
 - name: export echo
