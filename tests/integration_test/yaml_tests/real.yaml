@@ -54,3 +54,11 @@
   arguments:
     - "yaml_tests/sample_script/ascii_house.sh"
   type: success
+
+- name: Print N
+  arguments:
+    - "yaml_tests/sample_script/print_n.sh"
+    - "15"
+    - "test1"
+    - "test2"
+  type: success

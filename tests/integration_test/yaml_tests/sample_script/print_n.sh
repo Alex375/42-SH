@@ -1,20 +1,26 @@
-#!/bin/sh
-
-if [ $# -eq 0 ]; then 
+if [ $# -eq 0 ]
+then
     exit 1
 fi
 
-NUM=$1
-shift
-
-if [ "$NUM" -lt $((0)) ]; then 
+if [ $1 -lt 0 ]
+then
     exit 2
 fi
-for i in "$@"
+
+pass=0
+
+for arg in "$@"
 do
-    for _ in $(seq "$NUM")
-    do 
-        echo "$i"
-    done
+    if [ $pass -eq 1 ]
+    then
+        for i in $(seq 1 1 $1)
+        do
+            echo $arg
+        done
+    else
+        pass=1
+    fi
 done
+
 exit 0

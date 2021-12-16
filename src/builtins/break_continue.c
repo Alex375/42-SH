@@ -1,11 +1,11 @@
 #include <err.h>
 #include <stdlib.h>
 
+#include "ast_info.h"
 #include "sys/types.h"
 #include "unistd.h"
 #include "vars.h"
 #include "xalloc.h"
-#include "ast_info.h"
 
 static int break_or_continue(char **args, enum ast_info_type t)
 {
@@ -22,7 +22,6 @@ static int break_or_continue(char **args, enum ast_info_type t)
             err(2, "break/continue: illegal number in\n");
         }
     }
-
 
     set_b_c(code, t);
 

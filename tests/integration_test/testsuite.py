@@ -1,7 +1,4 @@
-import dataclasses
-import json
 import os.path
-import pathlib
 from argparse import ArgumentParser
 from pathlib import Path
 import subprocess as sp
@@ -10,7 +7,6 @@ from dataclasses import dataclass, field
 from contextlib import contextmanager
 from os import listdir
 from os.path import isfile, join
-import subprocess
 import signal
 import time
 import shutil
@@ -31,6 +27,7 @@ class TestCase:
     checks: List[str] = field(
         default_factory=lambda: ["stdout", "stderr", "exitcode", "err_msg"])
     arguments: List[str] = field(default_factory=lambda: [])
+    timeout: int = field(default_factory=lambda: 1)
 
 
 @dataclass
@@ -44,7 +41,7 @@ class TestResult:
     refstderr: str
     refexitcode: int
     category: str
-    exception: Exception = None
+    exception: Exception = field(default_factory=lambda: None)
 
 
 @dataclass
@@ -54,7 +51,7 @@ class TestCategory:
     file: str
 
 
-def raise_timeout(signum, frame):
+def raise_timeout(_, __):
     raise TimeoutError()
 
 
@@ -207,13 +204,11 @@ def get_categories(category: str, reference: str) -> List[TestCategory]:
         if catego not in all_categories:
             print(
                 f"Unknown category : {catego}\nChoose in all categories : {all_categories}")
-            raise SyntaxError("Bad category name")
+            raise NameError("Bad category name")
         ext = ".yaml"
         if not isfile(join("./yaml_tests", catego + ext)):
             ext = ".json"
-        refer = reference
-        if catego == "echo":
-            refer = "bash"
+        refer = reference if catego != "echo" else "bash"
         categlist.append(
             TestCategory(catego, refer, join("./yaml_tests", catego + ext)))
     return categlist
@@ -240,19 +235,27 @@ def build_binary(binary: Path, build_path: Path):
 
 def main() -> int:
     parser = ArgumentParser("Testsuite")
-    parser.add_argument("--binary", required=False, type=Path, default="42SH")
-    parser.add_argument("--category", required=False, type=str)
-    parser.add_argument("--reference", required=False, type=str, default="dash")
+    parser.add_argument("--binary", required=False, type=Path, default="42SH", metavar="<path>", help="Name of the binary to be tested")
+    parser.add_argument("--category", required=False, type=str, metavar="<categories>", help="categories to be tested")
+    parser.add_argument("--reference", required=False, type=str, default="dash", metavar="<ref>", help="reference for tests")
     parser.add_argument("--builddir", required=False, type=Path,
-                        default="../../cmake-build-debug")
-    parser.add_argument("--no_compile", required=False, action='store_true')
-    parser.add_argument("--clean", required=False, action='store_true')
+                        default="../../cmake-build-debug", metavar="<path>", help="directory of the build where binary is")
+    parser.add_argument("--no_compile", required=False, action='store_true', help="doesn't compile the target")
+    parser.add_argument("--clean", required=False, action='store_true', help="clean all temporary files after execution")
+    parser.add_argument("--only_failed", required=False, action='store_true', help="only print failed tests")
+    parser.add_argument("--raise_exception", required=False, action='store_true', help="raise exception if not all test passes")
+
+    parser.description = "A functional test suite to test the 42sh program"
+    parser.epilog = "Thank you"
+
     args = parser.parse_args()
 
     binary_path = args.binary.absolute()
     ref = args.reference
     build_dir = args.builddir
     no_compile = args.no_compile
+    only_failed = args.only_failed
+    raise_exception = args.raise_exception
     try:
         os.system(f"cat yaml_tests/sample_script/.hidden")
     except Exception:
@@ -299,13 +302,14 @@ def main() -> int:
                 if key == testcase.type:
                     testcase.checks = value
             try:
-                with timeout(1):
+                with timeout(testcase.timeout):
                     dash_proc = run_shell(categ.reference, stdin,
                                           testcase.arguments)
                     sh_proc = run_shell(binary_path, stdin, testcase.arguments)
                     test_result = get_testres(dash_proc, sh_proc, testcase, categ.name)
                     test_results.append(test_result)
-                    print(format_test(test_result))
+                    if not only_failed or not test_result.passed:
+                        print(format_test(test_result))
             except Exception as err:
                 test_result = TestResult(
                     False,
@@ -335,6 +339,7 @@ def main() -> int:
             os.remove(binary_path)
         except Exception:
             pass
+    assert not raise_exception or failed == 0
     return int(failed != 0)
 
 

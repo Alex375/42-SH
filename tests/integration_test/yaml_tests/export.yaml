@@ -1,3 +1,12 @@
 - name: export
-  input: "export a=2"
+  input: "export azs=2; echo $azs; env | azs"
+  type: success
+
+
+- name: export many
+  input: "export azs=2 sde=da; echo $azs $sde; env | azs; env | grep sde"
+  type: success
+
+- name: export no val
+  input: "export azs; echo azs; env | azs"
   type: success
