@@ -6,213 +6,75 @@
 #include <unistd.h>
 #include <xstrdup.h>
 
-#include "xalloc.h"
 #include "vars.h"
-#include "xstring.h"
+#include "xalloc.h"
 
-/*
- * Set_arr_PWD
- * Permet de creer un tableau contenant les differents dossiers parcouru pour
- * arriver au path actuel.
- *
- * EXEMPLE :
- *  -> `pwd` = /home/afs/ING1/42SH
- *  -> `getenv("PWD")` = /home/afs/ING1/42SH
- *  -> arr_PWD = [["HOME"], ["AFS"], ["ING1"], ["42SH"]]
- */
-static struct string **set_arr_PWD(void)
+char *get_curdir(void)
 {
-    char *PWD = getenv("PWD");
-    struct string **arr_PWD = NULL;
-    int size = 0;
-    char *token = strtok(PWD, "/");
-    while (token != NULL)
+    char *res = xcalloc(1, 4097);
+    int size = 4096;
+    while (getcwd(res, 4096) == NULL)
     {
-        arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
-        arr_PWD[size] = string_create();
-        arr_PWD[size] = string_concat(arr_PWD[size], token);
-        token = strtok(NULL, "/");
-        size++;
+        res = xrecalloc(res, size * 2 + 1);
+        size *= 2;
     }
-
-    arr_PWD = xrecalloc(arr_PWD, (size + 1) * sizeof(struct string *));
-    return arr_PWD;
-}
-
-/*
- * Set_arr_PATH
- * Permet de creer un tableau contenant les differents dossiers a parcourir pour
- * atteindre le dossier cible vise par cd.
- *
- * EXEMPLE :
- *  -> `cd /home/afs/ING1/42SH`
- *  -> path = "/home/afs/ING1/42SH"
- *  -> arr_PATH = [["HOME"], ["AFS"], ["ING1"], ["42SH"]]
- */
-static struct string **set_arr_PATH(char *path)
-{
-    struct string **arr_PATH = NULL;
-    int size = 0;
-    char *token = strtok(path, "/");
-    while (token != NULL)
-    {
-        arr_PATH = xrealloc(arr_PATH, ++size * sizeof(struct string *));
-        arr_PATH[size - 1] = string_create();
-        arr_PATH[size - 1] = string_concat(arr_PATH[size - 1], token);
-        token = strtok(NULL, "/");
-    }
-
-    arr_PATH = xrealloc(arr_PATH, (size + 1) * sizeof(struct string *));
-    arr_PATH[size] = NULL;
-    return arr_PATH;
-}
-
-/*
- * arr_append
- * Permet d'ajouter une chaine de charactere en derniere element d'un tableau
- *
- * EXEMPLE :
- *  -> arr = [["HELLO"], ["WORLD!"]]
- *  -> data = "BYE!"
- *
- *  Apres execution de arr_append(arr, data) :
- *   -> arr = [["HELLO"], ["WORLD!"], ["BYE!"]]
- */
-static struct string **arr_append(struct string **arr, char *data)
-{
-    int size_arr = 0;
-    while (arr[size_arr])
-        size_arr++;
-
-    arr = xrealloc(arr, (size_arr + 1) * sizeof(struct string *));
-    arr[size_arr - 1] = string_create();
-    arr[size_arr - 1] = string_concat(arr[size_arr], data);
-    arr[size_arr] = NULL;
-
-    return arr;
-}
-
-/*
- * arr_pop
- * Permet d'enlever une chaine de charactere en derniere element d'un tableau
- *
- * EXEMPLE :
- *  -> arr = [["HELLO"], ["WORLD!"], ["BYE!"]]
- *
- *  Apres execution de arr_append(arr) :
- *   -> arr = [["HELLO"], ["WORLD!"]]
- */
-static struct string **arr_pop(struct string **arr)
-{
-    int size_arr = 0;
-    for (int i = 0; arr[i] != NULL; i++)
-        size_arr++;
-
-    if (size_arr == 0)
-        return arr;
-
-    string_free(arr[size_arr - 1]);
-    arr[size_arr - 1] = NULL;
-    //arr = xrealloc(arr, --size_arr * sizeof(struct string *));
-    return arr;
-}
-
-/*
- *
- */
-void set_Envar(char *path)
-{
-    char *old = xstrdup(getenv("PWD"));
-
-    if (path[0] == '/') // si le path commence par un slash alors on reset $PWD
-        setenv("PWD", "", 1);
-
-    if (strcmp(path, getenv("HOME")) == 0)
-    {
-        setenv("OLDPWD", old, 1);
-        add_var("OLDPWD", old);
-        setenv("PWD", getenv("HOME"), 1);
-        return;
-    }
-    struct string **arr_PWD = set_arr_PWD();
-    struct string **arr_PATH = set_arr_PATH(path);
-
-    for (int i = 0; arr_PATH[i] != NULL; i++)
-    {
-        if (strcmp(arr_PATH[i]->data, "..") == 0)
-            arr_PWD = arr_pop(arr_PWD);
-
-        else if (strcmp(arr_PATH[i]->data, ".") == 0)
-            continue;
-
-        else
-            arr_PWD = arr_append(arr_PWD, arr_PATH[i]->data);
-    }
-
-    struct string *value_PWD = string_create();
-    if (arr_PATH[0] == NULL)
-        value_PWD = string_append(value_PWD, '/');
-
-    for (int i = 0; arr_PWD[i] != NULL; i++)
-    {
-        value_PWD = string_append(value_PWD, '/');
-        value_PWD = string_concat(value_PWD, arr_PWD[i]->data);
-    }
-
-    value_PWD = string_append(value_PWD, '\0');
-
-    setenv("OLDPWD", old, 1);
-    add_var("OLDPWD", old);
-    setenv("PWD", value_PWD->data, 1);
-}
-
-int comeback(void)
-{
-    char *oldpwd;
-    if ((oldpwd = getenv("OLDPWD")) == NULL)
-    {
-        fprintf(stderr, "Cannot obtain $OLDPWD");
-        return 2;
-    }
-
-    chdir(oldpwd);
-    char *tmp = xstrdup(getenv("PWD"));
-    setenv("PWD", oldpwd, 1);
-    setenv("OLDPWD", tmp, 1);
-    add_var("OLDPWD", tmp);
-    printf("%s\n", getenv("PWD"));
-    return 0;
+    return res;
 }
 
 int cd(char **args)
 {
     char *path;
+    char *oldpwd = getenv("PWD");
     if (args[1] == NULL)
+    {
         if (!getenv("HOME"))
             path = "/";
         else
             path = xstrdup(getenv("HOME"));
-
-    else if (strcmp(args[1], "-") == 0)
-        return comeback();
-
-    else
-        path = xstrdup(args[1]); // on recup le path passe en arg
-
-
-    int code_cd = chdir(path);
-    if (code_cd == -1)
-    {
-        fprintf(stderr, "%s: No such file or directory\n", path);
-        return 2;
+        if (chdir(path) == -1)
+        {
+            fprintf(stderr, "%s: No such file or directory\n", path);
+            return 2;
+        }
+        else
+        {
+            setenv("OLDPWD", oldpwd, 1);
+            add_var("OLDPWD", oldpwd);
+            setenv("PWD", path, 1);
+        }
     }
-
-    //printf("before PWD : %s\n", getenv("PWD"));
-    //printf("before OLDPWD : %s\n", getenv("OLDPWD"));
-    set_Envar(path);
-
-    //printf("PWD : %s\n", getenv("PWD"));
-    //printf("OLDPWD : %s\n", getenv("OLDPWD"));
-
+    else if (strcmp(args[1], "-") == 0)
+    {
+        char *target = getenv("OLDPWD");
+        if (chdir(target) == -1)
+        {
+            fprintf(stderr, "%s: No such file or directory\n", target);
+            return 2;
+        }
+        else
+        {
+            printf("%s\n", target);
+            setenv("OLDPWD", oldpwd, 1);
+            add_var("OLDPWD", oldpwd);
+            setenv("PWD", target, 1);
+        }
+    }
+    else
+    {
+        path = xstrdup(args[1]);
+        if (chdir(path) == -1)
+        {
+            fprintf(stderr, "%s: No such file or directory\n", path);
+            return 2;
+        }
+        else
+        {
+            setenv("OLDPWD", oldpwd, 1);
+            add_var("OLDPWD", oldpwd);
+            char *curdir = get_curdir();
+            setenv("PWD", curdir, 1);
+            xfree(curdir);
+        }
+    }
     return 0;
 }

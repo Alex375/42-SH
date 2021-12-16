@@ -1,5 +1,5 @@
 - name: export
-  input: "export a=2"
+  input: "export azs=2; echo $azs; env | azs"
   type: success
 
 - name: export echo

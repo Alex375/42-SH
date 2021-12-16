@@ -4,8 +4,8 @@
 #include <unistd.h>
 
 #include "read_script.h"
-#include "xparser.h"
 #include "xalloc.h"
+#include "xparser.h"
 
 int contain_slash(char *str)
 {

@@ -30,13 +30,12 @@ int eval_ast(struct ast *ast);
     {                                                                          \
         if (t == A_BREAK)                                                      \
         {                                                                      \
-            return res;                                                      \
+            return res;                                                        \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            continued = 1;                                                  \
+            continued = 1;                                                     \
         }                                                                      \
     }
-
 
 #endif // INC_42_SH_EVAL_AST_H

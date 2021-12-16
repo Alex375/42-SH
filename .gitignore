@@ -31,6 +31,7 @@ builddir/
 venv/
 
 debug.sh
+venv
 /tests/integration_test/42SH
 /src/xfnmatch/
 
@@ -52,3 +53,5 @@ tests/integration_test/42*
 tests/integration_test/yaml_tests/sample_script/default-1.txt
 
 tests/integration_test/default-1.txt
+
+tests/integration_test/__pycache__/

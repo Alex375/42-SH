@@ -17,7 +17,8 @@ struct string *string_append(struct string *string, char c)
     if (string->size == string->capacity)
     {
         string->capacity = string->capacity * 2;
-        string->data = xrecalloc(string->data, (string->capacity + 1) * sizeof(char));
+        string->data =
+            xrecalloc(string->data, (string->capacity + 1) * sizeof(char));
     }
     string->data[string->size] = c;
     string->size++;

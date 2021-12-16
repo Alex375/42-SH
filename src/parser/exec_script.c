@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stddef.h>
 
+#include "ast_info.h"
 #include "eval_ast.h"
 #include "handle_ast.h"
 #include "options.h"
@@ -10,7 +11,6 @@
 #include "vars.h"
 #include "xalloc.h"
 #include "xparser.h"
-#include "ast_info.h"
 
 extern struct options *opt;
 
@@ -51,19 +51,19 @@ int exec_script(char *script, size_t size, int set_var)
 
             res = eval_ast(ast);
 
-            //TODO SAVE AST
-            //xfree(ast_info);
+            // TODO SAVE AST
+            // xfree(ast_info);
         }
 
         handle_rec(ast, H_FREE);
     }
     lexer_reset();
-    //TODO SAVE AST
-    //TODO SAVE AST
-    //TODO SAVE AST
-    //TODO SAVE AST
-    //TODO SAVE AST
-    //free_context();
+    // TODO SAVE AST
+    // TODO SAVE AST
+    // TODO SAVE AST
+    // TODO SAVE AST
+    // TODO SAVE AST
+    // free_context();
     if (!set_var)
         revert_lexer(save);
     return res;
