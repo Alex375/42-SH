@@ -1,6 +1,7 @@
 #include "handle_ast.h"
 
 #include <stddef.h>
+#include <err.h>
 
 #include "ast_xalloc.h"
 #include "vector_tokens.h"
@@ -133,10 +134,6 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
     struct n_s_cmd *s_cmd_ast;
     struct n_binary *binary_ast;
     struct n_if *if_ast;
-    struct n_command *cmd_ast;
-    struct n_for *for_ast;
-    struct n_func *func;
-    struct n_case *case_ast;
 
     switch (ast->type)
     {
@@ -189,6 +186,18 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
             return build_binary(ast->type, handle_rec(binary_ast->left, h),
                                 handle_rec(binary_ast->right, h));
         }
+    default:
+        return handle_rec2(ast, h);
+    }
+}
+
+struct ast *handle_rec2(struct ast *ast, enum handle h)
+{
+    struct n_for *for_ast;
+    struct n_func *func;
+
+    switch (ast->type)
+    {
     case AST_FOR:
         for_ast = ast->t_ast;
         if (h == H_FREE)
@@ -229,6 +238,19 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
         {
             return build_func(handle_rec(func->ast, h), xstrdup(func->name));
         }
+    default:
+        return handle_rec3(ast, h);
+    }
+
+}
+
+struct ast *handle_rec3(struct ast *ast, enum handle h)
+{
+    struct n_command *cmd_ast;
+    struct n_case *case_ast;
+
+    switch (ast->type)
+    {
     case AST_CMD:
         cmd_ast = ast->t_ast;
         if (h == H_FREE)
@@ -257,7 +279,7 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
             return build_case(dup_token_vect(case_ast->pattern),
                               dup_list_case_item(case_ast->case_items));
         }
+    default:
+        err(2, "failed to handle ast");
     }
-
-    return NULL;
 }

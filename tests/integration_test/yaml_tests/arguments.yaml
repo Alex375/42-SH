@@ -99,4 +99,4 @@
   arguments:
     - yaml_tests/sample_script/long_args.sh
   type: success
-  timeout: 50
+  timeout: 5
