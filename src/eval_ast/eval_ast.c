@@ -13,9 +13,7 @@ int eval_ast(struct ast *ast)
     struct n_s_cmd *s_cmd_ast;
     struct n_binary *b_ast;
     struct n_if *if_ast;
-    struct n_command *cmd;
     struct n_for *for_ast;
-    struct n_func *func;
     struct n_case *case_ast;
 
     enum ast_info_type t;
@@ -28,20 +26,7 @@ int eval_ast(struct ast *ast)
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
 
-        char **cmd_arg = expand_vars_vect(s_cmd_ast->cmd_arg);
-        if (!s_cmd_ast->cmd_arg->len || !cmd_arg || !cmd_arg[0])
-        {
-            struct list_var_assign *tmp = s_cmd_ast->vars;
-            while (tmp)
-            {
-                char **value = expand_vars_vect(tmp->value);
-                add_var(tmp->name, value[0]);
-                tmp = tmp->next;
-            }
-        }
-        else
-            res = execute(cmd_arg);
-        RETURN(res)
+        RETURN(exec_s_cmd(s_cmd_ast))
     case AST_IF:
         if_ast = ast->t_ast;
         EVAL_AST(if_ast->condition)
@@ -93,6 +78,20 @@ int eval_ast(struct ast *ast)
     case AST_PIPE:
         b_ast = ast->t_ast;
         RETURN(exec_pipe(b_ast->left, b_ast->right))
+    default:
+        return eval_ast2(ast);
+    }
+}
+
+int eval_ast2(struct ast *ast)
+{
+    struct n_binary *b_ast;
+    struct n_command *cmd;
+    struct n_func *func;
+    int res = 0;
+
+    switch (ast->type)
+    {
     case AST_SUBSHELL:
         RETURN(subhsell(ast))
     case AST_FUNC:
@@ -127,10 +126,6 @@ int eval_ast(struct ast *ast)
         }
 
         RETURN(res)
-    case AST_BRACKET:
-        RETURN(0)
-    case AST_PARENTH:
-        RETURN(0)
     case AST_CMD:
         cmd = ast->t_ast;
         RETURN(exec_redirs(cmd->ast, cmd->redirs))

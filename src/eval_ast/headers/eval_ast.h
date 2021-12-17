@@ -11,6 +11,8 @@
 */
 int eval_ast(struct ast *ast);
 
+int eval_ast2(struct ast *ast);
+
 #define RETURN(val)                                                            \
     res = val;                                                                 \
     set_var_int("?", res);                                                     \

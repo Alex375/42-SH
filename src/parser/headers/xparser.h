@@ -23,8 +23,6 @@ enum AST_TYPE
     AST_NOT,
     AST_AND,
     AST_OR,
-    AST_BRACKET,
-    AST_PARENTH
 };
 
 /**

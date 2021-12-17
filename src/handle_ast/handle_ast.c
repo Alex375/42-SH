@@ -257,10 +257,6 @@ struct ast *handle_rec(struct ast *ast, enum handle h)
             return build_case(dup_token_vect(case_ast->pattern),
                               dup_list_case_item(case_ast->case_items));
         }
-    case AST_BRACKET:
-        break;
-    case AST_PARENTH:
-        break;
     }
 
     return NULL;

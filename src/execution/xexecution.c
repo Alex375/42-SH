@@ -63,3 +63,23 @@ int execute(char **args)
     exit_program("Failed");
     return 0;
 }
+
+int exec_s_cmd(struct n_s_cmd *cmd)
+{
+    char **cmd_arg = expand_vars_vect(cmd->cmd_arg);
+    if (!cmd->cmd_arg->len || !cmd_arg || !cmd_arg[0])
+    {
+        struct list_var_assign *tmp = cmd->vars;
+        while (tmp)
+        {
+            char **value = expand_vars_vect(tmp->value);
+            add_var(tmp->name, value[0]);
+            tmp = tmp->next;
+        }
+    }
+    else
+        return (execute(cmd_arg));
+
+    return 0;
+}
+

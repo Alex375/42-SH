@@ -11,11 +11,17 @@
 
 /*!
  * @brief Execute a command including builtins
- * @param cmd       Command string to be executed
  * @param args      Arguments string associated with the command
  * @return          Return the exit code of the executed command
  */
 int execute(char **args);
+
+/*!
+ * @brief Execute a command
+ * @param cmd       the ast node to execute
+ * @return          Return the exit code of the executed command
+ */
+int exec_s_cmd(struct n_s_cmd *cmd);
 
 /*!
  * @brief Creating a pipeline between to ast node and execute both nodes

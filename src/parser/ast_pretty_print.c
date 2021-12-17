@@ -175,10 +175,6 @@ void pp_rec(struct ast *ast, int prof)
         pp_rec(binary_ast->right, prof + 1);
 
         break;
-    case AST_BRACKET:
-        break;
-    case AST_PARENTH:
-        break;
     case AST_CMD:
         cmd_ast = ast->t_ast;
         pp_rec(cmd_ast->ast, prof);
