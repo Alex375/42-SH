@@ -39,12 +39,12 @@ int export(char **args)
 
         char *env_var = getenv(var_name);
         char *var = get_var(var_name, NULL);
-        if (env_var == NULL || var_value[0] != '\0')
+        if (env_var == NULL || pos_equal != NULL)
         {
             if (setenv(var_name, var_value, 1) == -1)
                 errx(2, "export: the maximum has been reached");
         }
-        if (var[0] == '\0' || var_value[0] != '\0')
+        if (var[0] == '\0' || pos_equal != NULL)
         {
             add_var(var_name, var_value);
         }

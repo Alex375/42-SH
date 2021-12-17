@@ -1,1 +1,1 @@
-exit 3 > trash/test.txt ; echo coucou ; rm trash/test.txt
+test=3; echo $test; export test=; echo $test
