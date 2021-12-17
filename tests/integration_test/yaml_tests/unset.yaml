@@ -18,10 +18,6 @@
   input: 'a=w; echo a; unset; echo $a'
   type: success
 
-- name: simple_unset 3
-  input: |
-
-
 - name: Unset bad option
   input: |
     a=3

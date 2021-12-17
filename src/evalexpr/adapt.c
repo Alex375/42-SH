@@ -44,9 +44,10 @@ char *adapt(char *line, int len)
                 i++;
             }
 
-            xfree(acc);
 
             string_concat(new_line, acc);
+
+            xfree(acc);
 
             i--;
         }

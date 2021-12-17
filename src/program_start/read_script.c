@@ -13,7 +13,7 @@ char *read_script(char *filename)
         xfree_all();
         err(127, "Failed to open file.");
     }
-    char *res = xmalloc(BUFFER_SIZE + 1);
+    char *res = xcalloc(BUFFER_SIZE + 1, 1);
     int i = 0;
     size_t r = 0;
     while ((r = fread(res + i, 1, BUFFER_SIZE, f)))
