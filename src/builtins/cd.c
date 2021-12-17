@@ -25,6 +25,8 @@ int cd(char **args)
 {
     char *path;
     char *oldpwd = getenv("PWD");
+    if (!oldpwd)
+        oldpwd = get_curdir();
     if (args[1] == NULL)
     {
         if (!getenv("HOME"))

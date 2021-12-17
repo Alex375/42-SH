@@ -68,3 +68,13 @@
     done
     echo out
   type: success
+
+- name: while return
+  input: |
+    i=1
+    while [ $i -ne 2 ]
+    do
+      echo coucou
+      i=2
+    done
+  type: success
