@@ -12,3 +12,15 @@
   input: |
     $( echo ls )
   type: success
+
+- name: Complxe commad sub
+  input: "echo $(echo `echo `echo `echo coucou` echo de`` $(la -a))"
+  type: success
+
+- name: Complexe multi
+  input: "`ls $( `echo -a ` ) `"
+  type: failed
+
+- name: Complexe backquote
+  input: "`echo `echo `echo `echo `echo coucou```"
+  type: success
