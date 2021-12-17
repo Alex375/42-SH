@@ -14,7 +14,7 @@
   type: success
 
 - name: Complxe commad sub
-  input: "echo $(echo `echo `echo `echo coucou` echo de`` $(la -a))"
+  input: "echo $(echo `echo `echo `echo coucou` echo de`` $(ls -a))"
   type: success
 
 - name: Complexe multi

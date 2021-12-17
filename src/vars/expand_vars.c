@@ -68,7 +68,7 @@ static char *my_strsep(char *copy, char *ifs, int nb_strtok)
 static int is_quoted(enum token t)
 {
     return t == T_VAR_INQUOTE || t == T_COMMAND_SUB_START_Q
-        || t == T_BACKQUOTE_Q;
+        || t == T_BACKQUOTE_START_Q;
 }
 
 static char *get_word(struct tok_vect *tok_vect, int *i, int *nb_strtok,

@@ -10,7 +10,7 @@ int is_part_word(enum token t)
 {
     return t == T_WORD || t == T_VAR || t == T_VAR_INQUOTE
         || t == T_COMMAND_SUB_START || t == T_COMMAND_SUB_START_Q
-        || t == T_BACKQUOTE || t == T_BACKQUOTE_Q || t == T_EVALEXPR;
+        || t == T_BACKQUOTE_START || t == T_BACKQUOTE_START_Q || t == T_EVALEXPR;
 }
 
 struct tok_vect *init_tok_vect()
@@ -44,7 +44,7 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
         pop_token();
 
         if (tok.type == T_COMMAND_SUB_START || tok.type == T_COMMAND_SUB_START_Q
-            || tok.type == T_BACKQUOTE || tok.type == T_BACKQUOTE_Q)
+            || tok.type == T_BACKQUOTE_START || tok.type == T_BACKQUOTE_START_Q)
         {
             tok_vect->cmd_sub_list[tok_vect->len] = parse_compound();
             struct token_info after_sub = pop_token();
@@ -52,18 +52,19 @@ int add_word_vect(struct tok_vect *tok_vect, int quote_word)
             if (((tok.type == T_COMMAND_SUB_START
                   || tok.type == T_COMMAND_SUB_START_Q)
                  && after_sub.type != T_COMMAND_SUB_END)
-                || ((tok.type == T_BACKQUOTE || tok.type == T_BACKQUOTE_Q)
-                    && (after_sub.type != T_BACKQUOTE
-                        && after_sub.type != T_BACKQUOTE_Q)))
+                || ((tok.type == T_BACKQUOTE_START || tok.type == T_BACKQUOTE_START_Q)
+                    && after_sub.type != T_BACKQUOTE_END))
             {
                 errno = ERROR_PARSING;
                 return 0;
             }
             tok_vect->list[tok_vect->len] = tok;
-            if (tok.type == T_COMMAND_SUB_START || tok.type == T_BACKQUOTE)
+            if (tok.type == T_COMMAND_SUB_START || tok.type == T_BACKQUOTE_START)
                 tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START;
             else
                 tok_vect->list[tok_vect->len].type = T_COMMAND_SUB_START_Q;
+
+            tok_vect->list[tok_vect->len].is_space_after = after_sub.is_space_after;
         }
         else
             tok_vect->list[tok_vect->len] = tok;
