@@ -30,3 +30,9 @@
     case z in z|1) echo inn ; ;; esac
   type: success
 
+- name: no semicolon compound
+  input: |
+    case a in a) echo a
+    esac
+  type: success
+

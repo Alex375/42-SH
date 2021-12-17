@@ -38,12 +38,15 @@ struct list_case_item *parse_case_clause()
 
     struct list_case_item *res = parse_case_item();
 
-    struct token_info tok =
-        POP_TOKEN CHECK_SEG_ERROR(tok.type != T_DOUBLE_SCOLON)
-
-            skip_newlines();
-
-    res->next = parse_case_clause();
+    struct token_info tok;
+    if ((tok = get_next_token()).type == T_DOUBLE_SCOLON)
+    {
+        POP_TOKEN
+        skip_newlines();
+        res->next = parse_case_clause();
+    }
+    else
+        skip_newlines();
 
     return res;
 }
