@@ -72,3 +72,12 @@
           fi;
         fi;
   type: success
+
+- name: for
+  input: |
+    for a
+
+    do
+    echo toto
+    done
+  type: success

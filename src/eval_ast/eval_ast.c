@@ -73,6 +73,12 @@ int eval_ast(struct ast *ast)
         RETURN(res)
     case AST_FOR:
         for_ast = ast->t_ast;
+
+        if (!for_ast->seq)
+        {
+            RETURN(res)
+        }
+
         char **seq = expand_vars_vect(for_ast->seq);
         for (int i = 0; seq[i]; ++i)
         {
