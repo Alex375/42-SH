@@ -1,7 +1,7 @@
 #include "handle_ast.h"
 
-#include <stddef.h>
 #include <err.h>
+#include <stddef.h>
 
 #include "ast_xalloc.h"
 #include "vector_tokens.h"
@@ -241,7 +241,6 @@ struct ast *handle_rec2(struct ast *ast, enum handle h)
     default:
         return handle_rec3(ast, h);
     }
-
 }
 
 struct ast *handle_rec3(struct ast *ast, enum handle h)

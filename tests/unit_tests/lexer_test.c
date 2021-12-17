@@ -1187,14 +1187,12 @@ Test(COMMAND_SUB, easy3)
 Test(COMMAND_SUB, medium9)
 {
     char *script = "`echo test``echo start`";
-    struct token_info expected[] = { { T_BACKQUOTE_START, NULL, 0 },
-            { T_WORD, "echo", 1 },
-            { T_WORD, "test", 0 },
-            { T_BACKQUOTE_END, ")", 0 },
-            { T_BACKQUOTE_START, NULL, 0 },
-            { T_WORD, "echo", 1 },
-            { T_WORD, "start", 0 },
-            { T_BACKQUOTE_END, NULL, 0 },};
+    struct token_info expected[] = {
+        { T_BACKQUOTE_START, NULL, 0 }, { T_WORD, "echo", 1 },
+        { T_WORD, "test", 0 },          { T_BACKQUOTE_END, ")", 0 },
+        { T_BACKQUOTE_START, NULL, 0 }, { T_WORD, "echo", 1 },
+        { T_WORD, "start", 0 },         { T_BACKQUOTE_END, NULL, 0 },
+    };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1493,7 +1491,7 @@ Test(COMMAND_SUB, empty1)
 {
     char *script = "``";
     struct token_info expected[] = { { T_BACKQUOTE_START, NULL, 0 },
-            { T_BACKQUOTE_END, ")", 0 } };
+                                     { T_BACKQUOTE_END, ")", 0 } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
@@ -1502,11 +1500,10 @@ Test(COMMAND_SUB, empty2)
 {
     char *script = "$()";
     struct token_info expected[] = { { T_COMMAND_SUB_START, NULL, 0 },
-            { T_COMMAND_SUB_END, ")", 0 } };
+                                     { T_COMMAND_SUB_END, ")", 0 } };
 
     test_lexer(script, EXPECTED_SIZE(expected), expected);
 }
-
 
 // int main()
 //{

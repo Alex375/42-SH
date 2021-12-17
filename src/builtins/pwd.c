@@ -1,11 +1,10 @@
 #define _POSIX_C_SOURCE 200112L
 
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <vars.h>
 #include <xalloc.h>
-#include <unistd.h>
 
 char *get_curdirr(void)
 {
@@ -18,7 +17,6 @@ char *get_curdirr(void)
     }
     return res;
 }
-
 
 int pwd(char **args)
 {

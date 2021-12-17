@@ -82,4 +82,3 @@ int exec_s_cmd(struct n_s_cmd *cmd)
 
     return 0;
 }
-

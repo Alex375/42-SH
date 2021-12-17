@@ -50,20 +50,11 @@ int exec_script(char *script, size_t size, int set_var)
             ast_info->type = A_NOTHING;
 
             res = eval_ast(ast);
-
-            // TODO SAVE AST
-            // xfree(ast_info);
         }
 
         handle_rec(ast, H_FREE);
     }
     lexer_reset();
-    // TODO SAVE AST
-    // TODO SAVE AST
-    // TODO SAVE AST
-    // TODO SAVE AST
-    // TODO SAVE AST
-    // free_context();
     if (!set_var)
         revert_lexer(save);
     return res;
