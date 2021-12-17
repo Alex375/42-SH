@@ -5,15 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#define operators "+-*/%^-+()"
+#define operators "+-/*%^-+()"
 #define whiteSpaces " \f\r\n\t\v"
 
 enum node_type
 {
     ADD = 0,
     MINUS,
-    MULTI,
     DIV,
+    MULTI,
     MODULO,
     POWER,
     UNARYM,

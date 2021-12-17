@@ -18,6 +18,7 @@ int eval_ast(struct ast *ast)
 
     enum ast_info_type t;
     int continued = 0;
+    int cond = 0;
 
     int res = 0;
 
@@ -43,16 +44,16 @@ int eval_ast(struct ast *ast)
     case AST_UNTIL:
         b_ast = ast->t_ast;
 
-        EVAL_AST_IN_LOOP(b_ast->left)
-        while ((ast->type == AST_UNTIL && res != 0)
-               || (ast->type == AST_WHILE && res == 0))
+        EVAL_AST_IN_LOOP(b_ast->left, 1)
+        while ((ast->type == AST_UNTIL && cond != 0)
+               || (ast->type == AST_WHILE && cond == 0))
         {
             if (!continued)
             {
-                EVAL_AST_IN_LOOP(b_ast->right)
+                EVAL_AST_IN_LOOP(b_ast->right, 0)
             }
             continued = 0;
-            EVAL_AST_IN_LOOP(b_ast->left)
+            EVAL_AST_IN_LOOP(b_ast->left, 1)
         }
 
         RETURN(res)
@@ -68,7 +69,7 @@ int eval_ast(struct ast *ast)
         for (int i = 0; seq[i]; ++i)
         {
             add_var(for_ast->name, seq[i]);
-            EVAL_AST_IN_LOOP(for_ast->statement);
+            EVAL_AST_IN_LOOP(for_ast->statement, 0);
         }
 
         RETURN(res)

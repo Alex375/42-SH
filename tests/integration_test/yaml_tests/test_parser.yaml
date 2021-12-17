@@ -81,3 +81,17 @@
     echo toto
     done
   type: success
+
+- name: while
+  input: |
+    i=3
+    while [ $i -ne 0 ] ; do echo $i; i=$((i-1));done
+    echo $?
+  type: success
+
+- name: until
+  input: |
+    i=3
+    until [ $i -eq 0 ] ; do echo $i; i=$((i-1));done
+    echo $?
+  type: success
