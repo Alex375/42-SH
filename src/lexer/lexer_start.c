@@ -11,6 +11,10 @@ void lexer_start(char *script, size_t size, long end)
         g_lexer_info.script_size = size;
         g_lexer_info.token_list = tkvec_create();
     }
+    if (end != -1 && g_lexer_info.pos >= (size_t)end)
+    {
+        return;
+    }
 
     struct token_info token;
     while ((token = tokenify_next(script, size)).type != T_EOF)

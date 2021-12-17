@@ -19,24 +19,31 @@ int look_eval(const char *script, size_t size)
 
 static long find_end_sub(const char *script, size_t size, enum token init_type)
 {
-    char start = '(';
-    char end = ')';
     if (init_type == T_BACKQUOTE)
     {
-        start = '`';
-        end = '`';
+        char end = '`';
+        for (size_t i = g_lexer_info.pos; i < size; i++)
+        {
+            if (script[i] == end)
+                return i;
+        }
     }
-
-    int nb = 1;
-
-    for (size_t i = g_lexer_info.pos; i < size; i++)
+    else
     {
-        if (script[i] == end)
-            nb--;
-        else if (script[i] == start)
-            nb++;
-        if (nb == 0)
-            return i;
+        char start = '(';
+        char end = ')';
+
+        int nb = 1;
+
+        for (size_t i = g_lexer_info.pos; i < size; i++)
+        {
+            if (script[i] == end)
+                nb--;
+            else if (script[i] == start)
+                nb++;
+            if (nb == 0)
+                return i;
+        }
     }
 
     return -1;
@@ -79,18 +86,22 @@ struct token_info lex_sub(struct token_info res)
     enum token initial_type = res.type;
     if (res.type != T_BACKQUOTE)
         res.type = T_COMMAND_SUB_START;
+    else
+        res.type = T_BACKQUOTE_START;
 
     if (g_lexer_info.soft_expansion != GENERAL_EXP_SOFT)
     {
         if (res.type == T_COMMAND_SUB_START)
             res.type = T_COMMAND_SUB_START_Q;
-        else if (res.type == T_BACKQUOTE_Q)
-            res.type = T_BACKQUOTE_Q;
+        else if (res.type == T_BACKQUOTE_START)
+            res.type = T_BACKQUOTE_START_Q;
     }
 
     g_lexer_info.token_list = tkvec_append(g_lexer_info.token_list, res);
-    if (res.type != T_BACKQUOTE)
+    if (initial_type != T_BACKQUOTE)
         res.type = T_COMMAND_SUB_END;
+    else
+        res.type = T_BACKQUOTE_END;
     res.command = NULL;
 
     struct lexer_info copy = new_context();

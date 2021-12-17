@@ -1,6 +1,1 @@
-dir=src
-cd .././../$dir/.
-ls
-env -i pwd
-echo $OLDPWD
-pwd
+exit 3 > trash/test.txt ; echo coucou ; rm trash/test.txt
