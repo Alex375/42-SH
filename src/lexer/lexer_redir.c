@@ -22,7 +22,7 @@ int is_ionumber(struct token_info res, struct string *string)
     return res.type == T_WORD && is_number(string->data) && string->size == 1
         && g_lexer_info.pos < g_lexer_info.script_size
         && (g_lexer_info.script[g_lexer_info.pos] == '>'
-            || g_lexer_info.script[g_lexer_info.pos] == '<');
+            || g_lexer_info.script[g_lexer_info.pos] == '<') && !res.is_space_after;
 }
 
 struct token_info lex_ionumber(struct token_info res, struct string *string)

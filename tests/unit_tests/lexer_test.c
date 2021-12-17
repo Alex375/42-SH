@@ -1510,7 +1510,7 @@ Test(COMMAND_SUB, empty2)
 
 // int main()
 //{
-//    char *script = "$( )";
+//    char *script = "echo 1 >2";
 //    lexer_start(script, strlen(script), -1);
 //    struct token_info tk;
 //    while ((tk = pop_token()).type != T_EOF)
