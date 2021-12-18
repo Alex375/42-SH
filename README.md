@@ -1,14 +1,43 @@
 # 42-SH
 
+42sh project for S5 at EPITA.
 
-## Git usage 
-When we need to merge branches we merge into the `dev-merge` branch which is subsequently pull into master.
+> Ended 18/12/2021
 
+## Compilation
+### Cmake
+```sh
+$ cmake -B build
+$ cd build
+$ make 42SH
+$ ./42SH -c "echo hello"
+```
+### Meson
+```shell
+$ meson setup build
+$ meson compile -C build
+$ cd build
+$ ./42sh -c "echo hello"
+```
+
+## Generate documentation
+```shell
+$ meson setup -Ddoc=true builddir
+$ meson compile -C builddir doxygen_doc
+$ cd builddir/doxygen_doc
+$ open index.html
+```
 
 # Tests
 Integration test file is `tests/integration_test/testsuite.py`.
 
 ### Environment setup
+#### Automatic setup:
+```shell
+$ cd tests/integration_test
+$ source init_env.sh
+```
+#### Manual setup
 - Generate en virtual environment named `env` (outside of AFS on Nuc)
 ```sh
 $ python3 -m venv env
@@ -33,6 +62,10 @@ Test suite argument :
 - `--reference` (optional) : reference program (`dash` by default)
 - `--category` (optional) : categories of test to be run categories are files stored in`yaml_tests` (by default all categories are run)
 - `--no_compile` (optional): if present the test suite will no try to compile the project
+- `--clean` (optional): clean all temporary files after execution
+- `--only_failed` (optional): only print failed tests
+- `--raise_exception` (optional): raise exception if not all test passes
+
 
 If the `--no_compile` isn’t present the test suite will compile the project with the following instructions:
 
@@ -94,18 +127,24 @@ Is equivalent to
 ```yaml
 - name: Echo basic
   input: echo coucou
-  checks: stdout stderr exitcode
+  checks: 
+    - stdout 
+    - stderr 
+    - exitcode
 ```
 Test with fail (we want to check the exitcode the stdout and that the program wrote any kind of error message in stderr)
 ````yaml
 - name: Pipe no end
-  input: echo coucou |
-  checks: stdout err_msg exitcode
+  input: echo coucou
+  checks: 
+    - stdout 
+    -  err_msg 
+    - exitcode
 ````
 Is equivalent to
 ````yaml
 - name: Pipe no end
-  input: echo coucou |
+  input: echo coucou
   type: failed
 ````
 Multiline input
