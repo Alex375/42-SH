@@ -1,0 +1,22 @@
+- name: simple
+  input: |
+    $(echo ls)
+  type: success
+
+- name: simple backquote
+  input: |
+    `echo ls`
+  type: success
+
+- name: simple space
+  input: |
+    $( echo ls )
+  type: success
+
+- name: Complxe commad sub
+  input: "echo $(echo `echo `echo `echo coucou` echo de`` $(ls -a))"
+  type: success
+
+- name: Complexe backquote
+  input: "`echo `echo `echo `echo `echo coucou```"
+  type: success

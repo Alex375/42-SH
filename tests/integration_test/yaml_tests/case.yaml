@@ -1,0 +1,38 @@
+- name: simple
+  input: |
+    case z in 1|z) echo inn ;;
+    $a) echo oon ;; esac
+  type: success
+
+- name: simple no good case
+  input: |
+    case n in z|1) echo inn ;;
+    zaazz) echo oon ;; esac
+  type: success
+
+- name: empty
+  input: |
+    case n in esac ; echo a
+  type: success
+
+- name: parenthesis before
+  input: |
+    case z in (i| ea|z|e|z) echo inn ;; zaazz) echo oon ;; esac
+  type: success
+
+- name: failed 2 word
+  input: |
+    case z in (i| e a|z|e|z) echo inn ;; zaazz) echo oon ;; esac
+  type: failed
+
+- name: empty compound
+  input: |
+    case z in z|1) echo inn ; ;; esac
+  type: success
+
+- name: no semicolon compound
+  input: |
+    case a in a) echo a
+    esac
+  type: success
+

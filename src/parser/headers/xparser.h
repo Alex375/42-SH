@@ -1,7 +1,8 @@
-#ifndef INC_42_SH_PARSER_H
-#define INC_42_SH_PARSER_H
+#ifndef INC_42_SH_XPARSER_H
+#define INC_42_SH_XPARSER_H
 
 #include "lexer.h"
+#include "vector_tokens.h"
 
 /**
 ** @brief                   Describe the node type in ast.
@@ -16,14 +17,12 @@ enum AST_TYPE
     AST_CASE,
     AST_UNTIL,
     AST_PIPE,
-    AST_REDIR,
+    AST_SUBSHELL,
     AST_FUNC,
     AST_LIST,
     AST_NOT,
     AST_AND,
     AST_OR,
-    AST_BRACKET,
-    AST_PARENTH
 };
 
 /**
@@ -40,8 +39,7 @@ struct ast
 */
 struct n_s_cmd
 {
-    char *cmd;
-    char **cmd_arg;
+    struct tok_vect *cmd_arg;
     struct list_var_assign *vars;
 };
 
@@ -79,8 +77,26 @@ struct n_command
 struct n_for
 {
     char *name;
-    char **seq;
+    struct tok_vect *seq;
     struct ast *statement;
+};
+
+/**
+** @brief                   AST_CASE ast member.
+*/
+struct n_case
+{
+    struct tok_vect *pattern;
+    struct list_case_item *case_items;
+};
+
+/**
+** @brief                   AST_FUNC ast member.
+*/
+struct n_func
+{
+    char *name;
+    struct ast *ast;
 };
 
 ////////////////
@@ -91,7 +107,7 @@ struct n_for
 struct list_var_assign
 {
     char *name;
-    char *value;
+    struct tok_vect *value;
     struct list_var_assign *next;
 };
 
@@ -102,8 +118,18 @@ struct list_redir
 {
     char *ionumber;
     enum token redir_type;
-    char *word;
+    struct tok_vect *word;
     struct list_redir *next;
+};
+
+/**
+** @brief                   chained list of case items.
+*/
+struct list_case_item
+{
+    struct tok_vect *seq;
+    struct ast *statement;
+    struct list_case_item *next;
 };
 
 ///////////////
@@ -132,8 +158,7 @@ struct ast *build_if(struct ast *condition, struct ast *true_c,
 ** @param cmd_arg       string list containing all the command arguments
 *                      separated by spaces.
 */
-struct ast *build_s_cmd(char *cmd, char **cmd_arg,
-                        struct list_var_assign *vars);
+struct ast *build_s_cmd(struct tok_vect *cmd_arg, struct list_var_assign *vars);
 
 /**
 ** @brief               builds a n_command node
@@ -149,7 +174,29 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs);
 *                      take it's values
 ** @param statement     ast inside the for
 */
-struct ast *build_for(char *name, char **seq, struct ast *statement);
+struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement);
+
+/*!
+** @brief               builds a n_func node
+** @param name          name of the function
+** @param statement     ast inside the function
+*/
+struct ast *build_func(struct ast *ast, char *name);
+
+/*!
+** @brief               builds a single node
+** @param ast           ast folowing
+** @param t             type of the node
+*/
+struct ast *build_single(struct ast *ast, enum AST_TYPE t);
+
+/*!
+** @brief               builds a case node
+** @param pattern       pattern to match
+** @param case_items    list of case items
+*/
+struct ast *build_case(struct tok_vect *pattern,
+                       struct list_case_item *case_items);
 
 #include <stddef.h>
 
@@ -161,22 +208,16 @@ struct ast *build_for(char *name, char **seq, struct ast *statement);
 *                      (crash if a parsing error is found)
 ** @param script        string containing block
 ** @param size          len of script parameter
+** @param set_var       If true will set vars
 ** @return              Return le exit code of the last executed command
 */
-int exec_script(char *script, size_t size);
+int exec_script(char *script, size_t size, int set_var);
 
 /**
 ** @brief               printing the ast obtain from a script
 ** @param ast           Ast to be printed
 */
 void ast_pretty_print(struct ast *ast);
-
-/**
-** @brief               start the parsing of a script
-** @param script        string containing block
-** @param size          len of script parameter
-*/
-struct ast *start_parse(char *script, size_t size);
 
 /**
 ** @brief               Parsing an input (cf sh_grammar.txt)
@@ -247,9 +288,35 @@ struct ast *parse_while_until_rule(enum token tokT);
 struct ast *parse_for_rule();
 
 /**
+** @brief               Parsing a case rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_case_rule();
+
+/**
+** @brief               Parsing a case clause
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_clause();
+
+/**
+** @brief               Parsing a case item
+**                      (cf sh_grammar.txt)
+*/
+struct list_case_item *parse_case_item();
+
+/**
+** @brief               Parsing a funcdec rule
+**                      (cf sh_grammar.txt)
+*/
+struct ast *parse_funcdec();
+
+/**
 ** @brief               Parsing a compound list (cf sh_grammar.txt)
 */
 struct ast *parse_compound();
+
+//////////////////////
 
 /**
 ** @brief               calling lexer while newline (cf sh_grammar.txt)
@@ -277,4 +344,27 @@ void add_to_redir_list(struct list_redir **redirs,
 void add_to_var_assign_list(struct list_var_assign **vars,
                             struct list_var_assign *new_var);
 
-#endif // INC_42_SH_PARSER_H
+#define CHECK_SEG_ERROR(condition)                                             \
+    if (condition)                                                             \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define POP_TOKEN                                                              \
+    pop_token();                                                               \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#define GET_TOKEN                                                              \
+    get_next_token();                                                          \
+    if (tok.type == T_ERROR)                                                   \
+    {                                                                          \
+        errno = ERROR_PARSING;                                                 \
+        return NULL;                                                           \
+    }
+
+#endif // INC_42_SH_XPARSER_H

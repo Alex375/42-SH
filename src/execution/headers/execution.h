@@ -6,25 +6,22 @@
 #define INC_42_SH_EXECUTION_H
 
 #include "execution.h"
-#include "parser.h"
-
-/*!
- * @brief Pipelin struct containing infos on pipline and redir
- * @param out State param of the pipeline
- * @param fd  File descriptors arrays for (piped if currently use)
- */
-struct pipeline
-{
-    int fd[2];
-};
+#include "vars.h"
+#include "xparser.h"
 
 /*!
  * @brief Execute a command including builtins
- * @param cmd       Command string to be executed
  * @param args      Arguments string associated with the command
- * @return          Return the exit command of the executed command
+ * @return          Return the exit code of the executed command
  */
-int execute(char *cmd, char **args);
+int execute(char **args);
+
+/*!
+ * @brief Execute a command
+ * @param cmd       the ast node to execute
+ * @return          Return the exit code of the executed command
+ */
+int exec_s_cmd(struct n_s_cmd *cmd);
 
 /*!
  * @brief Creating a pipeline between to ast node and execute both nodes
@@ -57,5 +54,35 @@ struct redir_info
     int io_number;
     struct redir_info *next;
 };
+
+/*!
+ * @brief Execut a subshell command (fork)
+ * @param ast Ast to be executed in the subshell
+ * @return Return the exitcode of the subshell command.
+ */
+int subhsell(struct ast *ast);
+
+/*!
+ * @brief           Execute a command including a previously define function
+ * @param args      Arguments string associated with the command
+ * @param fc_ast    ast to execute;
+ * @return          Return the exit code of the executed command
+ */
+int exec_func(char **args, struct ast *fc_ast);
+
+/*!
+ * @brief           Execute a case rule
+ * @param n_case    the node to treat
+ * @return          Return the exit code of the executed command
+ */
+int treat_case(struct n_case *case_ast);
+
+/*!
+ * @brief           Execute commands and gets the stdout
+ * @param ast       ast to execute
+ * @param stdout_r  pointer to the string of stdout content
+ * @return          Return the exit code of the executed command
+ */
+int get_stdout(struct ast *ast, char **stdout_r);
 
 #endif // INC_42_SH_EXECUTION_H

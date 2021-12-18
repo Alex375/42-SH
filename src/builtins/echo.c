@@ -34,7 +34,7 @@ struct string *echo_pars(char *s, struct string *new_s, int flag_e)
     return new_s;
 }
 
-int parse_option(struct string *res, char *token, int *flag_e, int *flag_n)
+int parse_option(struct string **res, char *token, int *flag_e, int *flag_n)
 {
     if (strcmp("-ne", token) == 0 || strcmp("-en", token) == 0)
     {
@@ -52,8 +52,8 @@ int parse_option(struct string *res, char *token, int *flag_e, int *flag_n)
         *flag_n = 1;
         return 1;
     }
-    echo_pars(token, res, *flag_e);
-    string_append(res, ' ');
+    *res = echo_pars(token, *res, *flag_e);
+    *res = string_append(*res, ' ');
     return 0;
 }
 
@@ -66,17 +66,26 @@ int echo(char **args)
     int i = 1;
     while (args[i] != NULL)
     {
+        if (args[i][0] == '\0')
+        {
+            i++;
+            continue;
+        }
         if (arguments)
-            arguments = parse_option(new_s, args[i], &flag_e, &flag_n);
+            arguments = parse_option(&new_s, args[i], &flag_e, &flag_n);
         else
         {
-            echo_pars(args[i], new_s, flag_e);
-            string_append(new_s, ' ');
+            new_s = echo_pars(args[i], new_s, flag_e);
+            new_s = string_append(new_s, ' ');
         }
         i++;
     }
     if (new_s->size > 0 && new_s->data[new_s->size - 1] == ' ')
         new_s->data[new_s->size - 1] = (flag_n) ? '\0' : '\n';
+    if (new_s->size == 0 && !flag_n)
+        new_s = string_append(new_s, '\n');
+    if (new_s->data[new_s->size - 1] != '\0')
+        new_s = string_append(new_s, '\0');
     printf("%s", new_s->data);
     fflush(stdout);
     string_free(new_s);

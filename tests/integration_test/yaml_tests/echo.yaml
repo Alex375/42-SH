@@ -1,3 +1,18 @@
+- name: Empty test
+  type: success
+
+- name: Empty echo
+  input: "echo"
+  type: success
+
+- name: Echo with spaces
+  input: "echo                                                           "
+  type: success
+
+- name: Echo with line break
+  input: "echo \n"
+  type: success
+
 - name: Simple echo
   input: echo coucou
   type: success
@@ -36,4 +51,36 @@
 
 - name: Echo hard expansion with e and n
   input: "echo -e -n 'cou\nco\tu'"
+  type: success
+
+- name: Echo double quote missing
+  input: "echo \"salut !"
+  type: failed
+
+- name: Echo double quote
+  input: "echo \"salut !\""
+  type: success
+
+- name: Echo escape
+  input: "echo 'ceci est un escape : \\'"
+  type: success
+
+- name: Echo empty
+  input: echo
+  type: success
+
+- name: Echo empty -n
+  input: echo -n
+  type: success
+
+- name: Empty var
+  input: a=3; echo $a $b
+  type: success
+
+- name: Empty var 2
+  input: a=3; echo $b $a
+  type: success
+
+- name: Lot backslash
+  input: echo -e \\\\\\
   type: success

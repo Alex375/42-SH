@@ -1,33 +1,9 @@
-#include "parser.h"
-
 #include <errno.h>
 #include <stddef.h>
 
-#include "xalloc.h"
+#include "ast_xalloc.h"
+#include "xparser.h"
 #include "xstrdup.h"
-
-#define CHECK_SEG_ERROR(condition)                                             \
-    if (condition)                                                             \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define POP_TOKEN                                                              \
-    pop_token();                                                               \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
-
-#define GET_TOKEN                                                              \
-    get_next_token();                                                          \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
 
 struct ast *parse_input()
 {
@@ -151,11 +127,7 @@ struct ast *parse_pipeline()
     if (!ast || errno != 0)
         return NULL;
 
-    struct ast *res = xcalloc(1, sizeof(struct ast));
-    res->type = (baseType == T_NOT) ? AST_NOT : AST_PIPE;
-    res->t_ast = ast;
-
-    return res;
+    return build_single(ast, (baseType == T_NOT) ? AST_NOT : AST_PIPE);
 }
 
 struct ast *parse_compound()

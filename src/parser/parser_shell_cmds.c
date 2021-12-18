@@ -1,32 +1,29 @@
 #include <errno.h>
 #include <stddef.h>
 
-#include "parser.h"
 #include "xalloc.h"
+#include "xparser.h"
 #include "xstrdup.h"
 
-#define CHECK_SEG_ERROR(condition)                                             \
-    if (condition)                                                             \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
+static struct ast *O_BRKT()
+{
+    struct ast *res = parse_compound();
 
-#define POP_TOKEN                                                              \
-    pop_token();                                                               \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(
+        errno == ERROR_PARSING || tok.type == T_EOF || tok.type != T_C_BRKT)
 
-#define GET_TOKEN                                                              \
-    get_next_token();                                                          \
-    if (tok.type == T_ERROR)                                                   \
-    {                                                                          \
-        errno = ERROR_PARSING;                                                 \
-        return NULL;                                                           \
-    }
+        return res;
+}
+
+static struct ast *O_PRTH()
+{
+    struct ast *ast = parse_compound();
+
+    struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(
+        errno == ERROR_PARSING || tok.type == T_EOF || tok.type != T_C_PRTH)
+
+        return build_single(ast, AST_SUBSHELL);
+}
 
 struct ast *parse_shell_command()
 {
@@ -34,19 +31,12 @@ struct ast *parse_shell_command()
         POP_TOKEN CHECK_SEG_ERROR(tok.type == T_EOF) enum token baseType =
             tok.type;
 
-    struct ast *res;
     switch (baseType)
     {
     case T_O_BRKT:
+        return O_BRKT();
     case T_O_PRTH:
-        res = parse_compound();
-
-        tok = POP_TOKEN CHECK_SEG_ERROR(
-            errno == ERROR_PARSING || tok.type == T_EOF
-            || (baseType == T_O_BRKT && tok.type != T_C_BRKT)
-            || (baseType == T_O_PRTH && tok.type != T_C_PRTH))
-
-            return res;
+        return O_PRTH();
     case T_IF:
         return parse_if_rule(0);
     case T_FOR:
@@ -54,7 +44,8 @@ struct ast *parse_shell_command()
     case T_WHILE:
     case T_UNTIL:
         return parse_while_until_rule(tok.type);
-        // T_CASE
+    case T_CASE:
+        return parse_case_rule();
 
     default:
         errno = ERROR_PARSING;
@@ -136,8 +127,7 @@ struct ast *parse_while_until_rule(enum token tokT)
 struct ast *parse_for_rule()
 {
     char *name = NULL;
-    int cap = 8;
-    char **seq = xcalloc(cap, sizeof(char *));
+    struct tok_vect *seq = NULL;
     struct ast *statement = NULL;
 
     struct token_info tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_VAR)
@@ -150,22 +140,14 @@ struct ast *parse_for_rule()
 
         if (tok.type != T_DO)
     {
-        POP_TOKEN;
+        POP_TOKEN
     }
     if (tok.type == T_IN)
     {
-        int i = 0;
-        while ((tok = get_next_token()).type == T_WORD)
-        {
-            if (i >= cap - 1)
-            {
-                cap *= 2;
-                xrecalloc(seq, cap * sizeof(char *));
-            }
-            POP_TOKEN;
-            seq[i] = xstrdup(tok.command);
-            i++;
-        }
+        seq = init_tok_vect();
+
+        while (add_word_vect(seq, 0))
+            ;
 
         tok = POP_TOKEN CHECK_SEG_ERROR(tok.type != T_SEMICOLON
                                         && tok.type != T_NEWLINE)

@@ -1,9 +1,7 @@
 #include <errno.h>
-#include <stddef.h>
 #include <stdio.h>
 
-#include "parser.h"
-#include "string.h"
+#include "xparser.h"
 
 void tab(int prof)
 {
@@ -21,7 +19,7 @@ void print_redir(struct list_redir *redirs, int prof)
         printf("REDIRS : ");
         while (redirs)
         {
-            printf("%s into %s | ", redirs->ionumber, redirs->word);
+            printf("%s into ... | ", redirs->ionumber);
             redirs = redirs->next;
         }
         printf("\n");
@@ -36,10 +34,107 @@ void print_assign(struct list_var_assign *vars, int prof)
         printf("ASSIGNEMENT : ");
         while (vars)
         {
-            printf("%s = %s | ", vars->name, vars->value);
+            printf("%s = ... | ", vars->name);
             vars = vars->next;
         }
         printf("\n");
+    }
+}
+
+void pp_rec(struct ast *ast, int prof);
+
+void pp_rec3(struct ast *ast, int prof)
+{
+    struct n_binary *binary_ast;
+    struct n_command *cmd_ast;
+
+    switch (ast->type)
+    {
+    case AST_LIST:
+        binary_ast = ast->t_ast;
+        tab(prof);
+        printf("LIST : \n");
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("----   \n");
+        pp_rec(binary_ast->right, prof + 1);
+        break;
+    case AST_NOT:
+        tab(prof);
+        printf("<< ! >>\n");
+        pp_rec(ast->t_ast, prof + 1);
+        break;
+    case AST_AND:
+        binary_ast = ast->t_ast;
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("<< && >>\n");
+        pp_rec(binary_ast->right, prof + 1);
+
+        break;
+    case AST_OR:
+        binary_ast = ast->t_ast;
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("<< || >>\n");
+        pp_rec(binary_ast->right, prof + 1);
+
+        break;
+    case AST_CMD:
+        cmd_ast = ast->t_ast;
+        pp_rec(cmd_ast->ast, prof);
+        print_redir(cmd_ast->redirs, prof);
+        break;
+    default:
+        return;
+    }
+}
+
+void pp_rec2(struct ast *ast, int prof)
+{
+    struct n_binary *binary_ast;
+    struct n_for *for_ast;
+    struct n_func *func;
+
+    switch (ast->type)
+    {
+    case AST_FOR:
+        for_ast = ast->t_ast;
+        tab(prof);
+        printf("FOR------\n");
+        tab(prof + 1);
+        printf("%s ", for_ast->name);
+
+        printf("\n");
+        tab(prof);
+        printf("DO------\n");
+        pp_rec(for_ast->statement, prof + 1);
+        tab(prof);
+        printf("DONE------\n");
+        break;
+    case AST_CASE:
+        break;
+    case AST_PIPE:
+        binary_ast = ast->t_ast;
+        pp_rec(binary_ast->left, prof + 1);
+        tab(prof);
+        printf("<< | >>\n");
+        pp_rec(binary_ast->right, prof + 1);
+
+        break;
+    case AST_SUBSHELL:
+        tab(prof);
+        printf("SUBSHELL\n");
+        pp_rec(ast->t_ast, prof + 1);
+        break;
+    case AST_FUNC:
+        func = ast->t_ast;
+        tab(prof);
+        printf("FUNCDEC %s\n", func->name);
+        pp_rec(func->ast, prof + 1);
+        break;
+    default:
+        pp_rec3(ast, prof);
     }
 }
 
@@ -55,19 +150,13 @@ void pp_rec(struct ast *ast, int prof)
     struct n_s_cmd *s_cmd_ast;
     struct n_binary *binary_ast;
     struct n_if *if_ast;
-    struct n_command *cmd_ast;
-    struct n_for *for_ast;
 
     switch (ast->type)
     {
     case AST_S_CMD:
         s_cmd_ast = ast->t_ast;
         tab(prof);
-        printf("COMMAND = %s ", s_cmd_ast->cmd);
-        int i = 1;
-        while (s_cmd_ast->cmd_arg[i])
-            printf("%s ", s_cmd_ast->cmd_arg[i++]);
-        printf("\n");
+        printf("COMMAND\n");
         print_assign(s_cmd_ast->vars, prof);
         break;
     case AST_IF:
@@ -102,77 +191,8 @@ void pp_rec(struct ast *ast, int prof)
         tab(prof);
         printf("DONE------\n");
         break;
-    case AST_FOR:
-        for_ast = ast->t_ast;
-        tab(prof);
-        printf("FOR------\n");
-        tab(prof + 1);
-        printf("%s ", for_ast->name);
-        int j = 0;
-        if (for_ast->seq[0])
-            printf("--IN-- ");
-        while (for_ast->seq[j])
-            printf("%s ", for_ast->seq[j++]);
-        printf("\n");
-        tab(prof);
-        printf("DO------\n");
-        pp_rec(for_ast->statement, prof + 1);
-        tab(prof);
-        printf("DONE------\n");
-        break;
-    case AST_CASE:
-        break;
-    case AST_PIPE:
-        binary_ast = ast->t_ast;
-        pp_rec(binary_ast->left, prof + 1);
-        tab(prof);
-        printf("<< | >>\n");
-        pp_rec(binary_ast->right, prof + 1);
-
-        break;
-    case AST_REDIR:
-        break;
-    case AST_FUNC:
-        break;
-    case AST_LIST:
-        binary_ast = ast->t_ast;
-        tab(prof);
-        printf("LIST : \n");
-        pp_rec(binary_ast->left, prof + 1);
-        tab(prof);
-        printf("----   \n");
-        pp_rec(binary_ast->right, prof + 1);
-        break;
-    case AST_NOT:
-        tab(prof);
-        printf("<< ! >>\n");
-        pp_rec(ast->t_ast, prof + 1);
-        break;
-    case AST_AND:
-        binary_ast = ast->t_ast;
-        pp_rec(binary_ast->left, prof + 1);
-        tab(prof);
-        printf("<< && >>\n");
-        pp_rec(binary_ast->right, prof + 1);
-
-        break;
-    case AST_OR:
-        binary_ast = ast->t_ast;
-        pp_rec(binary_ast->left, prof + 1);
-        tab(prof);
-        printf("<< || >>\n");
-        pp_rec(binary_ast->right, prof + 1);
-
-        break;
-    case AST_BRACKET:
-        break;
-    case AST_PARENTH:
-        break;
-    case AST_CMD:
-        cmd_ast = ast->t_ast;
-        pp_rec(cmd_ast->ast, prof);
-        print_redir(cmd_ast->redirs, prof);
-        break;
+    default:
+        pp_rec2(ast, prof);
     }
 }
 

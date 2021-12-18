@@ -1,0 +1,80 @@
+- name: Simple
+  input: "break; echo out"
+  type: success
+
+- name: Simple arg
+  input: "break 6; echo out"
+  type: success
+
+- name: Simple weird opt
+  input: "break 6 dazzd -56; echo out"
+  type: success
+
+- name: while break
+  input: "while true ;do echo a; break; echo b; done; echo out"
+  type: success
+
+- name: while break in cond and
+  input: "while echo ye && break 1 && echo nono ;do echo a; echo b; done; echo out"
+  type: success
+
+- name: for break
+  input: "for a in 1 2 3;do echo a; if [ $a = 2 ] ; then break;fi ; echo b; done; echo out"
+  type: success
+
+- name: for continue
+  input: "for a in 1 2 3;do echo a; if [ $a = 2 ] ; then continue;fi ; echo b; done; echo out"
+  type: success
+
+- name: while break 2
+  input: |
+    while [ "$a" = "" ]; do
+      while true ;do
+        echo a;
+        break 2;
+        echo b;
+      done
+      echo in first
+      a=1
+    done
+    echo out
+  type: success
+
+- name: while break 1 in 2
+  input: |
+    while [ "$a" = "" ]; do
+      while true ;do
+        echo a;
+        break 1;
+        echo b;
+      done
+      echo in first
+      a=1
+    done
+    echo out
+  type: success
+
+- name: while continue 1 in 2
+  input: |
+    while [ "$a" = "" ]; do
+      while true ;do
+        echo a;
+        a=2;
+        continue 2;
+        echo b;
+      done
+      echo in first
+      a=1
+    done
+    echo out
+  type: success
+
+- name: while return
+  input: |
+    i=1
+    while [ $i -ne 2 ]
+    do
+      echo coucou
+      i=2
+    done
+  type: success

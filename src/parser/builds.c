@@ -1,5 +1,5 @@
-#include "headers/parser.h"
 #include "xalloc.h"
+#include "xparser.h"
 #include "xstrdup.h"
 
 struct ast *build_binary(enum AST_TYPE type, struct ast *left,
@@ -31,10 +31,9 @@ struct ast *build_if(struct ast *condition, struct ast *true_c,
     return res;
 }
 
-struct ast *build_s_cmd(char *cmd, char **cmd_arg, struct list_var_assign *vars)
+struct ast *build_s_cmd(struct tok_vect *cmd_arg, struct list_var_assign *vars)
 {
     struct n_s_cmd *nCmd = xcalloc(1, sizeof(struct n_s_cmd));
-    nCmd->cmd = cmd;
     nCmd->cmd_arg = cmd_arg;
     nCmd->vars = vars;
 
@@ -58,7 +57,7 @@ struct ast *build_cmd(struct ast *ast, struct list_redir *redirs)
     return res;
 }
 
-struct ast *build_for(char *name, char **seq, struct ast *statement)
+struct ast *build_for(char *name, struct tok_vect *seq, struct ast *statement)
 {
     struct n_for *nFor = xcalloc(1, sizeof(struct n_for));
     nFor->name = name;

@@ -1,0 +1,102 @@
+- name: Simple arguments
+  arguments:
+    - -c
+    - echo 'echo $1; echo $2; echo $3; echo $#'> trash/testarg.txt; cat trash/testarg.txt
+  type: success
+
+- name: Test bad file
+  arguments:
+  - test
+  type: failed
+
+- name: Test hard bad file
+  arguments:
+  - test
+  - -c
+  - "echo coucou"
+  type: failed
+
+- name: Command + bad file
+  arguments:
+  - -c
+  - echo coucou
+  - file
+  type: success
+
+- name: Bad option
+  arguments:
+  - -d
+  - test.txt
+  type: failed
+
+- name: Bad option multi char
+  arguments:
+  - -dd
+  - trash/testarg.txt
+  type: failed
+
+- name: File
+  arguments:
+  - trash/testarg.txt
+  type: success
+
+- name: File + args
+  arguments:
+  - trash/testarg.txt
+  - arg1
+  - arg    2
+  type: success
+
+- name: c + args
+  arguments:
+    - -c
+    - echo $1 $2 $#
+    - a
+    - b
+  type: success
+
+- name: No arg c
+  arguments:
+    - -c
+  type: failed
+
+- name: C args setup
+  input: echo 'echo  $1 $2 $3 $#'> trash/test.txt
+  type: success
+
+- name: C args tearoff
+  arguments:
+    - trash/test.txt
+    - as
+    - de
+  type: success
+
+- name: C args tearoff
+  arguments:
+    - trash/test.txt
+  type: success
+
+
+- name: C args tearoff 2
+  arguments:
+    - -c
+    - 'echo  $1 $2 $3 $#'
+    - as
+    - de
+  type: success
+
+- name: C args teroff 3
+  arguments:
+    - -c
+    - 'echo  $1 $2 $3 $#'
+  type: success
+
+- name: C args teroff 3
+  input: 'echo $1 $2 $#'
+  type: success
+
+- name: Long args
+  arguments:
+    - yaml_tests/sample_script/long_args.sh
+  type: success
+  timeout: 5

@@ -57,6 +57,6 @@ else_clause - DONE:        'else' compound_list
 
 do_group - DONE:    'do' compound_list 'done'
 
-case_clause:     case_item (';;' ('\n')* case_item)* [;;] ('\n')*
+case_clause:     case_item (';;' ('\n')* case_item)* (';;'|'\n') ('\n')*
 
 case_item:    ['('] WORD ('|' WORD)* ')' ( ('\n')* | compound_list )

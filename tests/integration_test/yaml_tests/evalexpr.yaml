@@ -1,0 +1,10 @@
+- name: simple evalexpr
+  input: |
+    echo $((1+2))
+  type: success
+
+- name: vars evalexpr
+  input: |
+    i=5
+    echo $(( i * (i+2) / 8 ))
+  type: success
