@@ -1,5 +1,9 @@
 # 42-SH
 
+A ksh-like shell in C. 
+
+Bash language lexer/parser integrated. echo, cd, dot, exit, export, pwd, unset builtins recreated from scratch.
+
 42sh project for S5 at EPITA.
 
 > Ended 18/12/2021
