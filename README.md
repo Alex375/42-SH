@@ -1,6 +1,6 @@
 # 42-SH
 
-A ksh-like shell in C. 
+A dash-like shell in C. 
 
 Bash language lexer/parser integrated. echo, cd, dot, exit, export, pwd, unset builtins recreated from scratch.
 
